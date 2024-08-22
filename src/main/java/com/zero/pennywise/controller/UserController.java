@@ -19,6 +19,7 @@ public class UserController {
 
   private final UserService userService;
 
+  // 회원가입
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid RegisterDTO registerDTO) {
     Response result = userService.register(registerDTO);
@@ -26,6 +27,7 @@ public class UserController {
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
 
+  // 로그인
   @PostMapping("/login")
   public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
       HttpServletRequest request) {

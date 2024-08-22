@@ -31,6 +31,7 @@ public class RegisterDTO {
         .build();
   }
 
+  // 전화번호 formatting
   public static String formatPhoneNumber(String phoneNumber) {
     return phoneNumber.substring(0, 3) + "-" +
         phoneNumber.substring(3, 7) + "-" +

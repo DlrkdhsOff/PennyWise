@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+  // DTO 객체로 받는 매개변수 값에 null 값이 존재할 경우 처리하는 메서드
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
     StringBuilder errors = new StringBuilder();
