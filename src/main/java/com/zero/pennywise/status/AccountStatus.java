@@ -21,7 +21,11 @@ public enum AccountStatus {
 
   // 회원 정보 수정
   PARAMETER_IS_NULL(HttpStatus.BAD_REQUEST, "회원 정보 수정에 실패 했습니다."),
-  UPDATE_SUCCESS(HttpStatus.OK, "회원 정보가 성공적으로 수정되었습니다.");
+  UPDATE_SUCCESS(HttpStatus.OK, "회원 정보가 성공적으로 수정되었습니다."),
+
+  // 회원 탈퇴
+  ACCOUNT_DELETION_SUCCESS(HttpStatus.OK, "계정이 영구적으로 삭제 되었습니다."),
+  ACCOUNT_DELETION_FAILED(HttpStatus.OK, "회원 탈퇴중 문제가 생겼습니다. 다시 시도 해주세요");
 
   private final HttpStatus status;
   private final String message;

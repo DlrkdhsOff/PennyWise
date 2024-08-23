@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,7 +59,17 @@ public class UserController {
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
 
+  @DeleteMapping("/delete")
+  public ResponseEntity<String> delete(HttpServletRequest request) {
+    String email = (String) request.getSession().getAttribute("email");
 
+    if (email.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+    }
+
+    Response result = userService.delete(email);
+    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+  }
 
 }
 

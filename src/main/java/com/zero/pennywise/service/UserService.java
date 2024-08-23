@@ -89,6 +89,17 @@ public class UserService {
     return new Response(AccountStatus.UPDATE_SUCCESS);
   }
 
+
+  public Response delete(String email) {
+
+    if (!userRepository.existsByEmail(email)) {
+      userRepository.deleteByEmail(email);
+      return new Response(AccountStatus.ACCOUNT_DELETION_SUCCESS);
+    }
+
+    return new Response(AccountStatus.ACCOUNT_DELETION_FAILED);
+  }
+
   // 전화 번호 유효성 확인
   public Response validatePhoneNumber(String phone) {
     if (!phone.matches("^[0-9]+$")) {
