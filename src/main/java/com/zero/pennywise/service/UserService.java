@@ -23,13 +23,12 @@ public class UserService {
       return new Response(AccountStatus.REGISTER_FAILED_DUPLICATE_ID);
     }
 
-    // 전화번호에 유효하지 않은 문자 유무 확인
-    if (!registerDTO.getPhone().matches("^[0-9]+$")) {
-      return new Response(AccountStatus.PHONE_NUMBER_CONTAINS_INVALID_CHARACTERS);
+    Response response = validatePhoneNumber(registerDTO.getPhone());
 
-    // 전화번호 길이 확인
-    } else if (registerDTO.getPhone().length() > 11) {
-      return new Response(AccountStatus.PHONE_NUMBER_INVALID);
+    if (response != null) {
+      return response;
+    } else {
+      registerDTO.setPhone(registerDTO.getPhone());
     }
 
     UserEntity userEntity = RegisterDTO.of(registerDTO);
@@ -54,5 +53,24 @@ public class UserService {
     }
 
     return new Response(AccountStatus.LOGIN_SUCCESS);
+  }
+
+
+  // 전화 번호 유효성 확인
+  public Response validatePhoneNumber(String phone) {
+    if (!phone.matches("^[0-9]+$")) {
+      return new Response(AccountStatus.PHONE_NUMBER_CONTAINS_INVALID_CHARACTERS);
+    } else if (phone.length() > 11) {
+      return new Response(AccountStatus.PHONE_NUMBER_INVALID);
+    }
+
+    return null;
+  }
+
+  // 전화번호 formatting
+  public String formatPhoneNumber(String phoneNumber) {
+    return phoneNumber.substring(0, 3) + "-" +
+        phoneNumber.substring(3, 7) + "-" +
+        phoneNumber.substring(7);
   }
 }

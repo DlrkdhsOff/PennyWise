@@ -16,7 +16,8 @@ public enum AccountStatus {
   // 로그인
   LOGIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
   USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다."),
-  PASSWORD_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+  PASSWORD_DOES_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+  NOT_LOGGED_IN(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
 
   private final HttpStatus status;
   private final String message;

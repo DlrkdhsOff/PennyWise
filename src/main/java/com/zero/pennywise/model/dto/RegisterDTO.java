@@ -26,15 +26,8 @@ public class RegisterDTO {
         .email(registerDTO.getEmail())
         .password(registerDTO.getPassword())
         .username(registerDTO.getUsername())
-        .phone(formatPhoneNumber(registerDTO.getPhone()))
+        .phone(registerDTO.getPhone())
         .build();
-  }
-
-  // 전화번호 formatting
-  public static String formatPhoneNumber(String phoneNumber) {
-    return phoneNumber.substring(0, 3) + "-" +
-        phoneNumber.substring(3, 7) + "-" +
-        phoneNumber.substring(7);
   }
 
 }
