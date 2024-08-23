@@ -1,14 +1,14 @@
 package com.zero.pennywise.controller;
 
-import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.service.BudgetTrackerService;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +19,7 @@ public class BudgetTrackerController {
 
   private final BudgetTrackerService budgetTrackerService;
 
+  // 카테고리 목록 출력
   @GetMapping("/categories")
   public ResponseEntity<?> category(HttpServletRequest request) {
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -31,4 +32,5 @@ public class BudgetTrackerController {
 
     return ResponseEntity.ok(categoryList);
   }
+
 }

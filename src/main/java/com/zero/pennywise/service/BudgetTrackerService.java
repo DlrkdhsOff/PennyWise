@@ -1,6 +1,5 @@
 package com.zero.pennywise.service;
 
-import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.repository.BudgetRepository;
