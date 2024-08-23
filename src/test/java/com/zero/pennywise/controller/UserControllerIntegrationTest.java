@@ -111,4 +111,96 @@ class UserControllerIntegrationTest {
         .andExpect(content().string(INVALID_PHONE_LENGTH_MSG));
   }
 
+  // 회원 정보 수정 성공
+  @Test
+  @Transactional
+  void testUpdate_Success() throws Exception {
+    RegisterDTO registerDTO = createRegisterDTO("updateUser@example.com", "1111", "user1",
+        "01012345678");
+
+    mockMvc.perform(post("/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(content().string(REGISTER_SUCCESS_MSG));
+
+    UpdateDTO updateDTO = createUpdateDTO("newPassword", "newUser1", "01098765432");
+
+    mockMvc.perform(post("/update")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateDTO))
+            .sessionAttr("email", "updateUser@example.com"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(UPDATE_SUCCESS_MSG));
+  }
+
+
+  // 회원 정보 수정 실패 : 요효하지 않은 문자 포함
+  @Test
+  @Transactional
+  void testUpdate_InvalidPhoneCharacters() throws Exception {
+    RegisterDTO registerDTO = createRegisterDTO("userForUpdate@example.com", "1111", "user1",
+        "01012345678");
+
+    mockMvc.perform(post("/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(content().string(REGISTER_SUCCESS_MSG));
+
+    UpdateDTO updateDTO = createUpdateDTO("newPassword", "newUser1", "010-1234-5678");
+
+    mockMvc.perform(post("/update")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateDTO))
+            .sessionAttr("email", "userForUpdate@example.com"))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(INVALID_PHONE_CHAR_MSG));
+  }
+
+  // 회원 정보 수정 실패 : 요효하지 않은 전화번호 길이
+  @Test
+  @Transactional
+  void testUpdate_InvalidPhoneLength() throws Exception {
+    RegisterDTO registerDTO = createRegisterDTO("userForUpdate@example.com", "1111", "user1",
+        "01012345678");
+
+    mockMvc.perform(post("/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(content().string(REGISTER_SUCCESS_MSG));
+
+    UpdateDTO updateDTO = createUpdateDTO("newPassword", "newUser1", "010123456789");
+
+    mockMvc.perform(post("/update")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateDTO))
+            .sessionAttr("email", "userForUpdate@example.com"))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(INVALID_PHONE_LENGTH_MSG));
+  }
+
+  // 회원 정보 수정 실패 : 매개변수가 전부 빈 값인 경우
+  @Test
+  @Transactional
+  void testUpdate_ParameterIsNull() throws Exception {
+    RegisterDTO registerDTO = createRegisterDTO("userForUpdate@example.com", "1111", "user1",
+        "01012345678");
+
+    mockMvc.perform(post("/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerDTO)))
+        .andExpect(status().isCreated())
+        .andExpect(content().string(REGISTER_SUCCESS_MSG));
+
+    UpdateDTO updateDTO = createUpdateDTO("", "", "");
+
+    mockMvc.perform(post("/update")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateDTO))
+            .sessionAttr("email", "userForUpdate@example.com"))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(PARAMETER_IS_NULL_MSG));
+  }
 }
