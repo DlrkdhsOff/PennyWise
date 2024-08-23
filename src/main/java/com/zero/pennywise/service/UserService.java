@@ -3,18 +3,26 @@ package com.zero.pennywise.service;
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
+import com.zero.pennywise.model.entity.BudgetEntity;
+import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.Response;
+import com.zero.pennywise.repository.BudgetRepository;
+import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.status.AccountStatus;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
   private final UserRepository userRepository;
+  private final CategoriesRepository categoriesRepository;
+  private final BudgetRepository budgetRepository;
 
   // 회원 가입
   public Response register(RegisterDTO registerDTO) {
@@ -32,8 +40,10 @@ public class UserService {
       registerDTO.setPhone(registerDTO.getPhone());
     }
 
-    UserEntity userEntity = RegisterDTO.of(registerDTO);
-    userRepository.save(userEntity);
+    UserEntity user = RegisterDTO.of(registerDTO);
+    userRepository.save(user);
+
+    createDefaultBudget(user.getId());
 
     return new Response(AccountStatus.REGISTER_SUCCESS);
   }
@@ -89,7 +99,7 @@ public class UserService {
     return new Response(AccountStatus.UPDATE_SUCCESS);
   }
 
-
+  // 회원 탈퇴
   public Response delete(String email) {
 
     if (!userRepository.existsByEmail(email)) {
@@ -98,6 +108,25 @@ public class UserService {
     }
 
     return new Response(AccountStatus.ACCOUNT_DELETION_FAILED);
+  }
+
+  // 회원 가입시 기본 예산 생성
+  @Transactional
+  public void createDefaultBudget(Long id) {
+    try {
+      List<CategoriesEntity> categoryList = categoriesRepository.findAllByShared(true);
+
+      for (CategoriesEntity categories : categoryList) {
+        budgetRepository.save(BudgetEntity.builder()
+            .userId(id)
+            .categoryId(categories.getCategoryId())
+            .build());
+      }
+    } catch (Exception e) {
+      e.printStackTrace(); // 예외를 콘솔에 출력
+      // 또는 로그를 사용해 기록
+      // log.error("Error saving budget entity", e);
+    }
   }
 
   // 전화 번호 유효성 확인

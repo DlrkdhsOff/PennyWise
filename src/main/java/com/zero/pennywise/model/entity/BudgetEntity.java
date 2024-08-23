@@ -9,12 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity(name = "budgets")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 public class BudgetEntity extends DateEntity{
 
   @Id
@@ -22,11 +24,11 @@ public class BudgetEntity extends DateEntity{
   private Long budgetId;
 
   @Column(nullable = false)
-  private String userId;
+  private Long userId;
 
   @Column(nullable = false)
   private Long categoryId;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private Long amount;
 }
