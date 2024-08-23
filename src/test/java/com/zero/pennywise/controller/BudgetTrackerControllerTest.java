@@ -1,18 +1,19 @@
 package com.zero.pennywise.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zero.pennywise.PennyWiseApplication;
-import com.zero.pennywise.model.entity.BudgetEntity;
+import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
+import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.service.BudgetTrackerService;
 import jakarta.transaction.Transactional;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,19 +45,9 @@ class BudgetTrackerControllerTest {
   private Long userId;
 
   @BeforeEach
+
   void setup() {
-    // 테스트 데이터 설정
     userId = 1L;
-
-    // 카테고리 생성
-    CategoriesEntity category1 = new CategoriesEntity(null, "Food", true);
-    CategoriesEntity category2 = new CategoriesEntity(null, "Transport", true);
-    categoriesRepository.saveAll(Arrays.asList(category1, category2));
-
-    // 예산 항목 생성
-    BudgetEntity budget1 = new BudgetEntity(null, userId, category1.getCategoryId(), 10000L);
-    BudgetEntity budget2 = new BudgetEntity(null, userId, category2.getCategoryId(), 5000L);
-    budgetRepository.saveAll(Arrays.asList(budget1, budget2));
   }
 
   // 카테고리 목록 출력 테스트
@@ -78,5 +69,39 @@ class BudgetTrackerControllerTest {
     mockMvc.perform(get("/budgets/categories"))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("로그인을 해주세요"));
+  }
+
+  // 카테고리 추가 테스트
+  @Test
+  @Transactional
+  void testCreateCategory() throws Exception {
+    CategoryDTO newCategory = new CategoryDTO();
+    newCategory.setCategoryName("배달");
+
+    // 응답 상태 및 메시지 확인
+    mockMvc.perform(post("/budgets/create-category")
+            .sessionAttr("userId", userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(newCategory)))
+        .andExpect(status().isCreated())
+        .andExpect(content().string("카테고리를 생성하였습니다."));
+  }
+
+  // 이미 존재하는 카테고리를 추가하려는 경우
+  @Test
+  @Transactional
+  void testCreateCategory_AlreadyExists() throws Exception {
+    CategoryDTO existingCategory = new CategoryDTO();
+    existingCategory.setCategoryName("통신비");
+
+    Response response = budgetTrackerService.createCategory(userId, existingCategory);
+
+    // 응답 상태 및 메시지 확인
+    mockMvc.perform(post("/budgets/create-category")
+            .sessionAttr("userId", userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(existingCategory)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(response.getMessage()));
   }
 }
