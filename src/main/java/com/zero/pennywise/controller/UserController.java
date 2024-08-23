@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +44,7 @@ public class UserController {
 
 
   // 회원 정보 수정
-  @PostMapping("/update")
+  @PatchMapping("/update")
   public ResponseEntity<String> update(@RequestBody @Valid UpdateDTO updateDTO,
       HttpServletRequest request) {
 
@@ -56,6 +57,8 @@ public class UserController {
     Response result = userService.update(email, updateDTO);
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
+
+
 
 }
 
