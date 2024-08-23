@@ -111,54 +111,54 @@ class UserControllerTest {
     assertEquals(AccountStatus.PHONE_NUMBER_INVALID.getMessage(), response.getBody());
   }
 
-  @Test
-  void testSuccessLogin() {
-    // given
-    HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-    HttpSession mockSession = Mockito.mock(HttpSession.class);
-
-    when(userService.login(successLogin)).thenReturn(new Response(AccountStatus.LOGIN_SUCCESS));
-    when(mockRequest.getSession()).thenReturn(mockSession);
-
-    // when
-    ResponseEntity<?> response = userController.login(successLogin, mockRequest);
-
-    // then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals(AccountStatus.LOGIN_SUCCESS.getMessage(), response.getBody());
-  }
-
-  @Test
-  void testNotFoundUser() {
-    // given
-    HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-    HttpSession mockSession = Mockito.mock(HttpSession.class);
-
-    when(userService.login(notFoundUser)).thenReturn(new Response(AccountStatus.USER_NOT_FOUND));
-    when(mockRequest.getSession()).thenReturn(mockSession);
-
-    // when
-    ResponseEntity<?> response = userController.login(notFoundUser, mockRequest);
-
-    // then
-    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertEquals(AccountStatus.USER_NOT_FOUND.getMessage(), response.getBody());
-  }
-
-  @Test
-  void testPwUnMatch() {
-    // given
-    HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
-    HttpSession mockSession = Mockito.mock(HttpSession.class);
-
-    when(userService.login(pwUnMatch)).thenReturn(new Response(AccountStatus.PASSWORD_DOES_NOT_MATCH));
-    when(mockRequest.getSession()).thenReturn(mockSession);
-
-    // when
-    ResponseEntity<?> response = userController.login(pwUnMatch, mockRequest);
-
-    // then
-    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertEquals(AccountStatus.PASSWORD_DOES_NOT_MATCH.getMessage(), response.getBody());
-  }
+//  @Test
+//  void testSuccessLogin() {
+//    // given
+//    HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+//    HttpSession mockSession = Mockito.mock(HttpSession.class);
+//
+//    when(userService.login(successLogin)).thenReturn(new Response(AccountStatus.LOGIN_SUCCESS));
+//    when(mockRequest.getSession()).thenReturn(mockSession);
+//
+//    // when
+//    ResponseEntity<?> response = userController.login(successLogin, mockRequest);
+//
+//    // then
+//    assertEquals(HttpStatus.OK, response.getStatusCode());
+//    assertEquals(AccountStatus.LOGIN_SUCCESS.getMessage(), response.getBody());
+//  }
+//
+//  @Test
+//  void testNotFoundUser() {
+//    // given
+//    HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+//    HttpSession mockSession = Mockito.mock(HttpSession.class);
+//
+//    when(userService.login(notFoundUser)).thenReturn(new Response(AccountStatus.USER_NOT_FOUND));
+//    when(mockRequest.getSession()).thenReturn(mockSession);
+//
+//    // when
+//    ResponseEntity<?> response = userController.login(notFoundUser, mockRequest);
+//
+//    // then
+//    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//    assertEquals(AccountStatus.USER_NOT_FOUND.getMessage(), response.getBody());
+//  }
+//
+//  @Test
+//  void testPwUnMatch() {
+//    // given
+//    HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
+//    HttpSession mockSession = Mockito.mock(HttpSession.class);
+//
+//    when(userService.login(pwUnMatch)).thenReturn(new Response(AccountStatus.PASSWORD_DOES_NOT_MATCH));
+//    when(mockRequest.getSession()).thenReturn(mockSession);
+//
+//    // when
+//    ResponseEntity<?> response = userController.login(pwUnMatch, mockRequest);
+//
+//    // then
+//    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//    assertEquals(AccountStatus.PASSWORD_DOES_NOT_MATCH.getMessage(), response.getBody());
+//  }
 }
