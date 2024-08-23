@@ -11,7 +11,9 @@ import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.status.AccountStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +51,7 @@ public class UserService {
   }
 
   // 로그인
-  public Response login(LoginDTO loginDTO) {
+  public Response login(LoginDTO loginDTO, HttpServletRequest request) {
 
     // 아이디 존재여부 확인
     if (!userRepository.existsByEmail(loginDTO.getEmail())) {
@@ -63,13 +65,20 @@ public class UserService {
       return new Response(AccountStatus.PASSWORD_DOES_NOT_MATCH);
     }
 
+    request.getSession().setAttribute("userId", user.getId());
     return new Response(AccountStatus.LOGIN_SUCCESS);
   }
 
   // 회원 정보 수정
-  public Response update(String email, UpdateDTO updateDTO) {
+  public Response update(Long userId, UpdateDTO updateDTO) {
     // 회원 정보 조회
-    UserEntity user = userRepository.findByEmail(email);
+    Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
+
+    if (optionalUserEntity.isEmpty()) {
+      return new Response(AccountStatus.USER_NOT_FOUND);
+    }
+
+    UserEntity user = optionalUserEntity.get();
 
     if (updateDTO == null || updateDTO.getPassword().isBlank() && updateDTO.getUsername().isBlank()
         && updateDTO.getPhone().isBlank()) {
@@ -77,7 +86,7 @@ public class UserService {
     }
 
     // 비밀번호 업데이트
-    if (updateDTO.getPassword() != null && !updateDTO.getPassword().isBlank()) {
+    if (!updateDTO.getPassword().isBlank()) {
       user.setPassword(updateDTO.getPassword());
     }
 
@@ -95,15 +104,16 @@ public class UserService {
       user.setPhone(updateDTO.getPhone());
     }
 
-    // 업데이트 완료 응답 반환
+    userRepository.save(user);
+
     return new Response(AccountStatus.UPDATE_SUCCESS);
   }
 
   // 회원 탈퇴
-  public Response delete(String email) {
+  public Response delete(Long userId) {
 
-    if (!userRepository.existsByEmail(email)) {
-      userRepository.deleteByEmail(email);
+    if (!userRepository.existsById(userId)) {
+      userRepository.deleteById(userId);
       return new Response(AccountStatus.ACCOUNT_DELETION_SUCCESS);
     }
 
@@ -111,21 +121,14 @@ public class UserService {
   }
 
   // 회원 가입시 기본 예산 생성
-  @Transactional
   public void createDefaultBudget(Long id) {
-    try {
-      List<CategoriesEntity> categoryList = categoriesRepository.findAllByShared(true);
+    List<CategoriesEntity> categoryList = categoriesRepository.findAllByShared(true);
 
-      for (CategoriesEntity categories : categoryList) {
-        budgetRepository.save(BudgetEntity.builder()
-            .userId(id)
-            .categoryId(categories.getCategoryId())
-            .build());
-      }
-    } catch (Exception e) {
-      e.printStackTrace(); // 예외를 콘솔에 출력
-      // 또는 로그를 사용해 기록
-      // log.error("Error saving budget entity", e);
+    for (CategoriesEntity categories : categoryList) {
+      budgetRepository.save(BudgetEntity.builder()
+          .userId(id)
+          .categoryId(categories.getCategoryId())
+          .build());
     }
   }
 

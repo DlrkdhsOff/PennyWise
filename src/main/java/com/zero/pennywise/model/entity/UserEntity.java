@@ -35,8 +35,4 @@ public class UserEntity extends DateEntity{
 
   @Column(nullable = false)
   private String phone;
-
-//  @Column(nullable = false)
-//  private LocalDate createdAt;
-
 }
