@@ -2,6 +2,7 @@ package com.zero.pennywise.service;
 
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
+import com.zero.pennywise.model.dto.UpdateDTO;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.repository.UserRepository;
@@ -55,6 +56,38 @@ public class UserService {
     return new Response(AccountStatus.LOGIN_SUCCESS);
   }
 
+  // 회원 정보 수정
+  public Response update(String email, UpdateDTO updateDTO) {
+    // 회원 정보 조회
+    UserEntity user = userRepository.findByEmail(email);
+
+    if (updateDTO == null || updateDTO.getPassword().isBlank() && updateDTO.getUsername().isBlank()
+        && updateDTO.getPhone().isBlank()) {
+      return new Response(AccountStatus.PARAMETER_IS_NULL);
+    }
+
+    // 비밀번호 업데이트
+    if (updateDTO.getPassword() != null && !updateDTO.getPassword().isBlank()) {
+      user.setPassword(updateDTO.getPassword());
+    }
+
+    // 사용자 이름 업데이트
+    if (updateDTO.getUsername() != null && !updateDTO.getUsername().isBlank()) {
+      user.setUsername(updateDTO.getUsername());
+    }
+
+    // 전화번호 업데이트
+    if (updateDTO.getPhone() != null && !updateDTO.getPhone().isBlank()) {
+      Response validationResponse = validatePhoneNumber(updateDTO.getPhone());
+      if (validationResponse != null) {
+        return validationResponse;
+      }
+      user.setPhone(updateDTO.getPhone());
+    }
+
+    // 업데이트 완료 응답 반환
+    return new Response(AccountStatus.UPDATE_SUCCESS);
+  }
 
   // 전화 번호 유효성 확인
   public Response validatePhoneNumber(String phone) {
