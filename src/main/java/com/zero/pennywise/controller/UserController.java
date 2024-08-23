@@ -49,20 +49,12 @@ public class UserController {
 
     String email = (String) request.getSession().getAttribute("email");
 
-    if (isLogin(email)) {
+    if (email.isEmpty()) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
     }
 
     Response result = userService.update(email, updateDTO);
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
-  }
-
-  public boolean isLogin(String email) {
-    if (email.isEmpty()) {
-      return true;
-    }
-
-    return false;
   }
 
 }
