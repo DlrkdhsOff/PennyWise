@@ -121,12 +121,12 @@ public class UserService {
   }
 
   // 회원 가입시 기본 예산 생성
-  public void createDefaultBudget(Long id) {
+  public void createDefaultBudget(Long userId) {
     List<CategoriesEntity> categoryList = categoriesRepository.findAllByShared(true);
 
     for (CategoriesEntity categories : categoryList) {
       budgetRepository.save(BudgetEntity.builder()
-          .userId(id)
+          .userId(userId)
           .categoryId(categories.getCategoryId())
           .build());
     }

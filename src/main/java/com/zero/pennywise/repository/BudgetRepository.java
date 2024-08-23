@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
 
   List<BudgetEntity> findAllByUserId(Long userId);
+
+  boolean existsByUserIdAndCategoryId(Long userId, Long categoryId);
 }

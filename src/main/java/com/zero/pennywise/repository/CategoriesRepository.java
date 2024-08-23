@@ -9,4 +9,8 @@ import java.util.*;
 public interface CategoriesRepository extends JpaRepository<CategoriesEntity, Long> {
 
   List<CategoriesEntity> findAllByShared(boolean Shared);
+
+  CategoriesEntity findByCategoryName(String categoryName);
+
+  boolean existsByCategoryName(String category);
 }
