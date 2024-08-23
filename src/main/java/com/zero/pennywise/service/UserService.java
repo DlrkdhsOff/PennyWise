@@ -19,7 +19,7 @@ public class UserService {
   public Response register(RegisterDTO registerDTO) {
 
     // 중복 아이디 체크
-    if (userRepository.existsByUserId(registerDTO.getUserId())) {
+    if (userRepository.existsByEmail(registerDTO.getEmail())) {
       return new Response(AccountStatus.REGISTER_FAILED_DUPLICATE_ID);
     }
 
@@ -42,11 +42,11 @@ public class UserService {
   public Response login(LoginDTO loginDTO) {
 
     // 아이디 존재여부 확인
-    if (!userRepository.existsByUserId(loginDTO.getUserId())) {
+    if (!userRepository.existsByEmail(loginDTO.getEmail())) {
       return new Response(AccountStatus.USER_NOT_FOUND);
     }
 
-    UserEntity user = userRepository.findByUserId(loginDTO.getUserId());
+    UserEntity user = userRepository.findByEmail(loginDTO.getEmail());
 
     // 비밀번호 일치 확인
     if (!user.getPassword().equals(loginDTO.getPassword())) {

@@ -34,7 +34,7 @@ public class UserController {
     Response result = userService.login(loginDTO);
 
     if (result.getStatus() == HttpStatus.OK) {
-      request.getSession().setAttribute("userId", loginDTO.getUserId());
+      request.getSession().setAttribute("userId", loginDTO.getEmail());
     }
 
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());

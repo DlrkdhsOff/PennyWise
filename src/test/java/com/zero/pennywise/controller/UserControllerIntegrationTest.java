@@ -29,7 +29,7 @@ class UserControllerIntegrationTest {
   @Transactional
   void testRegister_Success() throws Exception {
     RegisterDTO registerDTO = new RegisterDTO();
-    registerDTO.setUserId("newUser");
+    registerDTO.setEmail("newUser");
     registerDTO.setPassword("1111");
     registerDTO.setUsername("user1");
     registerDTO.setPhone("01012345678");
@@ -45,7 +45,7 @@ class UserControllerIntegrationTest {
   @Transactional
   void testRegister_DuplicateId() throws Exception {
     RegisterDTO registerDTO = new RegisterDTO();
-    registerDTO.setUserId("duplicateUser");
+    registerDTO.setEmail("duplicateUser");
     registerDTO.setPassword("1111");
     registerDTO.setUsername("user1");
     registerDTO.setPhone("01012345678");
@@ -66,7 +66,7 @@ class UserControllerIntegrationTest {
   @Test
   void testRegister_InvalidPhoneCharacters() throws Exception {
     RegisterDTO registerDTO = new RegisterDTO();
-    registerDTO.setUserId("validUser");
+    registerDTO.setEmail("validUser");
     registerDTO.setPassword("1111");
     registerDTO.setUsername("user1");
     registerDTO.setPhone("010-1234-5678");
@@ -81,7 +81,7 @@ class UserControllerIntegrationTest {
   @Test
   void testRegister_InvalidPhoneLength() throws Exception {
     RegisterDTO registerDTO = new RegisterDTO();
-    registerDTO.setUserId("validUser");
+    registerDTO.setEmail("validUser");
     registerDTO.setPassword("1111");
     registerDTO.setUsername("user1");
     registerDTO.setPhone("0101234567890");

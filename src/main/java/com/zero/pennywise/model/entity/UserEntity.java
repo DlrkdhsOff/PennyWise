@@ -2,6 +2,8 @@ package com.zero.pennywise.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -14,10 +16,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class UserEntity {
+public class UserEntity extends DateEntity{
+
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
   @Column(length = 50)
-  private String userId;
+  private String email;
 
   @Column(nullable = false, length = 50)
   private String password;
@@ -28,7 +34,7 @@ public class UserEntity {
   @Column(nullable = false)
   private String phone;
 
-  @Column(nullable = false)
-  private LocalDate createdAt;
+//  @Column(nullable = false)
+//  private LocalDate createdAt;
 
 }
