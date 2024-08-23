@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class RegisterDTO {
 
   @NotBlank(message = "아이디를 입력해주세요.")
-  private String userId;
+  private String email;
   @NotBlank(message = "비밀번호를 입력해주세요.")
   private String password;
   @NotBlank(message = "이름을 입력해주세요.")
@@ -23,19 +23,11 @@ public class RegisterDTO {
 
   public static UserEntity of(RegisterDTO registerDTO) {
     return UserEntity.builder()
-        .userId(registerDTO.getUserId())
+        .email(registerDTO.getEmail())
         .password(registerDTO.getPassword())
         .username(registerDTO.getUsername())
-        .phone(formatPhoneNumber(registerDTO.getPhone()))
-        .createdAt(LocalDate.now())
+        .phone(registerDTO.getPhone())
         .build();
-  }
-
-  // 전화번호 formatting
-  public static String formatPhoneNumber(String phoneNumber) {
-    return phoneNumber.substring(0, 3) + "-" +
-        phoneNumber.substring(3, 7) + "-" +
-        phoneNumber.substring(7);
   }
 
 }
