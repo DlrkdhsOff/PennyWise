@@ -1,5 +1,6 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
@@ -20,6 +21,7 @@ public class BudgetTrackerService {
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
 
+  // 카테고리 목록
   public List<CategoriesEntity> getCategoryList(Long userId) {
     List<BudgetEntity> budgetList = budgetRepository.findAllByUserId(userId);
 
@@ -33,6 +35,7 @@ public class BudgetTrackerService {
     return categoryList;
   }
 
+  // 카테고리 생성
   public Response createCategory(Long userId, CategoryDTO categoryDTO) {
     if (categoriesRepository.existsByCategoryName(categoryDTO.getCategoryName())) {
       CategoriesEntity category = categoriesRepository.findByCategoryName(categoryDTO.getCategoryName());
@@ -53,6 +56,19 @@ public class BudgetTrackerService {
     return new Response(BudgetTrackerStatus.SUCCESS_CREATE_CATEGORY);
   }
 
+  // 카테고리별 예산 설정
+  public Response setBudget(Long userId, BudgetDTO budgetDTO) {
+    CategoriesEntity category = categoriesRepository.findByCategoryName(budgetDTO.getCategoryName());
+
+    BudgetEntity budget = budgetRepository.findByUserIdAndCategoryId(userId,
+        category.getCategoryId());
+
+    budget.setAmount(budgetDTO.getAmount());
+    budgetRepository.save(budget);
+
+    return new Response(BudgetTrackerStatus.SUCCESS_SET_BUDGET);
+  }
+
 
   // 기본 예산 생성 메서드
   public void createBudget(Long userId, CategoriesEntity category) {
@@ -61,4 +77,5 @@ public class BudgetTrackerService {
         .categoryId(category.getCategoryId())
         .build());
   }
+
 }
