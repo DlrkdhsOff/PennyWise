@@ -4,6 +4,8 @@ import com.zero.pennywise.model.entity.TransactionEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -34,5 +36,6 @@ public class TransactionDTO {
         .isFixed(transactionDTO.getIsFixed().equals("Y"))
         .build();
   }
+
 
 }

@@ -15,7 +15,8 @@ public enum BudgetTrackerStatus {
 
   SUCCESS_SET_BUDGET(HttpStatus.OK, "성공적으로 예산을 설정 했습니다."),
 
-  SUCCESS_TRANSACTION_REGISTRATION(HttpStatus.OK, "거래 등록 성공");
+  SUCCESS_TRANSACTION_REGISTRATION(HttpStatus.OK, "거래 등록 성공"),
+  TRANSACTIONS_NOT_FOUND(HttpStatus.NOT_FOUND, "거래내역이 존재 하지 않습니다.");
 
   private final HttpStatus status;
   private final String message;

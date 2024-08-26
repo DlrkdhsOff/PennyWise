@@ -6,9 +6,11 @@ import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.response.Response;
+import com.zero.pennywise.model.response.TransactionList;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
+import com.zero.pennywise.repository.view.V_TransactionRepository;
 import com.zero.pennywise.status.BudgetTrackerStatus;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ public class BudgetTrackerService {
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
   private final TransactionRepository transactionRepository;
+  private final V_TransactionRepository v_transactionRepository;
 
   // 카테고리 목록
   public List<String> getCategoryList(Long userId) {
@@ -69,6 +72,14 @@ public class BudgetTrackerService {
     return new Response(BudgetTrackerStatus.SUCCESS_CREATE_CATEGORY);
   }
 
+  // 기본 예산 생성 메서드
+  private void createBudget(Long userId, CategoriesEntity category) {
+    budgetRepository.save(BudgetEntity.builder()
+        .userId(userId)
+        .categoryId(category.getCategoryId())
+        .build());
+  }
+
 
   // 카테고리별 예산 설정
   public Response setBudget(Long userId, BudgetDTO budgetDTO) {
@@ -104,12 +115,19 @@ public class BudgetTrackerService {
         .orElse(new Response(BudgetTrackerStatus.CATEGORY_NOT_FOUND));
   }
 
+  // 수입 / 지출 내역
+  public Object getTransactionList(Long userId, String categoryName) {
+    // 전체 거래 내역 / 카테고리별 거래 내역
+    List<TransactionList> transactions = (categoryName == null || categoryName.isBlank())
+        ? TransactionList.of(v_transactionRepository.findAllByUserId(userId))
+        : TransactionList.of(v_transactionRepository.findAllByUserIdAndCategoryName(userId, categoryName));
 
-  // 기본 예산 생성 메서드
-  private void createBudget(Long userId, CategoriesEntity category) {
-    budgetRepository.save(BudgetEntity.builder()
-        .userId(userId)
-        .categoryId(category.getCategoryId())
-        .build());
+    if (transactions.isEmpty()) {
+      return new Response(categoryName != null
+          ? BudgetTrackerStatus.CATEGORY_NOT_FOUND
+          : BudgetTrackerStatus.TRANSACTIONS_NOT_FOUND);
+    }
+    return transactions;
   }
+
 }
