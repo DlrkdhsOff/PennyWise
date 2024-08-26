@@ -3,10 +3,17 @@ package com.zero.pennywise.service;
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
+import com.zero.pennywise.model.entity.BudgetEntity;
+import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.Response;
+import com.zero.pennywise.repository.BudgetRepository;
+import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.status.AccountStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +22,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final CategoriesRepository categoriesRepository;
+  private final BudgetRepository budgetRepository;
 
   // 회원 가입
   public Response register(RegisterDTO registerDTO) {
@@ -32,14 +41,16 @@ public class UserService {
       registerDTO.setPhone(registerDTO.getPhone());
     }
 
-    UserEntity userEntity = RegisterDTO.of(registerDTO);
-    userRepository.save(userEntity);
+    UserEntity user = RegisterDTO.of(registerDTO);
+    userRepository.save(user);
+
+    createDefaultBudget(user.getId());
 
     return new Response(AccountStatus.REGISTER_SUCCESS);
   }
 
   // 로그인
-  public Response login(LoginDTO loginDTO) {
+  public Response login(LoginDTO loginDTO, HttpServletRequest request) {
 
     // 아이디 존재여부 확인
     if (!userRepository.existsByEmail(loginDTO.getEmail())) {
@@ -53,13 +64,20 @@ public class UserService {
       return new Response(AccountStatus.PASSWORD_DOES_NOT_MATCH);
     }
 
+    request.getSession().setAttribute("userId", user.getId());
     return new Response(AccountStatus.LOGIN_SUCCESS);
   }
 
   // 회원 정보 수정
-  public Response update(String email, UpdateDTO updateDTO) {
+  public Response update(Long userId, UpdateDTO updateDTO) {
     // 회원 정보 조회
-    UserEntity user = userRepository.findByEmail(email);
+    Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
+
+    if (optionalUserEntity.isEmpty()) {
+      return new Response(AccountStatus.USER_NOT_FOUND);
+    }
+
+    UserEntity user = optionalUserEntity.get();
 
     if (updateDTO == null || updateDTO.getPassword().isBlank() && updateDTO.getUsername().isBlank()
         && updateDTO.getPhone().isBlank()) {
@@ -67,7 +85,7 @@ public class UserService {
     }
 
     // 비밀번호 업데이트
-    if (updateDTO.getPassword() != null && !updateDTO.getPassword().isBlank()) {
+    if (!updateDTO.getPassword().isBlank()) {
       user.setPassword(updateDTO.getPassword());
     }
 
@@ -85,19 +103,32 @@ public class UserService {
       user.setPhone(updateDTO.getPhone());
     }
 
-    // 업데이트 완료 응답 반환
+    userRepository.save(user);
+
     return new Response(AccountStatus.UPDATE_SUCCESS);
   }
 
+  // 회원 탈퇴
+  public Response delete(Long userId) {
 
-  public Response delete(String email) {
-
-    if (!userRepository.existsByEmail(email)) {
-      userRepository.deleteByEmail(email);
+    if (!userRepository.existsById(userId)) {
+      userRepository.deleteById(userId);
       return new Response(AccountStatus.ACCOUNT_DELETION_SUCCESS);
     }
 
     return new Response(AccountStatus.ACCOUNT_DELETION_FAILED);
+  }
+
+  // 회원 가입시 기본 예산 생성
+  public void createDefaultBudget(Long userId) {
+    List<CategoriesEntity> categoryList = categoriesRepository.findAllByShared(true);
+
+    for (CategoriesEntity categories : categoryList) {
+      budgetRepository.save(BudgetEntity.builder()
+          .userId(userId)
+          .categoryId(categories.getCategoryId())
+          .build());
+    }
   }
 
   // 전화 번호 유효성 확인

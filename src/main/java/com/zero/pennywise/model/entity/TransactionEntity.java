@@ -5,34 +5,43 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "Users")
-@AllArgsConstructor
+@Entity(name = "transactions")
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 @Setter
-public class UserEntity extends DateEntity{
+public class TransactionEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-
-  @Column(length = 50)
-  private String email;
-
-  @Column(nullable = false, length = 50)
-  private String password;
-
-  @Column(nullable = false, length = 50)
-  private String username;
+  private Long transactionId;
 
   @Column(nullable = false)
-  private String phone;
+  private Long userId;
+
+  @Column(nullable = false)
+  private Long categoryId;
+
+  @Column(nullable = false)
+  private String type;
+
+  @Column(nullable = false)
+  private Long amount;
+
+  private String description;
+
+  @Column(nullable = false)
+  private LocalDateTime date;
+
+  @Column(nullable = false)
+  private boolean isFixed;
+
 }

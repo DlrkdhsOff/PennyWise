@@ -34,11 +34,8 @@ public class UserController {
   @PostMapping("/login")
   public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
       HttpServletRequest request) {
-    Response result = userService.login(loginDTO);
+    Response result = userService.login(loginDTO, request);
 
-    if (result.getStatus() == HttpStatus.OK) {
-      request.getSession().setAttribute("email", loginDTO.getEmail());
-    }
 
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
@@ -49,25 +46,26 @@ public class UserController {
   public ResponseEntity<String> update(@RequestBody @Valid UpdateDTO updateDTO,
       HttpServletRequest request) {
 
-    String email = (String) request.getSession().getAttribute("email");
+    Long userId = (Long) request.getSession().getAttribute("userId");
 
-    if (email.isEmpty()) {
+    if (userId == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
     }
 
-    Response result = userService.update(email, updateDTO);
+    Response result = userService.update(userId, updateDTO);
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
 
+  // 회원 탈퇴
   @DeleteMapping("/delete")
   public ResponseEntity<String> delete(HttpServletRequest request) {
-    String email = (String) request.getSession().getAttribute("email");
+    Long userId = (Long) request.getSession().getAttribute("userId");
 
-    if (email.isEmpty()) {
+    if (userId == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
     }
 
-    Response result = userService.delete(email);
+    Response result = userService.delete(userId);
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
 

@@ -1,5 +1,6 @@
 package com.zero.pennywise.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -8,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zero.pennywise.PennyWiseApplication;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
+import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ class UserControllerIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @Autowired
+  private UserRepository userRepository;
 
   private RegisterDTO createRegisterDTO(String email, String password, String username,
       String phone) {
@@ -124,18 +130,19 @@ class UserControllerIntegrationTest {
         .andExpect(status().isCreated())
         .andExpect(content().string(REGISTER_SUCCESS_MSG));
 
+    UserEntity user = userRepository.findByEmail("updateUser@example.com");
+
     UpdateDTO updateDTO = createUpdateDTO("newPassword", "newUser1", "01098765432");
 
-    mockMvc.perform(post("/update")
+    mockMvc.perform(patch("/update")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updateDTO))
-            .sessionAttr("email", "updateUser@example.com"))
+            .sessionAttr("userId", user.getId()))
         .andExpect(status().isOk())
         .andExpect(content().string(UPDATE_SUCCESS_MSG));
   }
 
-
-  // 회원 정보 수정 실패 : 요효하지 않은 문자 포함
+  // 회원 정보 수정 실패 : 유효하지 않은 문자 포함
   @Test
   @Transactional
   void testUpdate_InvalidPhoneCharacters() throws Exception {
@@ -148,17 +155,19 @@ class UserControllerIntegrationTest {
         .andExpect(status().isCreated())
         .andExpect(content().string(REGISTER_SUCCESS_MSG));
 
+    UserEntity user = userRepository.findByEmail("userForUpdate@example.com");
+
     UpdateDTO updateDTO = createUpdateDTO("newPassword", "newUser1", "010-1234-5678");
 
-    mockMvc.perform(post("/update")
+    mockMvc.perform(patch("/update")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updateDTO))
-            .sessionAttr("email", "userForUpdate@example.com"))
+            .sessionAttr("userId", user.getId()))
         .andExpect(status().isBadRequest())
         .andExpect(content().string(INVALID_PHONE_CHAR_MSG));
   }
 
-  // 회원 정보 수정 실패 : 요효하지 않은 전화번호 길이
+  // 회원 정보 수정 실패 : 유효하지 않은 전화번호 길이
   @Test
   @Transactional
   void testUpdate_InvalidPhoneLength() throws Exception {
@@ -171,12 +180,14 @@ class UserControllerIntegrationTest {
         .andExpect(status().isCreated())
         .andExpect(content().string(REGISTER_SUCCESS_MSG));
 
+    UserEntity user = userRepository.findByEmail("userForUpdate@example.com");
+
     UpdateDTO updateDTO = createUpdateDTO("newPassword", "newUser1", "010123456789");
 
-    mockMvc.perform(post("/update")
+    mockMvc.perform(patch("/update")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updateDTO))
-            .sessionAttr("email", "userForUpdate@example.com"))
+            .sessionAttr("userId", user.getId()))
         .andExpect(status().isBadRequest())
         .andExpect(content().string(INVALID_PHONE_LENGTH_MSG));
   }
@@ -185,21 +196,27 @@ class UserControllerIntegrationTest {
   @Test
   @Transactional
   void testUpdate_ParameterIsNull() throws Exception {
+    // 사용자 등록
     RegisterDTO registerDTO = createRegisterDTO("userForUpdate@example.com", "1111", "user1",
         "01012345678");
 
+    // 회원가입 요청
     mockMvc.perform(post("/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(registerDTO)))
         .andExpect(status().isCreated())
         .andExpect(content().string(REGISTER_SUCCESS_MSG));
 
+    UserEntity user = userRepository.findByEmail("userForUpdate@example.com");
+
+    // UpdateDTO 생성
     UpdateDTO updateDTO = createUpdateDTO("", "", "");
 
-    mockMvc.perform(post("/update")
+    // 회원 정보 수정 요청
+    mockMvc.perform(patch("/update")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updateDTO))
-            .sessionAttr("email", "userForUpdate@example.com"))
+            .sessionAttr("userId", user.getId()))
         .andExpect(status().isBadRequest())
         .andExpect(content().string(PARAMETER_IS_NULL_MSG));
   }
