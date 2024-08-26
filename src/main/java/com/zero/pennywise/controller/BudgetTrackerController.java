@@ -28,14 +28,16 @@ public class BudgetTrackerController {
 
   // 카테고리 목록 출력
   @GetMapping("/categories")
-  public ResponseEntity<?> category(HttpServletRequest request) {
+  public ResponseEntity<?> category(HttpServletRequest request,
+      @RequestParam(name = "page", required = false) String page) {
+
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
     }
 
-    List<String> categoryList = budgetTrackerService.getCategoryList(userId);
+    List<String> categoryList = budgetTrackerService.getCategoryList(userId, page);
 
     return ResponseEntity.ok(categoryList);
   }
@@ -92,6 +94,7 @@ public class BudgetTrackerController {
   @GetMapping("/transaction-list")
   public ResponseEntity<?> getTransactionList(
       @RequestParam(name = "categoryName", required = false) String categoryName,
+      @RequestParam(name = "page", required = false) String page,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -100,6 +103,6 @@ public class BudgetTrackerController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
     }
 
-    return ResponseEntity.ok().body(budgetTrackerService.getTransactionList(userId, categoryName));
+    return ResponseEntity.ok().body(budgetTrackerService.getTransactionList(userId, categoryName, page));
   }
 }

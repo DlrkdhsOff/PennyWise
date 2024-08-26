@@ -1,17 +1,17 @@
 package com.zero.pennywise.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zero.pennywise.PennyWiseApplication;
+import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.dto.CategoryDTO;
-import com.zero.pennywise.model.entity.CategoriesEntity;
+import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.response.Response;
-import com.zero.pennywise.repository.BudgetRepository;
-import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.service.BudgetTrackerService;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -34,12 +34,6 @@ class BudgetTrackerControllerTest {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private BudgetRepository budgetRepository;
-
-  @Autowired
-  private CategoriesRepository categoriesRepository;
-
-  @Autowired
   private BudgetTrackerService budgetTrackerService;
 
   private Long userId;
@@ -54,7 +48,7 @@ class BudgetTrackerControllerTest {
   @Test
   @Transactional
   void testGetCategoryList() throws Exception {
-    List<CategoriesEntity> expectedCategories = budgetTrackerService.getCategoryList(userId);
+    List<String> expectedCategories = budgetTrackerService.getCategoryList(userId);
 
     mockMvc.perform(get("/budgets/categories")
             .sessionAttr("userId", userId))
@@ -76,7 +70,7 @@ class BudgetTrackerControllerTest {
   @Transactional
   void testCreateCategory() throws Exception {
     CategoryDTO newCategory = new CategoryDTO();
-    newCategory.setCategoryName("배달");
+    newCategory.setCategoryName("요리");
 
     // 응답 상태 및 메시지 확인
     mockMvc.perform(post("/budgets/create-category")
@@ -103,5 +97,87 @@ class BudgetTrackerControllerTest {
             .content(objectMapper.writeValueAsString(existingCategory)))
         .andExpect(status().isBadRequest())
         .andExpect(content().string(response.getMessage()));
+  }
+
+  // 카테고리별 예산 설정
+  @Test
+  @Transactional
+  void testSetBudget_Success() throws Exception {
+    BudgetDTO budgetDTO = new BudgetDTO();
+    budgetDTO.setCategoryName("월급");
+    budgetDTO.setAmount(100000L);
+
+    Response response = budgetTrackerService.setBudget(userId, budgetDTO);
+
+    mockMvc.perform(patch("/budgets/set-budget")
+        .sessionAttr("userId", userId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(budgetDTO)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(response.getMessage()));
+
+  }
+
+  // 존재하지 않은 카테고리 일 경우
+  @Test
+  @Transactional
+  void testSetBudget_NotFoundCategory() throws Exception {
+    BudgetDTO budgetDTO = new BudgetDTO();
+    budgetDTO.setCategoryName("쇼핑");
+    budgetDTO.setAmount(100000L);
+
+    Response response = budgetTrackerService.setBudget(userId, budgetDTO);
+
+    mockMvc.perform(patch("/budgets/set-budget")
+            .sessionAttr("userId", userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(budgetDTO)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(response.getMessage()));
+
+  }
+
+  // 수입 / 지출 내역 등록
+  @Test
+  @Transactional
+  void testTransaction_Success() throws Exception {
+    TransactionDTO transactionDTO = new TransactionDTO();
+    transactionDTO.setType("수입");
+    transactionDTO.setCategoryName("월급");
+    transactionDTO.setAmount(300000L);
+    transactionDTO.setDescription("회사 월급");
+    transactionDTO.setIsFixed("Y");
+
+    Response response = budgetTrackerService.transaction(userId, transactionDTO);
+
+    mockMvc.perform(post("/budgets/transaction")
+            .sessionAttr("userId", userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(transactionDTO)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(response.getMessage()));
+
+  }
+
+  // 수입 / 지출 내역 등록 : 존재하지 않은 카테고리
+  @Test
+  @Transactional
+  void testTransaction_NotFoundCategory() throws Exception {
+    TransactionDTO transactionDTO = new TransactionDTO();
+    transactionDTO.setType("수입");
+    transactionDTO.setCategoryName("쇼핑");
+    transactionDTO.setAmount(300000L);
+    transactionDTO.setDescription("회사 월급");
+    transactionDTO.setIsFixed("Y");
+
+    Response response = budgetTrackerService.transaction(userId, transactionDTO);
+
+    mockMvc.perform(post("/budgets/transaction")
+            .sessionAttr("userId", userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(transactionDTO)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(response.getMessage()));
+
   }
 }

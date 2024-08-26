@@ -6,16 +6,15 @@ import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.response.Response;
-import com.zero.pennywise.model.response.TransactionList;
-import com.zero.pennywise.repository.BudgetRepository;
+import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.repository.CategoriesRepository;
-import com.zero.pennywise.repository.TransactionRepository;
-import com.zero.pennywise.repository.view.V_TransactionRepository;
+import com.zero.pennywise.repository.budget.BudgetRepository;
+import com.zero.pennywise.repository.transaction.TransactionRepository;
 import com.zero.pennywise.status.BudgetTrackerStatus;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +23,11 @@ public class BudgetTrackerService {
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
   private final TransactionRepository transactionRepository;
-  private final V_TransactionRepository v_transactionRepository;
 
   // 카테고리 목록
-  public List<String> getCategoryList(Long userId) {
-    List<BudgetEntity> budgetList = budgetRepository.findAllByUserId(userId);
+  public List<String> getCategoryList(Long userId, String page) {
 
-    List<String> categoryList = new ArrayList<>();
-
-    for (BudgetEntity budget : budgetList) {
-      categoriesRepository.findById(budget.getCategoryId())
-          .ifPresent(category -> categoryList.add(category.getCategoryName()));
-    }
-
-    return categoryList;
+    return budgetRepository.getAllCategory(userId, page);
   }
 
   // 카테고리 생성
@@ -116,14 +106,15 @@ public class BudgetTrackerService {
   }
 
   // 수입 / 지출 내역
-  public Object getTransactionList(Long userId, String categoryName) {
+  public Object getTransactionList(Long userId, String categoryName, String page) {
     // 전체 거래 내역 / 카테고리별 거래 내역
-    List<TransactionList> transactions = (categoryName == null || categoryName.isBlank())
-        ? TransactionList.of(v_transactionRepository.findAllByUserId(userId))
-        : TransactionList.of(v_transactionRepository.findAllByUserIdAndCategoryName(userId, categoryName));
+    List<TransactionsDTO> transactions = (StringUtils.hasText(categoryName))
+        ? transactionRepository.getTransactionsByCategory(userId, categoryName, page)
+        : transactionRepository.getAllTransaction(userId, page);
+
 
     if (transactions.isEmpty()) {
-      return new Response(categoryName != null
+      return new Response(StringUtils.hasText(categoryName)
           ? BudgetTrackerStatus.CATEGORY_NOT_FOUND
           : BudgetTrackerStatus.TRANSACTIONS_NOT_FOUND);
     }
