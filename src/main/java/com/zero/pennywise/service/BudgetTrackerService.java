@@ -5,7 +5,6 @@ import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
@@ -13,7 +12,6 @@ import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.status.BudgetTrackerStatus;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +24,14 @@ public class BudgetTrackerService {
   private final TransactionRepository transactionRepository;
 
   // 카테고리 목록
-  public List<CategoriesEntity> getCategoryList(Long userId) {
+  public List<String> getCategoryList(Long userId) {
     List<BudgetEntity> budgetList = budgetRepository.findAllByUserId(userId);
 
-    List<CategoriesEntity> categoryList = new ArrayList<>();
+    List<String> categoryList = new ArrayList<>();
 
     for (BudgetEntity budget : budgetList) {
-      Optional<CategoriesEntity> optional = categoriesRepository.findById(budget.getCategoryId());
-      optional.ifPresent(categoryList::add);
+      categoriesRepository.findById(budget.getCategoryId())
+          .ifPresent(category -> categoryList.add(category.getCategoryName()));
     }
 
     return categoryList;
@@ -41,69 +39,77 @@ public class BudgetTrackerService {
 
   // 카테고리 생성
   public Response createCategory(Long userId, CategoryDTO categoryDTO) {
-    if (categoryDTO.getCategoryName() == null || categoryDTO.getCategoryName().isBlank()) {
-      return new Response(BudgetTrackerStatus.CATEGORY_IS_NULL);
+    return categoriesRepository.findByCategoryName(categoryDTO.getCategoryName())
+        .map(category -> existingCategory(userId, category))
+        .orElseGet(() -> createNewCategory(userId, categoryDTO));
+  }
+
+  // 카테고리 존재 여부 확인
+  private Response existingCategory(Long userId, CategoriesEntity category) {
+    // 사용자가 이미 등록한 카테고리일 경우
+    if (budgetRepository.existsByUserIdAndCategoryId(userId, category.getCategoryId())) {
+      return new Response(BudgetTrackerStatus.CATEGORY_ALREADY_EXISTS);
     }
 
-    if (categoriesRepository.existsByCategoryName(categoryDTO.getCategoryName())) {
-      CategoriesEntity category = categoriesRepository.findByCategoryName(categoryDTO.getCategoryName());
-
-      if (budgetRepository.existsByUserIdAndCategoryId(userId, category.getCategoryId())) {
-        return new Response(BudgetTrackerStatus.CATEGORY_ALREADY_EXISTS);
-      }
-      createBudget(userId, category);
-    } else {
-
-      CategoriesEntity category = categoriesRepository.save(CategoriesEntity.builder()
-          .categoryName(categoryDTO.getCategoryName())
-          .shared(false)
-          .build());
-
-      createBudget(userId, category);
-    }
+    // category 테이블에는 존재하는 카테고리이지만 해당 사용자가 등록한 카테고리가 아닐경우
+    createBudget(userId, category);
     return new Response(BudgetTrackerStatus.SUCCESS_CREATE_CATEGORY);
   }
 
+  // category 테이블에 존재하지 않은 새로운 카테고리 일 경우
+  private Response createNewCategory(Long userId, CategoryDTO categoryDTO) {
+    CategoriesEntity category = categoriesRepository.save(
+        CategoriesEntity.builder()
+            .categoryName(categoryDTO.getCategoryName())
+            .shared(false)
+            .build()
+    );
+
+    createBudget(userId, category);
+    return new Response(BudgetTrackerStatus.SUCCESS_CREATE_CATEGORY);
+  }
+
+
   // 카테고리별 예산 설정
   public Response setBudget(Long userId, BudgetDTO budgetDTO) {
-    CategoriesEntity category = categoriesRepository.findByCategoryName(budgetDTO.getCategoryName());
+    return categoriesRepository.findByCategoryName(budgetDTO.getCategoryName())
 
-    BudgetEntity budget = budgetRepository.findByUserIdAndCategoryId(userId,
-        category.getCategoryId());
+        // 사용자가 등록한 카테고리 예산 설정
+        .map(category -> {
+          BudgetEntity budget = budgetRepository
+              .findByUserIdAndCategoryId(userId, category.getCategoryId());
 
-    budget.setAmount(budgetDTO.getAmount());
-    budgetRepository.save(budget);
+          budget.setAmount(budgetDTO.getAmount());
+          budgetRepository.save(budget);
 
-    return new Response(BudgetTrackerStatus.SUCCESS_SET_BUDGET);
+          return new Response(BudgetTrackerStatus.SUCCESS_SET_BUDGET);
+        })
+
+        // 사용자가 등록한 카테고리가 아닐 경우
+        .orElse(new Response(BudgetTrackerStatus.CATEGORY_NOT_FOUND));
+  }
+
+  // 수입/지출 등록
+  public Response transaction(Long userId, TransactionDTO transactionDTO) {
+    return categoriesRepository.findByCategoryName(transactionDTO.getCategoryName())
+        .map(category -> {
+          transactionRepository.save(
+              TransactionDTO.of(userId, category.getCategoryId(), transactionDTO)
+          );
+
+          return new Response(BudgetTrackerStatus.SUCCESS_TRANSACTION_REGISTRATION);
+        })
+
+        // 사용자가 등록한 카테고리가 아닐 경우
+        .orElse(new Response(BudgetTrackerStatus.CATEGORY_NOT_FOUND));
   }
 
 
   // 기본 예산 생성 메서드
-  public void createBudget(Long userId, CategoriesEntity category) {
+  private void createBudget(Long userId, CategoriesEntity category) {
     budgetRepository.save(BudgetEntity.builder()
         .userId(userId)
         .categoryId(category.getCategoryId())
         .build());
-  }
-
-
-  // 수입 / 지출 등록
-  public Response transaction(Long userId, TransactionDTO transactionDTO) {
-    String categoryName = transactionDTO.getCategoryName();
-
-    if (categoryName == null || categoryName.isBlank()) {
-      return new Response(BudgetTrackerStatus.CATEGORY_IS_NULL);
-    }
-
-    CategoriesEntity category = categoriesRepository.findByCategoryName(transactionDTO.getCategoryName());
-
-    if (category == null) {
-      return new Response(BudgetTrackerStatus.CATEGORY_NOT_FOUND);
-    }
-
-    TransactionEntity transaction = transactionRepository.save(
-        TransactionDTO.of(userId, category.getCategoryId(), transactionDTO));
-
-    return new Response(BudgetTrackerStatus.SUCCESS_TRANSACTION_REGISTRATION);
   }
 }

@@ -4,10 +4,8 @@ import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.BudgetTrackerService;
-import com.zero.pennywise.status.BudgetTrackerStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -37,7 +35,7 @@ public class BudgetTrackerController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
     }
 
-    List<CategoriesEntity> categoryList = budgetTrackerService.getCategoryList(userId);
+    List<String> categoryList = budgetTrackerService.getCategoryList(userId);
 
     return ResponseEntity.ok(categoryList);
   }

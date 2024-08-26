@@ -1,6 +1,5 @@
 package com.zero.pennywise.model.entity;
 
-import com.zero.pennywise.model.dto.TransactionDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

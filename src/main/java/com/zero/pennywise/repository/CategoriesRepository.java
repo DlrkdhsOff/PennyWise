@@ -10,7 +10,5 @@ public interface CategoriesRepository extends JpaRepository<CategoriesEntity, Lo
 
   List<CategoriesEntity> findAllByShared(boolean Shared);
 
-  CategoriesEntity findByCategoryName(String categoryName);
-
-  boolean existsByCategoryName(String category);
+  Optional<CategoriesEntity> findByCategoryName(String categoryName);
 }

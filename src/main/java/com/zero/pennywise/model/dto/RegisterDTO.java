@@ -2,7 +2,6 @@ package com.zero.pennywise.model.dto;
 
 import com.zero.pennywise.model.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
