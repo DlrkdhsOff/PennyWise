@@ -2,9 +2,12 @@ package com.zero.pennywise.controller;
 
 import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.dto.CategoryDTO;
+import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
+import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.BudgetTrackerService;
+import com.zero.pennywise.status.BudgetTrackerStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -55,6 +58,7 @@ public class BudgetTrackerController {
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
 
+  // 카테고리별 예산 설정
   @PatchMapping("/set-budget")
   public ResponseEntity<?> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
       HttpServletRequest request) {
@@ -70,4 +74,19 @@ public class BudgetTrackerController {
     return ResponseEntity.status(result.getStatus()).body(result.getMessage());
   }
 
+  // 수입 / 지출 등록
+  @PostMapping("/transaction")
+  public ResponseEntity<?> transaction(@RequestBody @Valid TransactionDTO transactionDTO,
+      HttpServletRequest request) {
+
+    Long userId = (Long) request.getSession().getAttribute("userId");
+
+    if (userId == null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+    }
+
+    Response result = budgetTrackerService.transaction(userId, transactionDTO);
+
+    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+  }
 }

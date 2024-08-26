@@ -2,11 +2,14 @@ package com.zero.pennywise.service;
 
 import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.dto.CategoryDTO;
+import com.zero.pennywise.model.dto.TransactionDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
+import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
+import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.status.BudgetTrackerStatus;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ public class BudgetTrackerService {
 
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
+  private final TransactionRepository transactionRepository;
 
   // 카테고리 목록
   public List<CategoriesEntity> getCategoryList(Long userId) {
@@ -37,6 +41,10 @@ public class BudgetTrackerService {
 
   // 카테고리 생성
   public Response createCategory(Long userId, CategoryDTO categoryDTO) {
+    if (categoryDTO.getCategoryName() == null || categoryDTO.getCategoryName().isBlank()) {
+      return new Response(BudgetTrackerStatus.CATEGORY_IS_NULL);
+    }
+
     if (categoriesRepository.existsByCategoryName(categoryDTO.getCategoryName())) {
       CategoriesEntity category = categoriesRepository.findByCategoryName(categoryDTO.getCategoryName());
 
@@ -78,4 +86,24 @@ public class BudgetTrackerService {
         .build());
   }
 
+
+  // 수입 / 지출 등록
+  public Response transaction(Long userId, TransactionDTO transactionDTO) {
+    String categoryName = transactionDTO.getCategoryName();
+
+    if (categoryName == null || categoryName.isBlank()) {
+      return new Response(BudgetTrackerStatus.CATEGORY_IS_NULL);
+    }
+
+    CategoriesEntity category = categoriesRepository.findByCategoryName(transactionDTO.getCategoryName());
+
+    if (category == null) {
+      return new Response(BudgetTrackerStatus.CATEGORY_NOT_FOUND);
+    }
+
+    TransactionEntity transaction = transactionRepository.save(
+        TransactionDTO.of(userId, category.getCategoryId(), transactionDTO));
+
+    return new Response(BudgetTrackerStatus.SUCCESS_TRANSACTION_REGISTRATION);
+  }
 }
