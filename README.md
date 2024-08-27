@@ -20,7 +20,8 @@
 ### 2. 수입 및 지출 관리 (가계부) 
   - 월별 수입과 지출 내역을 금액, 날짜, 설명과 함께 입력.
   - 반복적인(고정 지출) 항목은 스케줄러를 통해 자동 등록.
-    - Transactions table type 컬럼에 enum 형식으로 (지출 / 고정 지출 / 수입 / 고정 수입)으로 저장 
+    - Transactions table type 컬럼에 enum 형식으로 (지출 / 수입)으로 저장
+    - 고정적인 결제인 경우에는 isFixed 컬럼에 boolean 형태로 저장 
   - 수입/지출 항목을 다양한 카테고리로 구분하여 관리. 
   - 사용자가 직접 카테고리를 생성하여 맞춤형 가계부를 구성.
   - 입력된 수입/지출 데이터를 수정하거나 삭제.
@@ -54,7 +55,8 @@
   - 사용자가 입력한 데이터를 바탕으로 연간 사용 내역을 조회.
 
 ## ERD
-![image](https://github.com/user-attachments/assets/c688a767-3074-4c47-af32-27e8c21d5bd3)
+![image](https://github.com/user-attachments/assets/46e47f09-fab7-4821-908c-7d1350ec2ac2)
+
 
 
 
