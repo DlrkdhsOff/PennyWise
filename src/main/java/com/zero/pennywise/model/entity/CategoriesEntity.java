@@ -23,7 +23,4 @@ public class CategoriesEntity {
 
   @Column(nullable = false)
   private String categoryName;
-
-  @Column(nullable = false)
-  private boolean shared;
 }

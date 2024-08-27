@@ -45,8 +45,6 @@ public class UserService {
     UserEntity user = RegisterDTO.of(registerDTO);
     userRepository.save(user);
 
-    createDefaultBudget(user.getId());
-
     return new Response(AccountStatus.REGISTER_SUCCESS);
   }
 
@@ -118,18 +116,6 @@ public class UserService {
     }
 
     return new Response(AccountStatus.ACCOUNT_DELETION_FAILED);
-  }
-
-  // 회원 가입시 기본 예산 생성
-  public void createDefaultBudget(Long userId) {
-    List<CategoriesEntity> categoryList = categoriesRepository.findAllBySharedIsTrue();
-
-    for (CategoriesEntity categories : categoryList) {
-      budgetRepository.save(BudgetEntity.builder()
-          .userId(userId)
-          .categoryId(categories.getCategoryId())
-          .build());
-    }
   }
 
   // 전화 번호 유효성 확인

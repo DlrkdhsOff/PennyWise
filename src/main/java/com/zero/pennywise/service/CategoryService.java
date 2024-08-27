@@ -48,7 +48,6 @@ public class CategoryService {
     CategoriesEntity category = categoriesRepository.save(
         CategoriesEntity.builder()
             .categoryName(categoryDTO.getCategoryName())
-            .shared(false)
             .build()
     );
 
