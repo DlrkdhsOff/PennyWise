@@ -7,15 +7,16 @@ import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.Response;
-import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
+import com.zero.pennywise.repository.budget.BudgetRepository;
 import com.zero.pennywise.status.AccountStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -79,30 +80,30 @@ public class UserService {
 
     UserEntity user = optionalUserEntity.get();
 
-    if (updateDTO == null || updateDTO.getPassword().isBlank() && updateDTO.getUsername().isBlank()
-        && updateDTO.getPhone().isBlank()) {
+    if (updateDTO == null || StringUtils.hasText(updateDTO.getPassword())
+        && StringUtils.hasText(updateDTO.getUsername())
+        && StringUtils.hasText(updateDTO.getPhone())) {
       return new Response(AccountStatus.PARAMETER_IS_NULL);
     }
 
     // 비밀번호 업데이트
-    if (!updateDTO.getPassword().isBlank()) {
+    if (!StringUtils.hasText(updateDTO.getPassword())) {
       user.setPassword(updateDTO.getPassword());
     }
 
     // 사용자 이름 업데이트
-    if (updateDTO.getUsername() != null && !updateDTO.getUsername().isBlank()) {
+    if (!StringUtils.hasText(updateDTO.getUsername())) {
       user.setUsername(updateDTO.getUsername());
     }
 
     // 전화번호 업데이트
-    if (updateDTO.getPhone() != null && !updateDTO.getPhone().isBlank()) {
+    if (!StringUtils.hasText(updateDTO.getPhone())) {
       Response validationResponse = validatePhoneNumber(updateDTO.getPhone());
       if (validationResponse != null) {
         return validationResponse;
       }
-      user.setPhone(updateDTO.getPhone());
+      user.setPhone(formatPhoneNumber(updateDTO.getPhone()));
     }
-
     userRepository.save(user);
 
     return new Response(AccountStatus.UPDATE_SUCCESS);
@@ -121,7 +122,7 @@ public class UserService {
 
   // 회원 가입시 기본 예산 생성
   public void createDefaultBudget(Long userId) {
-    List<CategoriesEntity> categoryList = categoriesRepository.findAllByShared(true);
+    List<CategoriesEntity> categoryList = categoriesRepository.findAllBySharedIsTrue();
 
     for (CategoriesEntity categories : categoryList) {
       budgetRepository.save(BudgetEntity.builder()

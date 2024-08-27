@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,7 +38,7 @@ public class TransactionEntity {
   private String description;
 
   @Column(nullable = false)
-  private LocalDateTime date;
+  private String dateTime;
 
   @Column(nullable = false)
   private boolean isFixed;

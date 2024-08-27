@@ -4,8 +4,7 @@ import com.zero.pennywise.model.entity.TransactionEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 import lombok.Data;
 
 @Data
@@ -32,10 +31,16 @@ public class TransactionDTO {
         .type(transactionDTO.getType())
         .amount(transactionDTO.getAmount())
         .description(transactionDTO.getDescription())
-        .date(LocalDateTime.now())
+        .dateTime(dateTimeFormatting(LocalDateTime.now()))
         .isFixed(transactionDTO.getIsFixed().equals("Y"))
         .build();
   }
 
+   // "yyyy-MM-dd HH:mm:ss" 형식
+    public static String dateTimeFormatting(LocalDateTime date) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    return date.format(formatter);
+  }
 
 }
