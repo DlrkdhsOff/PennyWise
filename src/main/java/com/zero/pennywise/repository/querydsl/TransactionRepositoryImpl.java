@@ -1,27 +1,33 @@
 package com.zero.pennywise.repository.querydsl;
 
-import static com.zero.pennywise.status.TransactionStatus.EXPENDITURE;
 import static com.zero.pennywise.utils.PageUtils.calculateOffset;
 
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import com.zero.pennywise.model.entity.QTransactionEntity;
 import com.zero.pennywise.model.response.TransactionsDTO;
+import com.zero.pennywise.service.TransactionService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   public final JPAQueryFactory jpaQueryFactory;
+  private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
+
+  // 전체 거래 내역
   @Override
   public List<TransactionsDTO> getAllTransaction(Long userId, String page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
@@ -45,6 +51,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .fetch();
   }
 
+  // 카테고리별 거래 내역
   @Override
   public List<TransactionsDTO> getTransactionsByCategory(Long userId, String categoryName, String page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
@@ -68,7 +75,6 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .fetch();
   }
 
-
   // 총 데이터의 개수
   private Long getTransactionCount(QTransactionEntity t, QCategoriesEntity c, Long userId, String categoryName) {
 
@@ -90,24 +96,10 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   }
 
 
-  // 중복 코드 메서드로 추출
+  // 중복 코드 메서드로 추출(사용할 컬럼)
   private Expression<TransactionsDTO> selectTransactionAndCategoryColumn(QTransactionEntity t, QCategoriesEntity c) {
-
-    // type = EXPENDITURE And isFixed = ture  : 고정 지출
-    // type = EXPENDITURE And isFixed = false : 지출
-    // type = EARNINGS And isFixed = ture     : 고정 수입
-    // type = EARNINGS And isFixed = false    : 수입
-
     return Projections.fields(TransactionsDTO.class,
-        new CaseBuilder()
-            .when(t.type.eq(EXPENDITURE).and(t.isFixed.isTrue()))
-            .then("고정 지출")
-            .when(t.type.eq(EXPENDITURE).and(t.isFixed.isFalse()))
-            .then("지출")
-            .when(t.isFixed.isTrue())
-            .then("고정 수입")
-            .otherwise("수입")
-            .as("type"),
+        t.type.stringValue().as("type"),
         c.categoryName.as("categoryName"),
         t.amount.as("amount"),
         t.description.as("description"),

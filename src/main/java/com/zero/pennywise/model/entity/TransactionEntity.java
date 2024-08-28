@@ -41,10 +41,10 @@ public class TransactionEntity {
 
   private String description;
 
-  @Column(nullable = false)
+  @Column(nullable = false, updatable = false)
   private String dateTime;
 
-  @Column(nullable = false)
-  private boolean isFixed;
+
+  private String fixedDateTime;
 
 }

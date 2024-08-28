@@ -1,5 +1,6 @@
 package com.zero.pennywise.model.response;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,19 @@ public class TransactionsDTO {
   private String description;
   private String dateTime;
 
+  public static List<TransactionsDTO> of(List<TransactionsDTO> list) {
+    for (TransactionsDTO transaction : list) {
+      if ("FIXED_EXPENSES".equals(transaction.getType())) {
+        transaction.setType("고정 지출");
+      } else if ("FIXED_INCOME".equals(transaction.getType())) {
+        transaction.setType("고정 수입");
+      } else if ("EXPENSES".equals(transaction.getType())) {
+        transaction.setType("지출");
+      } else {
+        transaction.setType("수입");
+      }
+    }
+    return list;
+  }
 
 }

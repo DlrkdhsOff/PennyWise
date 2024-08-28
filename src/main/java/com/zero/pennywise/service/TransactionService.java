@@ -6,6 +6,9 @@ import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,8 +40,8 @@ public class TransactionService {
   // 수입 / 지출 내역
   public List<TransactionsDTO> getTransactionList(Long userId, String categoryName, String page) {
     List<TransactionsDTO> transactions = (StringUtils.hasText(categoryName))
-        ? transactionQueryRepository.getTransactionsByCategory(userId, categoryName, page)
-        : transactionQueryRepository.getAllTransaction(userId, page);
+        ? TransactionsDTO.of(transactionQueryRepository.getTransactionsByCategory(userId, categoryName, page))
+        : TransactionsDTO.of(transactionQueryRepository.getAllTransaction(userId, page));
 
     validateTransactions(transactions, categoryName);
 
@@ -52,9 +55,5 @@ public class TransactionService {
           : "거래 내역에 존재하지 않습니다.";
       throw new GlobalException(HttpStatus.BAD_REQUEST, message);
     }
-  }
-
-  public void test() {
-    System.out.println("test");
   }
 }

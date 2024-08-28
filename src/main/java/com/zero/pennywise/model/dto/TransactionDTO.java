@@ -1,5 +1,7 @@
 package com.zero.pennywise.model.dto;
 
+import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
+
 import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.status.TransactionStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -29,20 +31,11 @@ public class TransactionDTO {
     return TransactionEntity.builder()
         .userId(userId)
         .categoryId(categoryId)
-        .type(castToTransactionStatus(transactionDTO.getType()))
+        .type(castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()))
         .amount(transactionDTO.getAmount())
         .description(transactionDTO.getDescription())
         .dateTime(dateTimeFormatting(LocalDateTime.now()))
-        .isFixed(transactionDTO.getIsFixed().equals("Y"))
         .build();
-  }
-
-  public static TransactionStatus castToTransactionStatus(String type) {
-    if ("지출".equals(type)) {
-      return TransactionStatus.EXPENDITURE;
-    } else {
-      return TransactionStatus.EARNINGS;
-    }
   }
 
    // "yyyy-MM-dd HH:mm:ss" 형식
