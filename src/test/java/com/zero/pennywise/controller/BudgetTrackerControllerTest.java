@@ -11,7 +11,6 @@ import com.zero.pennywise.PennyWiseApplication;
 import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.dto.TransactionDTO;
-import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.BudgetTrackerService;
 import jakarta.transaction.Transactional;
 import java.util.List;

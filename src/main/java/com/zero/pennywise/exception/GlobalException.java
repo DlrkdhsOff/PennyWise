@@ -7,7 +7,5 @@ import org.springframework.http.HttpStatus;
 public class GlobalException extends RuntimeException {
   HttpStatus status;
 
-  public GlobalException(HttpStatus status, String message) {
-    super();
-  }
+
 }
