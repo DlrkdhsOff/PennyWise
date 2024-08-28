@@ -92,6 +92,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   // 중복 코드 메서드로 추출(사용할 컬럼)
   private Expression<TransactionsDTO> selectTransactionAndCategoryColumn(QTransactionEntity t, QCategoriesEntity c) {
     return Projections.fields(TransactionsDTO.class,
+        t.transactionId.as("transactionId"),
         t.type.stringValue().as("type"),
         c.categoryName.as("categoryName"),
         t.amount.as("amount"),
