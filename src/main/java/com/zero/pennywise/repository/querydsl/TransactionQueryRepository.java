@@ -14,4 +14,7 @@ public interface TransactionQueryRepository {
   Page<TransactionsDTO> getAllTransaction(Long userId, Pageable page);
 
   Page<TransactionsDTO> getTransactionsByCategory(Long userId, String categoryName, Pageable page);
+
+  void updateFixedTransaction(String lastMonthsDate, String today);
+
 }

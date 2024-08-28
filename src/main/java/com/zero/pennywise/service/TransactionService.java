@@ -62,4 +62,13 @@ public class TransactionService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, message);
     }
   }
+
+  public void updateFixedTransaction() {
+    String lastMonthsDate = LocalDate.now().minusMonths(1).toString();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    String today = LocalDateTime.now().format(formatter);
+
+    transactionQueryRepository.updateFixedTransaction(lastMonthsDate, today);
+  }
 }

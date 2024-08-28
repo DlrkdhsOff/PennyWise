@@ -1,5 +1,8 @@
 package com.zero.pennywise.repository.querydsl;
 
+import static com.zero.pennywise.status.TransactionStatus.FIXED_EXPENSES;
+import static com.zero.pennywise.status.TransactionStatus.FIXED_INCOME;
+
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -94,5 +98,22 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         t.description.as("description"),
         t.dateTime.as("dateTime"));
   }
+
+  @Transactional
+  @Override
+  public void updateFixedTransaction(String lastMonthsDate, String today) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+
+    long affectedRows = jpaQueryFactory
+        .update(t)
+        .set(t.fixedDateTime, today)
+        .where(t.type.eq(FIXED_EXPENSES)
+            .or(t.type.eq(FIXED_INCOME))
+            .and(t.dateTime.startsWith(lastMonthsDate)))
+        .execute();
+
+    logger.info("날짜 : {} {}개 행이 수정 되었습니다. ",today, affectedRows);
+  }
+
 
 }
