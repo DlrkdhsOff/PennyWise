@@ -1,4 +1,4 @@
-package com.zero.pennywise.repository.transaction;
+package com.zero.pennywise.repository.querydsl;
 
 import com.zero.pennywise.model.response.TransactionsDTO;
 import java.util.List;

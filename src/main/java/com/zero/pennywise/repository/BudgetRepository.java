@@ -1,11 +1,12 @@
-package com.zero.pennywise.repository.budget;
+package com.zero.pennywise.repository;
 
 import com.zero.pennywise.model.entity.BudgetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 
-public interface BudgetRepository extends JpaRepository<BudgetEntity, Long>
-    , BudgetQueryRepository {
+@Repository
+public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
 
   boolean existsByUserIdAndCategoryId(Long userId, Long categoryId);
 

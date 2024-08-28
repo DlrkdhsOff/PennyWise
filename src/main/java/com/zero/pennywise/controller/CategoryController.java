@@ -1,11 +1,10 @@
 package com.zero.pennywise.controller;
 
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.CategoryDTO;
-import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +28,10 @@ public class CategoryController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    List<String> categoryList = categoryService.getCategoryList(userId, page);
-
-    return ResponseEntity.ok(categoryList);
+    return ResponseEntity.ok(categoryService.getCategoryList(userId, page));
   }
 
   // 카테고리 생성
@@ -45,12 +42,11 @@ public class CategoryController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    Response result = categoryService.createCategory(userId, categoryDTO);
-
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(categoryService.createCategory(userId, categoryDTO));
   }
 
 }

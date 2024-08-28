@@ -1,7 +1,5 @@
 package com.zero.pennywise.model.response;
 
-import com.zero.pennywise.status.AccountStatus;
-import com.zero.pennywise.status.BudgetTrackerStatus;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

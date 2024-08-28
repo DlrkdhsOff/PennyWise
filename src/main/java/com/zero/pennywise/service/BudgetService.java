@@ -1,12 +1,12 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.BudgetDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
-import com.zero.pennywise.model.response.Response;
+import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
-import com.zero.pennywise.repository.budget.BudgetRepository;
-import com.zero.pennywise.status.BudgetTrackerStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +18,7 @@ public class BudgetService {
 
 
   // 카테고리별 예산 설정
-  public Response setBudget(Long userId, BudgetDTO budgetDTO) {
+  public String setBudget(Long userId, BudgetDTO budgetDTO) {
     return categoriesRepository.findByCategoryName(budgetDTO.getCategoryName())
 
         // 사용자가 등록한 카테고리 예산 설정
@@ -29,11 +29,11 @@ public class BudgetService {
           budget.setAmount(budgetDTO.getAmount());
           budgetRepository.save(budget);
 
-          return new Response(BudgetTrackerStatus.SUCCESS_SET_BUDGET);
+          return "성공적으로 예산을 설정 했습니다.";
         })
 
         // 사용자가 등록한 카테고리가 아닐 경우
-        .orElse(new Response(BudgetTrackerStatus.CATEGORY_NOT_FOUND));
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
   }
 
 }

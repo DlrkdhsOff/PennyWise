@@ -1,7 +1,7 @@
 package com.zero.pennywise.controller;
 
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.TransactionDTO;
-import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -28,12 +28,12 @@ public class TransactionController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    Response result = transactionService.transaction(userId, transactionDTO);
 
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(transactionService.transaction(userId, transactionDTO));
   }
 
   // 거래 목록 출력(전체 / 카테고리별)
@@ -46,9 +46,9 @@ public class TransactionController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
-
-    return ResponseEntity.ok().body(transactionService.getTransactionList(userId, categoryName, page));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(transactionService.getTransactionList(userId, categoryName, page));
   }
 }

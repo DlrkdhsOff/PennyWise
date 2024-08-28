@@ -1,9 +1,8 @@
 package com.zero.pennywise.controller;
 
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.BudgetDTO;
-import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.BudgetService;
-import com.zero.pennywise.service.BudgetTrackerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +26,11 @@ public class BudgetController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    Response result = budgetService.setBudget(userId, BudgetDTO);
-
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(budgetService.setBudget(userId, BudgetDTO));
   }
 
 }
