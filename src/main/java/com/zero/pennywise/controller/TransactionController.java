@@ -6,6 +6,8 @@ import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +42,7 @@ public class TransactionController {
   @GetMapping("/transaction")
   public ResponseEntity<?> getTransactionList(
       @RequestParam(name = "categoryName", required = false) String categoryName,
-      @RequestParam(name = "page", required = false) String page,
+      @PageableDefault(page = 0, size = 10) Pageable page,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -48,7 +50,6 @@ public class TransactionController {
     if (userId == null) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(transactionService.getTransactionList(userId, categoryName, page));
+    return ResponseEntity.ok(transactionService.getTransactionList(userId, categoryName, page));
   }
 }

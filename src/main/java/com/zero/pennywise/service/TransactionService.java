@@ -1,7 +1,10 @@
 package com.zero.pennywise.service;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.TransactionDTO;
+import com.zero.pennywise.model.response.TransactionPage;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
@@ -11,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -38,12 +42,14 @@ public class TransactionService {
   }
 
   // 수입 / 지출 내역
-  public List<TransactionsDTO> getTransactionList(Long userId, String categoryName, String page) {
-    List<TransactionsDTO> transactions = (StringUtils.hasText(categoryName))
-        ? TransactionsDTO.of(transactionQueryRepository.getTransactionsByCategory(userId, categoryName, page))
-        : TransactionsDTO.of(transactionQueryRepository.getAllTransaction(userId, page));
+  public TransactionPage getTransactionList(Long userId, String categoryName, Pageable page) {
+    Pageable pageable = page(page);
 
-    validateTransactions(transactions, categoryName);
+    TransactionPage transactions = (StringUtils.hasText(categoryName))
+        ? TransactionsDTO.of(transactionQueryRepository.getTransactionsByCategory(userId, categoryName, pageable))
+        : TransactionsDTO.of(transactionQueryRepository.getAllTransaction(userId, pageable));
+
+    validateTransactions(transactions.getTransactions(), categoryName);
 
     return transactions;
   }

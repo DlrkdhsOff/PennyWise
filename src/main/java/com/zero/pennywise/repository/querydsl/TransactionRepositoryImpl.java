@@ -1,11 +1,8 @@
 package com.zero.pennywise.repository.querydsl;
 
-import static com.zero.pennywise.utils.PageUtils.calculateOffset;
-
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import com.zero.pennywise.model.entity.QTransactionEntity;
 import com.zero.pennywise.model.response.TransactionsDTO;
@@ -15,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -29,50 +28,40 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 전체 거래 내역
   @Override
-  public List<TransactionsDTO> getAllTransaction(Long userId, String page) {
+  public Page<TransactionsDTO> getAllTransaction(Long userId, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
-    long pageSize = 10L;
-    Long totalCount = getTransactionCount(t, c, userId, null);
-    long[] data = calculateOffset(page, pageSize, totalCount);
-
-    if (data[1] == -1) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "총 페이지 수는 " + data[0] + "개 입니다.");
-    }
-
-    return jpaQueryFactory
+    List<TransactionsDTO> list =  jpaQueryFactory
         .select(selectTransactionAndCategoryColumn(t, c))
         .from(t)
         .join(c).on(t.categoryId.eq(c.categoryId))
         .where(t.userId.eq(userId))
-        .limit(pageSize)
-        .offset(data[1])
+        .limit(page.getPageSize())
+        .offset(page.getOffset())
         .fetch();
+
+    Long total = getTransactionCount(t, c, userId, null);
+    return new PageImpl<>(list, page, total);
   }
 
   // 카테고리별 거래 내역
   @Override
-  public List<TransactionsDTO> getTransactionsByCategory(Long userId, String categoryName, String page) {
+  public Page<TransactionsDTO> getTransactionsByCategory(Long userId, String categoryName, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
-    long pageSize = 10L;
-    Long totalCount = getTransactionCount(t, c, userId, categoryName);
-    long[] data = calculateOffset(page, pageSize, totalCount);
-
-    if (data[1] == -1) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "총 페이지 수는 " + data[0] + "개 입니다.");
-    }
-
-    return jpaQueryFactory
+    List<TransactionsDTO> list = jpaQueryFactory
         .select(selectTransactionAndCategoryColumn(t, c))
         .from(t)
         .join(c).on(t.categoryId.eq(c.categoryId), c.categoryName.eq(categoryName))
         .where(t.userId.eq(userId))
-        .limit(pageSize)
-        .offset(data[1])
+        .limit(page.getPageSize())
+        .offset(page.getOffset())
         .fetch();
+
+    Long total = getTransactionCount(t, c, userId, categoryName);
+    return new PageImpl<>(list, page, total);
   }
 
   // 총 데이터의 개수

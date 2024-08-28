@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 @Data
 @NoArgsConstructor
@@ -15,8 +16,8 @@ public class TransactionsDTO {
   private String description;
   private String dateTime;
 
-  public static List<TransactionsDTO> of(List<TransactionsDTO> list) {
-    for (TransactionsDTO transaction : list) {
+  public static TransactionPage of(Page<TransactionsDTO> list) {
+    for (TransactionsDTO transaction : list.getContent()) {
       if ("FIXED_EXPENSES".equals(transaction.getType())) {
         transaction.setType("고정 지출");
       } else if ("FIXED_INCOME".equals(transaction.getType())) {
@@ -27,7 +28,13 @@ public class TransactionsDTO {
         transaction.setType("수입");
       }
     }
-    return list;
+
+    return new TransactionPage(
+        list.getNumber() + 1,
+        list.getTotalPages(),
+        list.getTotalElements(),
+        list.getContent()
+    );
   }
 
 }

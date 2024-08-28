@@ -1,14 +1,17 @@
 package com.zero.pennywise.service;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
+import com.zero.pennywise.model.response.CategoriesPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.querydsl.CategoryQueryRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +24,11 @@ public class CategoryService {
   private final CategoryQueryRepository categoryQueryRepository;
 
   // 카테고리 목록
-  public List<String> getCategoryList(Long userId, String page) {
+  public CategoriesPage getCategoryList(Long userId, Pageable page) {
+    Pageable pageable = page(page);
 
-    return categoryQueryRepository.getAllCategory(userId, page);
+    return CategoriesPage
+        .of(categoryQueryRepository.getAllCategory(userId, pageable));
   }
 
   // 카테고리 생성

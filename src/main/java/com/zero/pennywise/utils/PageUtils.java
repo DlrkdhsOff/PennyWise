@@ -1,21 +1,13 @@
 package com.zero.pennywise.utils;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 public class PageUtils {
 
-  public static long[] calculateOffset(String page, long pageSize, Long totalCount) {
+  public static Pageable page(Pageable page) {
 
-    long[] data = new long[2];
-
-    // 총 페이지 개수
-    data[0] = (long) Math.ceil((double) totalCount / pageSize);
-    long currentPage = Long.parseLong(page);
-
-    if (currentPage > data[0]) {
-      data[1] = -1;
-      return data;
-    }
-
-    data[1] = (currentPage - 1) * pageSize;
-    return data;
+    int pageNumber = page.getPageNumber() > 0 ? page.getPageNumber() -1 : 0;
+    return PageRequest.of(pageNumber, page.getPageSize());
   }
 }

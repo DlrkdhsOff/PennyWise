@@ -2,15 +2,15 @@ package com.zero.pennywise.repository.querydsl;
 
 import static com.zero.pennywise.model.entity.QBudgetEntity.budgetEntity;
 import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity;
-import static com.zero.pennywise.utils.PageUtils.calculateOffset;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.entity.QBudgetEntity;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -31,25 +31,20 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
   }
 
   @Override
-  public List<String> getAllCategory(Long userId, String page) {
+  public Page<String> getAllCategory(Long userId, Pageable page) {
     QCategoriesEntity c = categoriesEntity;
     QBudgetEntity b = budgetEntity;
 
-    long pageSize = 10L;
-    Long totalCount = getBudgetCount(b, c, userId);
-    long[] data = calculateOffset(page, pageSize, totalCount);
-
-    if (data[1] == -1) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "총 페이지 수는 " + data[0] + "개 입니다.");
-    }
-
-    return jpaQueryFactory
+    List<String> list = jpaQueryFactory
         .select(c.categoryName)
         .from(b)
         .join(c).on(b.categoryId.eq(c.categoryId))
         .where(b.userId.eq(userId))
-        .limit(pageSize)
-        .offset(data[1])
+        .limit(page.getPageSize())
+        .offset(page.getOffset())
         .fetch();
+
+    Long total = getBudgetCount(b, c, userId);
+    return new PageImpl<>(list, page, total);
   }
 }
