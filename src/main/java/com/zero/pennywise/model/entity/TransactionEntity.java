@@ -1,7 +1,10 @@
 package com.zero.pennywise.model.entity;
 
+import com.zero.pennywise.status.TransactionStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,17 +33,18 @@ public class TransactionEntity {
   private Long categoryId;
 
   @Column(nullable = false)
-  private String type;
+  @Enumerated(EnumType.STRING)
+  private TransactionStatus type;
 
   @Column(nullable = false)
   private Long amount;
 
   private String description;
 
-  @Column(nullable = false)
+  @Column(nullable = false, updatable = false)
   private String dateTime;
 
-  @Column(nullable = false)
-  private boolean isFixed;
+
+  private String fixedDateTime;
 
 }

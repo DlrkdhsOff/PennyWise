@@ -1,6 +1,9 @@
 package com.zero.pennywise.model.dto;
 
+import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
+
 import com.zero.pennywise.model.entity.TransactionEntity;
+import com.zero.pennywise.status.TransactionStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -28,11 +31,10 @@ public class TransactionDTO {
     return TransactionEntity.builder()
         .userId(userId)
         .categoryId(categoryId)
-        .type(transactionDTO.getType())
+        .type(castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()))
         .amount(transactionDTO.getAmount())
         .description(transactionDTO.getDescription())
         .dateTime(dateTimeFormatting(LocalDateTime.now()))
-        .isFixed(transactionDTO.getIsFixed().equals("Y"))
         .build();
   }
 

@@ -1,20 +1,15 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
-import com.zero.pennywise.model.entity.BudgetEntity;
-import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserEntity;
-import com.zero.pennywise.model.response.Response;
-import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
-import com.zero.pennywise.repository.budget.BudgetRepository;
-import com.zero.pennywise.status.AccountStatus;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -23,67 +18,81 @@ import org.springframework.util.StringUtils;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final CategoriesRepository categoriesRepository;
-  private final BudgetRepository budgetRepository;
 
   // 회원 가입
-  public Response register(RegisterDTO registerDTO) {
+  public String register(RegisterDTO registerDTO) {
 
     // 중복 아이디 체크
     if (userRepository.existsByEmail(registerDTO.getEmail())) {
-      return new Response(AccountStatus.REGISTER_FAILED_DUPLICATE_ID);
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디 입니다.");
     }
 
-    Response response = validatePhoneNumber(registerDTO.getPhone());
+    validatePhoneNumber(registerDTO.getPhone());
+    registerDTO.setPhone(registerDTO.getPhone());
 
-    if (response != null) {
-      return response;
-    } else {
-      registerDTO.setPhone(registerDTO.getPhone());
-    }
+    userRepository.save(RegisterDTO.of(registerDTO));
 
-    UserEntity user = RegisterDTO.of(registerDTO);
-    userRepository.save(user);
-
-    createDefaultBudget(user.getId());
-
-    return new Response(AccountStatus.REGISTER_SUCCESS);
+    return "회원가입 성공";
   }
 
   // 로그인
-  public Response login(LoginDTO loginDTO, HttpServletRequest request) {
+  public String login(LoginDTO loginDTO, HttpServletRequest request) {
 
     // 아이디 존재여부 확인
     if (!userRepository.existsByEmail(loginDTO.getEmail())) {
-      return new Response(AccountStatus.USER_NOT_FOUND);
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다.");
     }
 
     UserEntity user = userRepository.findByEmail(loginDTO.getEmail());
 
     // 비밀번호 일치 확인
     if (!user.getPassword().equals(loginDTO.getPassword())) {
-      return new Response(AccountStatus.PASSWORD_DOES_NOT_MATCH);
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
     }
 
     request.getSession().setAttribute("userId", user.getId());
-    return new Response(AccountStatus.LOGIN_SUCCESS);
+    return "로그인 성공";
   }
 
   // 회원 정보 수정
-  public Response update(Long userId, UpdateDTO updateDTO) {
-    // 회원 정보 조회
+  public String update(Long userId, UpdateDTO updateDTO) {
     Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
 
     if (optionalUserEntity.isEmpty()) {
-      return new Response(AccountStatus.USER_NOT_FOUND);
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다.");
     }
 
     UserEntity user = optionalUserEntity.get();
+    userRepository.save(validateUpdateDTO(user, updateDTO));
 
+    return "회원 정보가 성공적으로 수정되었습니다.";
+  }
+
+  // 회원 탈퇴
+  public String delete(Long userId) {
+
+    if (!userRepository.existsById(userId)) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 탈퇴 실패하였습니다.");
+    }
+
+    userRepository.deleteById(userId);
+    return "계정이 영구적으로 삭제 되었습니다.";
+  }
+
+  // 전화 번호 유효성 확인
+  public void validatePhoneNumber(String phone) {
+    if (!phone.matches("^[0-9]+$")) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "전화번호에 유효하지 않은 문자가 포함되어 있습니다.");
+    } else if (phone.length() > 11) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "유효하지 않은 전화번호 입니다.");
+    }
+  }
+
+  public UserEntity validateUpdateDTO(UserEntity user, UpdateDTO updateDTO) {
     if (updateDTO == null || StringUtils.hasText(updateDTO.getPassword())
         && StringUtils.hasText(updateDTO.getUsername())
         && StringUtils.hasText(updateDTO.getPhone())) {
-      return new Response(AccountStatus.PARAMETER_IS_NULL);
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 정보 수정에 실패 했습니다.");
     }
 
     // 비밀번호 업데이트
@@ -98,49 +107,11 @@ public class UserService {
 
     // 전화번호 업데이트
     if (!StringUtils.hasText(updateDTO.getPhone())) {
-      Response validationResponse = validatePhoneNumber(updateDTO.getPhone());
-      if (validationResponse != null) {
-        return validationResponse;
-      }
+      validatePhoneNumber(updateDTO.getPhone());
       user.setPhone(formatPhoneNumber(updateDTO.getPhone()));
     }
-    userRepository.save(user);
 
-    return new Response(AccountStatus.UPDATE_SUCCESS);
-  }
-
-  // 회원 탈퇴
-  public Response delete(Long userId) {
-
-    if (!userRepository.existsById(userId)) {
-      userRepository.deleteById(userId);
-      return new Response(AccountStatus.ACCOUNT_DELETION_SUCCESS);
-    }
-
-    return new Response(AccountStatus.ACCOUNT_DELETION_FAILED);
-  }
-
-  // 회원 가입시 기본 예산 생성
-  public void createDefaultBudget(Long userId) {
-    List<CategoriesEntity> categoryList = categoriesRepository.findAllBySharedIsTrue();
-
-    for (CategoriesEntity categories : categoryList) {
-      budgetRepository.save(BudgetEntity.builder()
-          .userId(userId)
-          .categoryId(categories.getCategoryId())
-          .build());
-    }
-  }
-
-  // 전화 번호 유효성 확인
-  public Response validatePhoneNumber(String phone) {
-    if (!phone.matches("^[0-9]+$")) {
-      return new Response(AccountStatus.PHONE_NUMBER_CONTAINS_INVALID_CHARACTERS);
-    } else if (phone.length() > 11) {
-      return new Response(AccountStatus.PHONE_NUMBER_INVALID);
-    }
-
-    return null;
+    return user;
   }
 
   // 전화번호 formatting

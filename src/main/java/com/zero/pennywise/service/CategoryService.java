@@ -1,14 +1,18 @@
 package com.zero.pennywise.service;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.response.Response;
+import com.zero.pennywise.model.response.CategoriesPage;
+import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
-import com.zero.pennywise.repository.budget.BudgetRepository;
-import com.zero.pennywise.status.BudgetTrackerStatus;
-import java.util.List;
+import com.zero.pennywise.repository.querydsl.CategoryQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,43 +21,45 @@ public class CategoryService {
 
   private final BudgetRepository budgetRepository;
   private final CategoriesRepository categoriesRepository;
+  private final CategoryQueryRepository categoryQueryRepository;
 
   // 카테고리 목록
-  public List<String> getCategoryList(Long userId, String page) {
+  public CategoriesPage getCategoryList(Long userId, Pageable page) {
+    Pageable pageable = page(page);
 
-    return budgetRepository.getAllCategory(userId, page);
+    return CategoriesPage
+        .of(categoryQueryRepository.getAllCategory(userId, pageable));
   }
 
   // 카테고리 생성
-  public Response createCategory(Long userId, CategoryDTO categoryDTO) {
+  public String createCategory(Long userId, CategoryDTO categoryDTO) {
     return categoriesRepository.findByCategoryName(categoryDTO.getCategoryName())
         .map(category -> existingCategory(userId, category))
         .orElseGet(() -> createNewCategory(userId, categoryDTO));
   }
 
   // 카테고리 존재 여부 확인
-  private Response existingCategory(Long userId, CategoriesEntity category) {
+  private String existingCategory(Long userId, CategoriesEntity category) {
     // 사용자가 이미 등록한 카테고리일 경우
     if (budgetRepository.existsByUserIdAndCategoryId(userId, category.getCategoryId())) {
-      return new Response(BudgetTrackerStatus.CATEGORY_ALREADY_EXISTS);
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리 입니다.");
     }
 
     // category 테이블에는 존재하는 카테고리이지만 해당 사용자가 등록한 카테고리가 아닐경우
     createBudget(userId, category);
-    return new Response(BudgetTrackerStatus.SUCCESS_CREATE_CATEGORY);
+    return "카테고리를 생성하였습니다.";
   }
 
   // category 테이블에 존재하지 않은 새로운 카테고리 일 경우
-  private Response createNewCategory(Long userId, CategoryDTO categoryDTO) {
+  private String createNewCategory(Long userId, CategoryDTO categoryDTO) {
     CategoriesEntity category = categoriesRepository.save(
         CategoriesEntity.builder()
             .categoryName(categoryDTO.getCategoryName())
-            .shared(false)
             .build()
     );
 
     createBudget(userId, category);
-    return new Response(BudgetTrackerStatus.SUCCESS_CREATE_CATEGORY);
+    return "카테고리를 생성하였습니다.";
   }
 
   // 기본 예산 생성 메서드

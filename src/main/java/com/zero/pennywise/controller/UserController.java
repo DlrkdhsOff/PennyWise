@@ -1,9 +1,9 @@
 package com.zero.pennywise.controller;
 
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
-import com.zero.pennywise.model.response.Response;
 import com.zero.pennywise.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,19 +25,17 @@ public class UserController {
   // 회원가입
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid RegisterDTO registerDTO) {
-    Response result = userService.register(registerDTO);
 
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(registerDTO));
   }
 
   // 로그인
   @PostMapping("/login")
   public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
       HttpServletRequest request) {
-    Response result = userService.login(loginDTO, request);
 
-
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(userService.login(loginDTO, request));
   }
 
 
@@ -49,11 +47,11 @@ public class UserController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    Response result = userService.update(userId, updateDTO);
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(userService.update(userId, updateDTO));
   }
 
   // 회원 탈퇴
@@ -62,11 +60,9 @@ public class UserController {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인을 해주세요");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
-
-    Response result = userService.delete(userId);
-    return ResponseEntity.status(result.getStatus()).body(result.getMessage());
+    return ResponseEntity.status(HttpStatus.OK).body(userService.delete(userId));
   }
 
 }
