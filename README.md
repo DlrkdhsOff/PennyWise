@@ -7,7 +7,9 @@
 - **Spring Boot**
 - **JPA**
 - **MySQL**
-- **Gitt**
+- **Redis**
+- **Git**
+
 
 
 ## 기능
