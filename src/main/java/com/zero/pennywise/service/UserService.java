@@ -9,6 +9,7 @@ import com.zero.pennywise.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -54,6 +55,7 @@ public class UserService {
     return "로그인 성공";
   }
 
+
   // 회원 정보 수정
   public String update(Long userId, UpdateDTO updateDTO) {
     Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
@@ -89,24 +91,24 @@ public class UserService {
   }
 
   public UserEntity validateUpdateDTO(UserEntity user, UpdateDTO updateDTO) {
-    if (updateDTO == null || StringUtils.hasText(updateDTO.getPassword())
-        && StringUtils.hasText(updateDTO.getUsername())
-        && StringUtils.hasText(updateDTO.getPhone())) {
+    if (!StringUtils.hasText(updateDTO.getPassword())
+        && !StringUtils.hasText(updateDTO.getUsername())
+        && !StringUtils.hasText(updateDTO.getPhone())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 정보 수정에 실패 했습니다.");
     }
 
     // 비밀번호 업데이트
-    if (!StringUtils.hasText(updateDTO.getPassword())) {
+    if (StringUtils.hasText(updateDTO.getPassword())) {
       user.setPassword(updateDTO.getPassword());
     }
 
     // 사용자 이름 업데이트
-    if (!StringUtils.hasText(updateDTO.getUsername())) {
+    if (StringUtils.hasText(updateDTO.getUsername())) {
       user.setUsername(updateDTO.getUsername());
     }
 
     // 전화번호 업데이트
-    if (!StringUtils.hasText(updateDTO.getPhone())) {
+    if (StringUtils.hasText(updateDTO.getPhone())) {
       validatePhoneNumber(updateDTO.getPhone());
       user.setPhone(formatPhoneNumber(updateDTO.getPhone()));
     }
@@ -120,4 +122,5 @@ public class UserService {
         phoneNumber.substring(3, 7) + "-" +
         phoneNumber.substring(7);
   }
+
 }
