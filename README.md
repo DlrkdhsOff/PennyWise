@@ -54,7 +54,8 @@
   - 사용자가 입력한 데이터를 바탕으로 연간 사용 내역을 조회.
 
 ## ERD
-![image](https://github.com/user-attachments/assets/46e47f09-fab7-4821-908c-7d1350ec2ac2)
+![image](https://github.com/user-attachments/assets/5b98b090-c4fc-4c9c-94fc-9d35a879d654)
+
 
 
 
