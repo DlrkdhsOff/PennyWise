@@ -4,7 +4,12 @@ import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
+import com.zero.pennywise.model.entity.TransactionEntity;
+import com.zero.pennywise.model.entity.UserCategoryEntity;
 import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.repository.BudgetRepository;
+import com.zero.pennywise.repository.TransactionRepository;
+import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -12,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -19,6 +25,9 @@ import org.springframework.util.StringUtils;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final TransactionRepository transactionRepository;
+  private final BudgetRepository budgetRepository;
+  private final UserCategoryRepository userCategoryRepository;
 
   // 회원 가입
   public String register(RegisterDTO registerDTO) {
@@ -71,12 +80,16 @@ public class UserService {
   }
 
   // 회원 탈퇴
+  @Transactional
   public String delete(Long userId) {
 
     if (!userRepository.existsById(userId)) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 탈퇴 실패하였습니다.");
     }
 
+    budgetRepository.deleteAllByUserId(userId);
+    transactionRepository.deleteAllByUserId(userId);
+    userCategoryRepository.deleteAllByUserId(userId);
     userRepository.deleteById(userId);
     return "계정이 영구적으로 삭제 되었습니다.";
   }

@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
 
+  void deleteAllByUserId(Long userId);
+
   boolean existsByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
 
-  BudgetEntity findByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
 }

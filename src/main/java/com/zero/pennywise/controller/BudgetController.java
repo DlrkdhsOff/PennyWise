@@ -19,6 +19,7 @@ public class BudgetController {
   private final BudgetService budgetService;
 
   // 카테고리별 예산 설정
+  
   @PostMapping("/budgets")
   public ResponseEntity<?> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
       HttpServletRequest request) {

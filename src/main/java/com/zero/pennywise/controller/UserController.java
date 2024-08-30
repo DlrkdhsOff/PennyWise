@@ -40,7 +40,7 @@ public class UserController {
 
 
   // 회원 정보 수정
-  @PatchMapping("/update")
+  @PatchMapping("/account")
   public ResponseEntity<String> update(@RequestBody @Valid UpdateDTO updateDTO,
       HttpServletRequest request) {
 
@@ -55,7 +55,7 @@ public class UserController {
   }
 
   // 회원 탈퇴
-  @DeleteMapping("/delete")
+  @DeleteMapping("/account")
   public ResponseEntity<String> delete(HttpServletRequest request) {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
