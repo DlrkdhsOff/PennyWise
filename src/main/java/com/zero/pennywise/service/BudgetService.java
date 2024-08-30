@@ -24,7 +24,7 @@ public class BudgetService {
         // 사용자가 등록한 카테고리 예산 설정
         .map(category -> {
           BudgetEntity budget = budgetRepository
-              .findByUserIdAndCategoryId(userId, category.getCategoryId());
+              .findByUserIdAndCategoryCategoryId(userId, category.getCategoryId());
 
           budget.setAmount(budgetDTO.getAmount());
           budgetRepository.save(budget);

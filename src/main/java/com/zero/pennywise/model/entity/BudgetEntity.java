@@ -1,10 +1,14 @@
 package com.zero.pennywise.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,11 +27,13 @@ public class BudgetEntity extends DateEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long budgetId;
 
-  @Column(nullable = false)
-  private Long userId;
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "user_id", nullable = false)
+  private UserEntity user;
 
-  @Column(nullable = false)
-  private Long categoryId;
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "category_id", nullable = false)
+  private CategoriesEntity category;
 
   @Column(nullable = true)
   private Long amount;

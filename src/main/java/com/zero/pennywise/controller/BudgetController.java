@@ -2,12 +2,14 @@ package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.BudgetDTO;
+import com.zero.pennywise.model.dto.CategoryDTO;
 import com.zero.pennywise.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +34,6 @@ public class BudgetController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.setBudget(userId, BudgetDTO));
   }
+
 
 }

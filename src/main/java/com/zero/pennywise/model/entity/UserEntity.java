@@ -23,7 +23,7 @@ public class UserEntity extends DateEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(length = 50)
+  @Column(length = 50, unique = true)
   private String email;
 
   @Column(nullable = false, length = 50)
@@ -32,6 +32,6 @@ public class UserEntity extends DateEntity{
   @Column(nullable = false, length = 50)
   private String username;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String phone;
 }

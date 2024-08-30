@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
 
-  boolean existsByUserIdAndCategoryId(Long userId, Long categoryId);
+  boolean existsByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
 
-  BudgetEntity findByUserIdAndCategoryId(Long userId, Long categoryId);
+  BudgetEntity findByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
+//  BudgetEntity findByUserIdAndCategory(Long userId, Long categoryId);
 }

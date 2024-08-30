@@ -9,18 +9,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity(name = "categories")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 public class CategoriesEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long categoryId;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String categoryName;
+
+  @Column(nullable = false)
+  private boolean shared ;
 }
