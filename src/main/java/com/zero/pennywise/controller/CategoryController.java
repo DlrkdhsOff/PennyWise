@@ -55,6 +55,7 @@ public class CategoryController {
         .body(categoryService.createCategory(userId, categoryDTO));
   }
 
+  // 카테고리 수정
   @PatchMapping("/categories")
   public ResponseEntity<?> updateCategory(@RequestBody @Valid UpdateCategoryDTO updateCategoryDTO,
       HttpServletRequest request) {
@@ -68,7 +69,7 @@ public class CategoryController {
     return ResponseEntity.ok().body(categoryService.updateCategoryName(userId, updateCategoryDTO));
   }
 
-
+  // 카테고리 삭제
   @DeleteMapping("/categories")
   public ResponseEntity<?> deleteCategory(@RequestBody @Valid CategoryDTO categoryDTO,
       HttpServletRequest request) {

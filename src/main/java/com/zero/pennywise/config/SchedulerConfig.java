@@ -2,7 +2,6 @@ package com.zero.pennywise.config;
 
 import com.zero.pennywise.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
