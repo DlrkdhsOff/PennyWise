@@ -10,5 +10,5 @@ public interface CategoriesRepository extends JpaRepository<CategoriesEntity, Lo
 
   Optional<CategoriesEntity> findByCategoryName(String categoryName);
 
-  boolean existsByCategoryName(String categoryName);
+  void deleteByCategoryId(Long categoryId);
 }

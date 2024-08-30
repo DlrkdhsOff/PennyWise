@@ -119,10 +119,12 @@ public class TransactionService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "거래내역이 존재하지 않습니다.");
     }
 
-    TransactionEntity transaction = transactionRepository.findByTransactionId(updateTransactionDTO.getTransactionId())
+    TransactionEntity transaction = transactionRepository
+            .findByTransactionId(updateTransactionDTO.getTransactionId())
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 거래 아이디 입니다."));
 
-    CategoriesEntity categories = categoriesRepository.findByCategoryName(updateTransactionDTO.getCategoryName())
+    CategoriesEntity categories = categoriesRepository
+            .findByCategoryName(updateTransactionDTO.getCategoryName())
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 카테고리 입니다."));
 
     transaction.setCategoryId(categories.getCategoryId());
