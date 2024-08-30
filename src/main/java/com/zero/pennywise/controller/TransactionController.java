@@ -56,6 +56,7 @@ public class TransactionController {
   }
 
 
+  // 거래 수정
   @PatchMapping("/transaction")
   public ResponseEntity<?> updateTransaction(
       @RequestBody @Valid UpdateTransactionDTO updateTransactionDTO,

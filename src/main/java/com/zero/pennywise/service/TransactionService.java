@@ -15,7 +15,6 @@ import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
-import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -60,7 +59,8 @@ public class TransactionService {
     Pageable pageable = page(page);
 
     TransactionPage transactions = (StringUtils.hasText(categoryName))
-        ? TransactionsDTO.of(transactionQueryRepository.getTransactionsByCategory(user, categoryName, pageable))
+        ? TransactionsDTO.of(
+        transactionQueryRepository.getTransactionsByCategory(user, categoryName, pageable))
         : TransactionsDTO.of(transactionQueryRepository.getAllTransaction(user, pageable));
 
     validateTransactions(transactions.getTransactions(), categoryName);
@@ -98,47 +98,16 @@ public class TransactionService {
     TransactionEntity transaction = transactionRepository.findByTransactionId(updateTransactionDTO.getTransactionId())
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 거래 아이디 입니다."));
 
-    transaction = validateUpdateTransactionDTO(transaction, updateTransactionDTO);
+    CategoriesEntity categories = categoriesRepository.findByCategoryName(updateTransactionDTO.getCategoryName())
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 카테고리 입니다."));
 
+    transaction.setCategoryId(categories.getCategoryId());
+    transaction.setType(castToTransactionStatus(updateTransactionDTO.getType(), updateTransactionDTO.getIsFixed()));
+    transaction.setAmount(updateTransactionDTO.getAmount());
+    transaction.setDescription(updateTransactionDTO.getDescription());
     transactionRepository.save(transaction);
 
     return "거래 정보를 수정하였습니다.";
   }
 
-
-  // updateTransactionDTO 유효값 검증
-  public TransactionEntity validateUpdateTransactionDTO(TransactionEntity transaction, UpdateTransactionDTO updateDTO) {
-    if (updateDTO.getCategoryName() != null) {
-      CategoriesEntity categories = categoriesRepository.findByCategoryName(updateDTO.getCategoryName())
-              .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 카테고리 입니다."));
-      transaction.setCategoryId(categories.getCategoryId());
-    }
-
-    if (updateDTO.getType() != null && updateDTO.getIsFixed() != null) {
-      transaction.setType(castToTransactionStatus(updateDTO.getType(), updateDTO.getIsFixed()));
-
-    }else if(updateDTO.getType() != null){
-
-      if ("지출".equals(updateDTO.getType())) {
-        transaction.setType("FIXED".startsWith(transaction.getType().toString())
-            ? TransactionStatus.FIXED_EXPENSES
-            : TransactionStatus.EXPENSES);
-
-      } else if ("수입".equals(updateDTO.getType())) {
-        transaction.setType("FIXED".startsWith(transaction.getType().toString())
-            ? TransactionStatus.FIXED_INCOME
-            : TransactionStatus.INCOME);
-      }
-    }
-
-    if (updateDTO.getAmount() != null) {
-      transaction.setAmount(updateDTO.getAmount());
-    }
-
-    if (updateDTO.getDescription() != null) {
-      transaction.setDescription(updateDTO.getDescription());
-    }
-
-    return transaction;
-  }
 }
