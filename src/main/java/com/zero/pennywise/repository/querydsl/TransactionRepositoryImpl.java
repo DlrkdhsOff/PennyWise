@@ -8,6 +8,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import com.zero.pennywise.model.entity.QTransactionEntity;
+import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.service.TransactionService;
@@ -101,21 +102,14 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         t.dateTime.as("dateTime"));
   }
 
-  @Transactional
+
   @Override
-  public void updateFixedTransaction(String lastMonthsDate, String today) {
+  public List<TransactionEntity> findFixedTransaction(String lastMonthsDate) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-
-    long affectedRows = jpaQueryFactory
-        .update(t)
-        .set(t.fixedDateTime, today)
-        .where(t.type.eq(FIXED_EXPENSES)
-            .or(t.type.eq(FIXED_INCOME))
-            .and(t.dateTime.startsWith(lastMonthsDate)))
-        .execute();
-
-    logger.info("날짜 : {} {}개 행이 수정 되었습니다. ",today, affectedRows);
+    return jpaQueryFactory
+        .selectFrom(t)
+        .where(t.dateTime.startsWith(lastMonthsDate))
+        .fetch();
   }
-
 
 }

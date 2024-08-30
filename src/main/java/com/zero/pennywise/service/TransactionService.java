@@ -17,6 +17,7 @@ import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -80,12 +81,35 @@ public class TransactionService {
 
   // 매일 00시에 자동으로 현재를 기준으로 고정 수입/지출 자동 등록
   public void updateFixedTransaction() {
-    String lastMonthsDate = LocalDate.now().minusMonths(1).toString();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    String today = LocalDateTime.now().format(formatter);
+    // 오늘 날짜
+    String todayDate = LocalDateTime.now().format(formatter);
+    // 한 달 전 날짜
+    LocalDate lastMonthsDate = LocalDate.now().minusMonths(1);
 
-    transactionQueryRepository.updateFixedTransaction(lastMonthsDate, today);
+    // 한 달 전의 마지막 날짜 계산
+    YearMonth yearMonth = YearMonth.of(lastMonthsDate.getYear(), lastMonthsDate.getMonth());
+    LocalDate lastDayOfLastMonth = yearMonth.atEndOfMonth();
+
+    // 마지막 날에 맞춰 날짜를 조정
+    if (lastMonthsDate.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth()) {
+      lastMonthsDate = lastDayOfLastMonth;
+    }
+
+    List<TransactionEntity> transactions = transactionRepository
+        .findByDateTimeStartingWith(lastMonthsDate.toString());
+
+    for (TransactionEntity transaction : transactions) {
+      transactionRepository.save(TransactionEntity.builder()
+          .user(transaction.getUser())
+          .categoryId(transaction.getCategoryId())
+          .type(transaction.getType())
+          .amount(transaction.getAmount())
+          .description(transaction.getDescription())
+          .dateTime(todayDate)
+          .build());
+    }
   }
 
 

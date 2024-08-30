@@ -50,6 +50,4 @@ public class TransactionEntity {
   private String dateTime;
 
 
-  private String fixedDateTime;
-
 }
