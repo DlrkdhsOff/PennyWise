@@ -1,7 +1,7 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.BudgetDTO;
+import com.zero.pennywise.model.dto.budget.BudgetDTO;
 import com.zero.pennywise.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ public class BudgetController {
   private final BudgetService budgetService;
 
   // 카테고리별 예산 설정
-  
+
   @PostMapping("/budgets")
   public ResponseEntity<?> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
       HttpServletRequest request) {

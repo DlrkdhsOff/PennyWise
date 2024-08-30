@@ -5,9 +5,11 @@ import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity
 import static com.zero.pennywise.model.entity.QUserCategoryEntity.userCategoryEntity;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.QBudgetEntity;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import com.zero.pennywise.model.entity.QUserCategoryEntity;
+import com.zero.pennywise.model.entity.UserEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,5 +49,21 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
 
     Long total = getBudgetCount(uC, userId);
     return new PageImpl<>(list, page, total);
+  }
+
+  @Override
+  public void updateCategory(Long userId, Long categoryId, CategoriesEntity newCategory) {
+
+    QUserCategoryEntity uC = QUserCategoryEntity.userCategoryEntity;
+    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+
+    jpaQueryFactory
+        .update(uC)
+        .set(uC.category.categoryId, newCategory.getCategoryId())
+        .where(
+            uC.user.id.eq(userId),
+            uC.category.categoryId.eq(categoryId)
+        )
+        .execute();
   }
 }

@@ -1,8 +1,8 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.TransactionDTO;
-import com.zero.pennywise.model.dto.UpdateTransactionDTO;
+import com.zero.pennywise.model.dto.transaction.TransactionDTO;
+import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

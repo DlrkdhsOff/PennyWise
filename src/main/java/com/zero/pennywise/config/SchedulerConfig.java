@@ -12,7 +12,7 @@ public class SchedulerConfig {
   private final TransactionService transactionService;
 
 
-  @Scheduled(cron = "0/9 * * * * ?")
+//  @Scheduled(cron = "0/9 * * * * ?")
   public void run() {
     transactionService.updateFixedTransaction();
   }

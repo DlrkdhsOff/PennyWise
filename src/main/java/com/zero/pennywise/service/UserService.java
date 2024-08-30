@@ -1,26 +1,19 @@
 package com.zero.pennywise.service;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.LoginDTO;
-import com.zero.pennywise.model.dto.RegisterDTO;
-import com.zero.pennywise.model.dto.UpdateDTO;
-import com.zero.pennywise.model.entity.TransactionEntity;
-import com.zero.pennywise.model.entity.UserCategoryEntity;
+import com.zero.pennywise.model.dto.account.LoginDTO;
+import com.zero.pennywise.model.dto.account.RegisterDTO;
+import com.zero.pennywise.model.dto.account.UpdateDTO;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.SQLNonTransientException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor

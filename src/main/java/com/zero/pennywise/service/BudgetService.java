@@ -1,7 +1,7 @@
 package com.zero.pennywise.service;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.BudgetDTO;
+import com.zero.pennywise.model.dto.budget.BudgetDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserEntity;
@@ -36,7 +36,7 @@ public class BudgetService {
     if (budgetRepository.existsByUserIdAndCategoryCategoryId(user.getId(),
         category.getCategoryId())) {
 
-      throw  new GlobalException(HttpStatus.BAD_REQUEST, "이미 등록한 예산입니다.");
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 등록한 예산입니다.");
     }
 
     budgetRepository.save(BudgetEntity.builder()

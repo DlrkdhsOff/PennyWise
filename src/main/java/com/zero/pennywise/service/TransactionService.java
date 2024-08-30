@@ -4,8 +4,8 @@ import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatu
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.TransactionDTO;
-import com.zero.pennywise.model.dto.UpdateTransactionDTO;
+import com.zero.pennywise.model.dto.transaction.TransactionDTO;
+import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.entity.UserEntity;
