@@ -3,7 +3,7 @@ package com.zero.pennywise.model.dto;
 import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
 
 import com.zero.pennywise.model.entity.TransactionEntity;
-import com.zero.pennywise.status.TransactionStatus;
+import com.zero.pennywise.model.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -27,9 +27,9 @@ public class TransactionDTO {
   @NotBlank(message = "고정적인 지출/수입일 경우 \"Y\"를 입력해주세요.")
   private String isFixed;
 
-  public static TransactionEntity of(Long userId, Long categoryId, TransactionDTO transactionDTO) {
+  public static TransactionEntity of(UserEntity user, Long categoryId, TransactionDTO transactionDTO) {
     return TransactionEntity.builder()
-        .userId(userId)
+        .user(user)
         .categoryId(categoryId)
         .type(castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()))
         .amount(transactionDTO.getAmount())

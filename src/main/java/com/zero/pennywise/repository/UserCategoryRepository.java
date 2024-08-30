@@ -1,15 +1,10 @@
 package com.zero.pennywise.repository;
 
-import com.zero.pennywise.model.entity.BudgetEntity;
+import com.zero.pennywise.model.entity.UserCategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-
-@Repository
-public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
-
+public interface UserCategoryRepository extends JpaRepository<UserCategoryEntity, Long> {
   void deleteAllByUserId(Long userId);
 
   boolean existsByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
-
 }

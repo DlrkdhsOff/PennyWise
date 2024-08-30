@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +19,8 @@ public class BudgetController {
   private final BudgetService budgetService;
 
   // 카테고리별 예산 설정
-  @PatchMapping("/budgets")
+  
+  @PostMapping("/budgets")
   public ResponseEntity<?> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
       HttpServletRequest request) {
 
@@ -32,5 +33,6 @@ public class BudgetController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.setBudget(userId, BudgetDTO));
   }
+
 
 }

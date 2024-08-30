@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -40,8 +42,8 @@ public class UserController {
 
 
   // 회원 정보 수정
-  @PatchMapping("/update")
-  public ResponseEntity<String> update(@RequestBody @Valid UpdateDTO updateDTO,
+  @PatchMapping( "/account")
+  public ResponseEntity<String> updateAccount(@RequestBody @Valid UpdateDTO updateDTO,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -55,7 +57,7 @@ public class UserController {
   }
 
   // 회원 탈퇴
-  @DeleteMapping("/delete")
+  @DeleteMapping("/account")
   public ResponseEntity<String> delete(HttpServletRequest request) {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
@@ -64,7 +66,6 @@ public class UserController {
     }
     return ResponseEntity.status(HttpStatus.OK).body(userService.delete(userId));
   }
-
 }
 
 

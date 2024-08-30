@@ -2,10 +2,12 @@ package com.zero.pennywise.repository.querydsl;
 
 import static com.zero.pennywise.model.entity.QBudgetEntity.budgetEntity;
 import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity;
+import static com.zero.pennywise.model.entity.QUserCategoryEntity.userCategoryEntity;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.model.entity.QBudgetEntity;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
+import com.zero.pennywise.model.entity.QUserCategoryEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,30 +23,29 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
 
 
   // 총 데이터의 개수
-  private Long getBudgetCount(QBudgetEntity b, QCategoriesEntity c, Long userId) {
+  private Long getBudgetCount(QUserCategoryEntity uC, Long userId) {
     return jpaQueryFactory
-        .select(b.count())
-        .from(b)
-        .join(c).on(b.categoryId.eq(c.categoryId))
-        .where(b.userId.eq(userId))
+        .select(uC.count())
+        .from(uC)
+        .where(uC.user.id.eq(userId))
         .fetchOne();
   }
 
   @Override
   public Page<String> getAllCategory(Long userId, Pageable page) {
+    QUserCategoryEntity uC = userCategoryEntity;
     QCategoriesEntity c = categoriesEntity;
-    QBudgetEntity b = budgetEntity;
 
     List<String> list = jpaQueryFactory
         .select(c.categoryName)
-        .from(b)
-        .join(c).on(b.categoryId.eq(c.categoryId))
-        .where(b.userId.eq(userId))
+        .from(c)
+        .join(uC).on(c.categoryId.eq(uC.category.categoryId))
+        .where(uC.user.id.eq(userId))
         .limit(page.getPageSize())
         .offset(page.getOffset())
         .fetch();
 
-    Long total = getBudgetCount(b, c, userId);
+    Long total = getBudgetCount(uC, userId);
     return new PageImpl<>(list, page, total);
   }
 }

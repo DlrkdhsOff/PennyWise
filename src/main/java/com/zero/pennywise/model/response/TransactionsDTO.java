@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionsDTO {
+
+  private Long transactionId;
   private String type;
   private String categoryName;
   private Long amount;

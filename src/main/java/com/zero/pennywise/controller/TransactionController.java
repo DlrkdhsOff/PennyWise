@@ -2,6 +2,7 @@ package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.TransactionDTO;
+import com.zero.pennywise.model.dto.UpdateTransactionDTO;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,5 +53,22 @@ public class TransactionController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
     return ResponseEntity.ok(transactionService.getTransactionList(userId, categoryName, page));
+  }
+
+
+  // 거래 수정
+  @PatchMapping("/transaction")
+  public ResponseEntity<?> updateTransaction(
+      @RequestBody @Valid UpdateTransactionDTO updateTransactionDTO,
+      HttpServletRequest request) {
+
+    Long userId = (Long) request.getSession().getAttribute("userId");
+
+    if (userId == null) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
+    }
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(transactionService.updateTransaction(userId, updateTransactionDTO));
   }
 }

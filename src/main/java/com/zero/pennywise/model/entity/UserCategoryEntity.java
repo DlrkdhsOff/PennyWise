@@ -1,7 +1,6 @@
 package com.zero.pennywise.model.entity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,17 +14,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "budgets")
+@Entity(name = "user_category")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
-public class BudgetEntity extends DateEntity{
-
+public class UserCategoryEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long budgetId;
+  private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
@@ -34,7 +32,4 @@ public class BudgetEntity extends DateEntity{
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id", nullable = false)
   private CategoriesEntity category;
-
-  @Column(nullable = true)
-  private Long amount;
 }

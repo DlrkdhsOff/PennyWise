@@ -4,13 +4,22 @@ import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.LoginDTO;
 import com.zero.pennywise.model.dto.RegisterDTO;
 import com.zero.pennywise.model.dto.UpdateDTO;
+import com.zero.pennywise.model.entity.TransactionEntity;
+import com.zero.pennywise.model.entity.UserCategoryEntity;
 import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.repository.BudgetRepository;
+import com.zero.pennywise.repository.TransactionRepository;
+import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLNonTransientException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -18,6 +27,9 @@ import org.springframework.util.StringUtils;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final TransactionRepository transactionRepository;
+  private final BudgetRepository budgetRepository;
+  private final UserCategoryRepository userCategoryRepository;
 
   // 회원 가입
   public String register(RegisterDTO registerDTO) {
@@ -30,7 +42,11 @@ public class UserService {
     validatePhoneNumber(registerDTO.getPhone());
     registerDTO.setPhone(registerDTO.getPhone());
 
-    userRepository.save(RegisterDTO.of(registerDTO));
+    try {
+      userRepository.save(RegisterDTO.of(registerDTO));
+    } catch (Exception e) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 가입된 전화번호 입니다.");
+    }
 
     return "회원가입 성공";
   }
@@ -54,27 +70,33 @@ public class UserService {
     return "로그인 성공";
   }
 
+
   // 회원 정보 수정
   public String update(Long userId, UpdateDTO updateDTO) {
-    Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원 입니다."));
 
-    if (optionalUserEntity.isEmpty()) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다.");
-    }
+    validatePhoneNumber(updateDTO.getPhone());
 
-    UserEntity user = optionalUserEntity.get();
-    userRepository.save(validateUpdateDTO(user, updateDTO));
+    user.setPassword(updateDTO.getPassword());
+    user.setUsername(updateDTO.getUsername());
+    user.setPhone(formatPhoneNumber(updateDTO.getPhone()));
+    userRepository.save(user);
 
     return "회원 정보가 성공적으로 수정되었습니다.";
   }
 
   // 회원 탈퇴
+  @Transactional
   public String delete(Long userId) {
 
     if (!userRepository.existsById(userId)) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 탈퇴 실패하였습니다.");
     }
 
+    budgetRepository.deleteAllByUserId(userId);
+    transactionRepository.deleteAllByUserId(userId);
+    userCategoryRepository.deleteAllByUserId(userId);
     userRepository.deleteById(userId);
     return "계정이 영구적으로 삭제 되었습니다.";
   }
@@ -86,32 +108,6 @@ public class UserService {
     } else if (phone.length() > 11) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "유효하지 않은 전화번호 입니다.");
     }
-  }
-
-  public UserEntity validateUpdateDTO(UserEntity user, UpdateDTO updateDTO) {
-    if (updateDTO == null || StringUtils.hasText(updateDTO.getPassword())
-        && StringUtils.hasText(updateDTO.getUsername())
-        && StringUtils.hasText(updateDTO.getPhone())) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 정보 수정에 실패 했습니다.");
-    }
-
-    // 비밀번호 업데이트
-    if (!StringUtils.hasText(updateDTO.getPassword())) {
-      user.setPassword(updateDTO.getPassword());
-    }
-
-    // 사용자 이름 업데이트
-    if (!StringUtils.hasText(updateDTO.getUsername())) {
-      user.setUsername(updateDTO.getUsername());
-    }
-
-    // 전화번호 업데이트
-    if (!StringUtils.hasText(updateDTO.getPhone())) {
-      validatePhoneNumber(updateDTO.getPhone());
-      user.setPhone(formatPhoneNumber(updateDTO.getPhone()));
-    }
-
-    return user;
   }
 
   // 전화번호 formatting
