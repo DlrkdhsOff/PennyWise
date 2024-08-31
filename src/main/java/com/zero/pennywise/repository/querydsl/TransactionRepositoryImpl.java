@@ -1,8 +1,5 @@
 package com.zero.pennywise.repository.querydsl;
 
-import static com.zero.pennywise.status.TransactionStatus.FIXED_EXPENSES;
-import static com.zero.pennywise.status.TransactionStatus.FIXED_INCOME;
-
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -39,7 +35,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     List<TransactionsDTO> list =  jpaQueryFactory
-        .select(selectTransactionAndCategoryColumn(t, c))
+        .select(selectTransactionAndCategoryColumn())
         .from(t)
         .join(c).on(t.categoryId.eq(c.categoryId))
         .where(t.user.id.eq(user.getId()))
@@ -47,7 +43,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .offset(page.getOffset())
         .fetch();
 
-    Long total = getTransactionCount(t, c, user, null);
+    Long total = getTransactionCount(user, null);
     return new PageImpl<>(list, page, total);
   }
 
@@ -58,7 +54,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     List<TransactionsDTO> list = jpaQueryFactory
-        .select(selectTransactionAndCategoryColumn(t, c))
+        .select(selectTransactionAndCategoryColumn())
         .from(t)
         .join(c).on(t.categoryId.eq(c.categoryId), c.categoryName.eq(categoryName))
         .where(t.user.id.eq(user.getId()))
@@ -66,12 +62,14 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .offset(page.getOffset())
         .fetch();
 
-    Long total = getTransactionCount(t, c, user, categoryName);
+    Long total = getTransactionCount(user, categoryName);
     return new PageImpl<>(list, page, total);
   }
 
   // 총 데이터의 개수
-  private Long getTransactionCount(QTransactionEntity t, QCategoriesEntity c, UserEntity user, String categoryName) {
+  private Long getTransactionCount(UserEntity user, String categoryName) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     if (categoryName == null) {
       return jpaQueryFactory
@@ -92,7 +90,10 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
 
   // 중복 코드 메서드로 추출(사용할 컬럼)
-  private Expression<TransactionsDTO> selectTransactionAndCategoryColumn(QTransactionEntity t, QCategoriesEntity c) {
+  private Expression<TransactionsDTO> selectTransactionAndCategoryColumn() {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+
     return Projections.fields(TransactionsDTO.class,
         t.transactionId.as("transactionId"),
         t.type.stringValue().as("type"),

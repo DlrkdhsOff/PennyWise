@@ -1,15 +1,12 @@
 package com.zero.pennywise.repository.querydsl;
 
-import static com.zero.pennywise.model.entity.QBudgetEntity.budgetEntity;
 import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity;
 import static com.zero.pennywise.model.entity.QUserCategoryEntity.userCategoryEntity;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.QBudgetEntity;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import com.zero.pennywise.model.entity.QUserCategoryEntity;
-import com.zero.pennywise.model.entity.UserEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

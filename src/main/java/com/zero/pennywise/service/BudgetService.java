@@ -1,17 +1,25 @@
 package com.zero.pennywise.service;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.budget.BudgetDTO;
 import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.model.response.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
+import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
+import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +28,7 @@ public class BudgetService {
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
   private final UserRepository userRepository;
+  private final BudgetQueryRepository budgetQueryRepository;
 
 
   // 카테고리별 예산 설정
@@ -66,5 +75,14 @@ public class BudgetService {
     budgetRepository.save(budget);
 
     return "성공적으로 예산을 수정하였습니다.";
+  }
+
+  public BudgetPage getBudget(Long userId, Pageable page) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+
+    Pageable pageable = page(page);
+
+    return BudgetPage.of(budgetQueryRepository.findAllBudgetByUserId(userId, pageable));
   }
 }
