@@ -12,14 +12,11 @@ import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
-import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -85,4 +82,21 @@ public class BudgetService {
 
     return BudgetPage.of(budgetQueryRepository.findAllBudgetByUserId(userId, pageable));
   }
+
+  public String deleteBudget(Long userId, String categoryName) {
+    UserEntity user = userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+
+    CategoriesEntity category = categoriesRepository.findByCategoryName(categoryName)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리입니다."));
+
+    BudgetEntity budget = budgetRepository.findByUserIdAndCategoryCategoryId(user.getId(),
+            category.getCategoryId())
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));
+
+    budgetRepository.deleteByBudgetId(budget.getBudgetId());
+
+    return "예산을 성공적으로 삭제 하였습닏.";
+  }
+
 }
