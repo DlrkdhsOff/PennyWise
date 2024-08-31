@@ -31,8 +31,7 @@ public class BudgetService {
   // 카테고리별 예산 설정
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
 
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원 입니다."));
+    UserEntity user = getUserById(userId);
     
     return categoriesRepository.findByCategoryName(budgetDTO.getCategoryName())
         .map(category -> existingCategory(user, category, budgetDTO.getAmount()))
@@ -58,15 +57,11 @@ public class BudgetService {
   // 카테고리별 예산 수정
   @Transactional
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+    UserEntity user = getUserById(userId);
 
-    String categoryName = budgetDTO.getCategoryName();
-    CategoriesEntity category = categoriesRepository.findByCategoryName(categoryName)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리입니다."));
+    CategoriesEntity category = getCategoryByName(budgetDTO.getCategoryName());
 
-    BudgetEntity budget = budgetRepository.findByUserIdAndCategoryCategoryId(userId, category.getCategoryId())
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));
+    BudgetEntity budget = getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
 
     budget.setAmount(budgetDTO.getAmount());
     budgetRepository.save(budget);
@@ -75,8 +70,7 @@ public class BudgetService {
   }
 
   public BudgetPage getBudget(Long userId, Pageable page) {
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+    UserEntity user = getUserById(userId);
 
     Pageable pageable = page(page);
 
@@ -84,19 +78,33 @@ public class BudgetService {
   }
 
   public String deleteBudget(Long userId, String categoryName) {
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+    UserEntity user = getUserById(userId);
 
-    CategoriesEntity category = categoriesRepository.findByCategoryName(categoryName)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리입니다."));
+    CategoriesEntity category = getCategoryByName(categoryName);
 
-    BudgetEntity budget = budgetRepository.findByUserIdAndCategoryCategoryId(user.getId(),
-            category.getCategoryId())
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));
+    BudgetEntity budget = getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
 
     budgetRepository.deleteByBudgetId(budget.getBudgetId());
 
     return "예산을 성공적으로 삭제 하였습닏.";
+  }
+
+  // 공통 메서드: 사용자 조회
+  private UserEntity getUserById(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  }
+
+  // 공통 메서드: 카테고리 조회
+  private CategoriesEntity getCategoryByName(String categoryName) {
+    return categoriesRepository.findByCategoryName(categoryName)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
+  }
+
+  // 공통 메서드: 예산 조회
+  private BudgetEntity getBudgetByUserIdAndCategoryId(Long userId, Long categoryId) {
+    return budgetRepository.findByUserIdAndCategoryCategoryId(userId, categoryId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));
   }
 
 }
