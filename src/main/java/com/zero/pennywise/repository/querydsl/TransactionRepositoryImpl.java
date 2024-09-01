@@ -1,15 +1,22 @@
 package com.zero.pennywise.repository.querydsl;
 
+import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity;
+import static com.zero.pennywise.model.entity.QTransactionEntity.transactionEntity;
+
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.zero.pennywise.model.dto.transaction.CategoryAmountDTO;
+import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import com.zero.pennywise.model.entity.QTransactionEntity;
-import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.service.TransactionService;
+import com.zero.pennywise.status.TransactionStatus;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -32,7 +39,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   @Override
   public Page<TransactionsDTO> getAllTransaction(UserEntity user, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoriesEntity c = categoriesEntity;
 
     List<TransactionsDTO> list =  jpaQueryFactory
         .select(selectTransactionAndCategoryColumn())
@@ -50,8 +57,8 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   // 카테고리별 거래 내역
   @Override
   public Page<TransactionsDTO> getTransactionsByCategory(UserEntity user, String categoryName, Pageable page) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QTransactionEntity t = transactionEntity;
+    QCategoriesEntity c = categoriesEntity;
 
     List<TransactionsDTO> list = jpaQueryFactory
         .select(selectTransactionAndCategoryColumn())
@@ -68,8 +75,8 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 총 데이터의 개수
   private Long getTransactionCount(UserEntity user, String categoryName) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QTransactionEntity t = transactionEntity;
+    QCategoriesEntity c = categoriesEntity;
 
     if (categoryName == null) {
       return jpaQueryFactory
@@ -91,8 +98,8 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 중복 코드 메서드로 추출(사용할 컬럼)
   private Expression<TransactionsDTO> selectTransactionAndCategoryColumn() {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QTransactionEntity t = transactionEntity;
+    QCategoriesEntity c = categoriesEntity;
 
     return Projections.fields(TransactionsDTO.class,
         t.transactionId.as("transactionId"),
@@ -104,13 +111,86 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   }
 
 
+  // 카테고리 변경시 해당 변경된 categoryId로 변경
   @Override
-  public List<TransactionEntity> findFixedTransaction(String lastMonthsDate) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-    return jpaQueryFactory
-        .selectFrom(t)
-        .where(t.dateTime.startsWith(lastMonthsDate))
-        .fetch();
+  public void updateCategoryId(Long userId, Long categoryId, CategoriesEntity updatedCategory) {
+    QTransactionEntity t = transactionEntity;
+
+    jpaQueryFactory
+        .update(t)
+        .set(t.categoryId, updatedCategory.getCategoryId())
+        .where(
+            t.user.id.eq(userId),
+            t.categoryId.eq(categoryId)
+        )
+        .execute();
   }
+
+  //
+  @Override
+  public Map<String, Long> getTotalAmount(Long userId, String thisMonth) {
+    QTransactionEntity t = transactionEntity;
+
+    Long totalExpenses = getAmount(userId, null, thisMonth,
+        TransactionStatus.EXPENSES, TransactionStatus.FIXED_EXPENSES);
+
+    Long totalIncome = getAmount(userId, null, thisMonth,
+        TransactionStatus.INCOME, TransactionStatus.FIXED_INCOME);
+
+    totalExpenses = (totalExpenses == null) ? 0 : totalExpenses;
+    totalIncome = (totalIncome == null) ? 0 : totalIncome;
+
+    Map<String, Long> map = new HashMap<>();
+    map.put("수입", totalIncome);
+    map.put("지출", totalExpenses);
+
+    return map;
+  }
+
+  @Override
+  public CategoryAmountDTO getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId,
+      String thisMonth) {
+
+    QTransactionEntity t = transactionEntity;
+    QCategoriesEntity c = categoriesEntity;
+
+    String categoryName = jpaQueryFactory
+        .select(c.categoryName)
+        .from(c)
+        .where(c.categoryId.eq(categoryId))
+        .fetchOne();
+
+    Long totalExpenses = getAmount(userId, categoryId, thisMonth,
+        TransactionStatus.EXPENSES, TransactionStatus.FIXED_EXPENSES);
+
+    Long totalIncome = getAmount(userId, categoryId, thisMonth,
+        TransactionStatus.INCOME, TransactionStatus.FIXED_INCOME);
+
+    totalExpenses = (totalExpenses == null) ? 0 : totalExpenses;
+    totalIncome = (totalIncome == null) ? 0 : totalIncome;
+
+    return new CategoryAmountDTO(categoryName, totalIncome, totalExpenses);
+  }
+
+
+  // 공통 메서드 : 해당 값과 일치하는 데이터의 합계
+  private Long getAmount(Long userId, Long categoryId, String thisMonths,
+      TransactionStatus notFixed, TransactionStatus fixed) {
+
+    QTransactionEntity t = transactionEntity;
+
+    return jpaQueryFactory
+        .select(t.amount.sum())
+        .from(t)
+        .where(
+            t.user.id.eq(userId),
+            t.dateTime.startsWith(thisMonths),
+            t.type.eq(fixed)
+                .or( t.type.eq(notFixed)),
+            categoryId != null ? t.categoryId.eq(categoryId) : null
+        )
+        .fetchOne();
+  }
+
 
 }

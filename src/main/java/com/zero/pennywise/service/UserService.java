@@ -4,13 +4,22 @@ import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.account.LoginDTO;
 import com.zero.pennywise.model.dto.account.RegisterDTO;
 import com.zero.pennywise.model.dto.account.UpdateDTO;
+import com.zero.pennywise.model.dto.transaction.CategoryAmountDTO;
+import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
+import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +32,8 @@ public class UserService {
   private final TransactionRepository transactionRepository;
   private final BudgetRepository budgetRepository;
   private final UserCategoryRepository userCategoryRepository;
+  private final CacheManager cacheManager;
+  private final TransactionQueryRepository transactionQueryRepository;
 
   // 회원 가입
   public String register(RegisterDTO registerDTO) {
@@ -59,8 +70,48 @@ public class UserService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
     }
 
+    List<Map<String, Long>> categoryBalances = getUserCategoryBalances(user);
+    if (categoryBalances != null) {
+      cacheManager.getCache("categoryBalances").put(user.getId(), categoryBalances);
+    }
+
     request.getSession().setAttribute("userId", user.getId());
     return "로그인 성공";
+  }
+
+  // 카테고리별 남은 금액
+  private List<Map<String, Long>> getUserCategoryBalances(UserEntity user) {
+    List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
+    if (userBudget == null) {
+      return null;
+    }
+
+    List<Map<String, Long>> result = new ArrayList<>();
+
+    for (BudgetEntity budget : userBudget) {
+      Map<String, Long> map = getCategoryBalances(user.getId(), budget);
+      result.add(map);
+    }
+    return result;
+  }
+
+  // 카테고리 남은 금액
+  public Map<String, Long> getCategoryBalances(Long userId, BudgetEntity budget) {
+
+    Long categoryId = budget.getCategory().getCategoryId();
+    String thisMonths = LocalDate.now().toString();
+
+    CategoryAmountDTO categoryAmountDTO = transactionQueryRepository
+        .getTotalAmountByUserIdAndCategoryId(userId, categoryId, thisMonths);
+
+    Long balance = budget.getAmount();
+    balance += categoryAmountDTO.getTotalIncome();
+    balance -= categoryAmountDTO.getTotalExpenses();
+
+    Map<String, Long> map = new HashMap<>();
+    map.put(categoryAmountDTO.getCategoryName(), balance);
+
+    return map;
   }
 
 

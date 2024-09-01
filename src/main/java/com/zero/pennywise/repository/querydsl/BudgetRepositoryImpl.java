@@ -7,6 +7,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.model.dto.budget.BudgetDTO;
+import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.QBudgetEntity;
 import com.zero.pennywise.model.entity.QCategoriesEntity;
 import java.util.List;
@@ -40,12 +41,28 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
     return new PageImpl<>(list, pageable, total);
   }
 
+  @Override
+  public void updateCategoryId(Long userId, Long categoryId, CategoriesEntity updatedCategory) {
+    QBudgetEntity b = budgetEntity;
+
+    jpaQueryFactory
+        .update(b)
+        .set(b.category.categoryId, updatedCategory.getCategoryId())
+        .where(
+            b.user.id.eq(userId),
+            b.category.categoryId.eq(categoryId)
+        )
+        .execute();
+  }
+
+  // select 변수 지정
   private Expression<BudgetDTO> selectBudgetAndCategory(QCategoriesEntity c, QBudgetEntity b) {
     return Projections.fields(BudgetDTO.class,
         c.categoryName.as("categoryName"),
         b.amount.as("amount"));
   }
 
+  // 총 데이터 개수
   private Long countBudgetsByUserId(Long userId) {
     QBudgetEntity b = budgetEntity;
 
@@ -55,4 +72,6 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
         .where(b.user.id.eq(userId))
         .fetchOne();
   }
+
+
 }

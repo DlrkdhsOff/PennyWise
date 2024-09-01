@@ -12,7 +12,9 @@ import com.zero.pennywise.model.response.CategoriesPage;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
+import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
 import com.zero.pennywise.repository.querydsl.CategoryQueryRepository;
+import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,8 @@ public class CategoryService {
   private final CategoriesRepository categoriesRepository;
   private final CategoryQueryRepository categoryQueryRepository;
   private final UserRepository userRepository;
+  private final TransactionQueryRepository transactionQueryRepository;
+  private final BudgetQueryRepository budgetQueryRepository;
 
 
   // 카테고리 목록
@@ -90,8 +94,18 @@ public class CategoryService {
     CategoriesEntity updatedCategory = updateOrCreateNewCategory(user.getId(), existingCategory,
         updateCategoryDTO.getNewCategoryName(), isUsedByOtherUser);
 
+    // 카테고리 정보 수정
     categoryQueryRepository.updateCategory(user.getId(), existingCategory.getCategoryId(),
         updatedCategory);
+
+    // 거래 정보 수정
+    transactionQueryRepository.updateCategoryId(user.getId(), existingCategory.getCategoryId(),
+        updatedCategory);
+
+    // 예산 정보 수정
+    budgetQueryRepository.updateCategoryId(user.getId(), existingCategory.getCategoryId(),
+        updatedCategory);
+
 
     return "성공적으로 카테고리를 수정하였습니다.";
   }

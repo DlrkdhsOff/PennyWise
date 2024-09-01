@@ -10,8 +10,10 @@ import com.zero.pennywise.model.entity.UserEntity;
 import com.zero.pennywise.model.response.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
+import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
+import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,12 +29,11 @@ public class BudgetService {
   private final UserRepository userRepository;
   private final BudgetQueryRepository budgetQueryRepository;
 
-
   // 카테고리별 예산 설정
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
 
     UserEntity user = getUserById(userId);
-    
+
     return categoriesRepository.findByCategoryName(budgetDTO.getCategoryName())
         .map(category -> existingCategory(user, category, budgetDTO.getAmount()))
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
@@ -54,6 +55,8 @@ public class BudgetService {
     return "성공적으로 예산을 등록하였습니다.";
   }
 
+
+
   // 카테고리별 예산 수정
   @Transactional
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
@@ -69,6 +72,8 @@ public class BudgetService {
     return "성공적으로 예산을 수정하였습니다.";
   }
 
+
+  // 예산 목록
   public BudgetPage getBudget(Long userId, Pageable page) {
     UserEntity user = getUserById(userId);
 
@@ -77,6 +82,8 @@ public class BudgetService {
     return BudgetPage.of(budgetQueryRepository.findAllBudgetByUserId(userId, pageable));
   }
 
+
+  // 예산 삭제
   public String deleteBudget(Long userId, String categoryName) {
     UserEntity user = getUserById(userId);
 
@@ -88,6 +95,7 @@ public class BudgetService {
 
     return "예산을 성공적으로 삭제 하였습닏.";
   }
+
 
   // 공통 메서드: 사용자 조회
   private UserEntity getUserById(Long userId) {
@@ -106,5 +114,4 @@ public class BudgetService {
     return budgetRepository.findByUserIdAndCategoryCategoryId(userId, categoryId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));
   }
-
 }
