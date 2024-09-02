@@ -23,6 +23,8 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -68,32 +70,60 @@ public class TransactionService {
 
 
   // 캐시 업데이트 메서드
-  private void updateCategoryBalanceCache(UserEntity user, String categoryName, String type, Long amount) {
-    // 기존 캐시 가져오기
-    @SuppressWarnings("unchecked")
-    Map<String, Long> categoryBalances = (Map<String, Long>) redisTemplate.opsForHash()
-        .get("categoryBalances", user.getId().toString());
+  public void updateCategoryBalanceCache(UserEntity user, String categoryName, String type, Long amount) {
+    String key = "lock:" + user.getId().toString();
+    String value = UUID.randomUUID().toString();
+    Long ttl = 30000L;
 
-    if (categoryBalances != null) {
-      if (categoryBalances.containsKey(categoryName)) {
-        Long currentValue = categoryBalances.get(categoryName);
+    // 락 설정
+    if (lock(key, value, ttl)) {
+      try {
+        // 기존 캐시 가져오기
+        @SuppressWarnings("unchecked")
+        Map<String, Long> categoryBalances = (Map<String, Long>) redisTemplate.opsForHash()
+            .get("categoryBalances", user.getId().toString());
 
-        if ("지출".equals(type)) {
-          currentValue -= amount;
-        } else {
-          currentValue += amount;
+        if (categoryBalances != null) {
+          if (categoryBalances.containsKey(categoryName)) {
+            Long currentValue = categoryBalances.get(categoryName);
+
+            if ("지출".equals(type)) {
+              currentValue -= amount;
+            } else {
+              currentValue += amount;
+            }
+
+            // 예산 초과시 알림 설정
+            if (currentValue < 0) {
+              isFull(user, categoryName + " : 예산을 초과 했습니다.");
+            }
+
+            // 연산된 값으로 다시 저장
+            categoryBalances.put(categoryName, currentValue);
+          }
+          // 업데이트된 categoryBalances를 다시 캐시에 저장
+          redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
         }
-
-        // 예산 초과시 알림 설정
-        if (currentValue < 0) {
-          isFull(user,categoryName + " : 예산을 초과 했습니다.");
-        }
-
-        // 연산된 값으로 다시 저장
-        categoryBalances.put(categoryName, currentValue);
+      } finally {
+        // 락 해제
+        unlock(key, value);
       }
-      // 업데이트된 categoryBalances를 다시 캐시에 저장
-      redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
+    } else {
+      throw new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, "캐시 업데이트 실패했습니다.");
+    }
+  }
+
+  // 락을 시도하는 메서드
+  private boolean lock(String key, String value, Long ttl) {
+    Boolean success = redisTemplate.opsForValue().setIfAbsent(key, value, ttl, TimeUnit.MILLISECONDS);
+    return Boolean.TRUE.equals(success);
+  }
+
+  // 락을 해제하는 메서드
+  private void unlock(String key, String value) {
+    String currentValue = (String) redisTemplate.opsForValue().get(key);
+    if (value.equals(currentValue)) {
+      redisTemplate.delete(key);
     }
   }
 

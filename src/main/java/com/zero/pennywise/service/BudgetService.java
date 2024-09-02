@@ -90,7 +90,7 @@ public class BudgetService {
 
     budgetRepository.deleteByBudgetId(budget.getBudgetId());
 
-    return "예산을 성공적으로 삭제 하였습닏.";
+    return "예산을 성공적으로 삭제 하였습니다.";
   }
 
 
