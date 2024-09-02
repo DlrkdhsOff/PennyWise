@@ -9,11 +9,13 @@ import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.model.entity.WaringMessageEntity;
 import com.zero.pennywise.model.response.TransactionPage;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
+import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +38,8 @@ public class TransactionService {
   private final TransactionRepository transactionRepository;
   private final UserRepository userRepository;
   private final TransactionQueryRepository transactionQueryRepository;
+  private final WaringMessageRepository waringMessageRepository;
+  private final SseService sseService;
   private final RedisTemplate<String, Object> redisTemplate;
 
   // 수입/지출 등록
@@ -50,8 +54,8 @@ public class TransactionService {
           );
 
           updateCategoryBalanceCache(
-              user.getId(),
-              category,
+              user,
+              category.getCategoryName(),
               transactionDTO.getType(),
               transactionDTO.getAmount()
           );
@@ -64,13 +68,11 @@ public class TransactionService {
 
 
   // 캐시 업데이트 메서드
-  private void updateCategoryBalanceCache(Long userId, CategoriesEntity category, String type, Long amount) {
-
-    String categoryName = category.getCategoryName();
+  private void updateCategoryBalanceCache(UserEntity user, String categoryName, String type, Long amount) {
     // 기존 캐시 가져오기
     @SuppressWarnings("unchecked")
     Map<String, Long> categoryBalances = (Map<String, Long>) redisTemplate.opsForHash()
-        .get("categoryBalances", userId.toString());
+        .get("categoryBalances", user.getId().toString());
 
     if (categoryBalances != null) {
       if (categoryBalances.containsKey(categoryName)) {
@@ -82,14 +84,33 @@ public class TransactionService {
           currentValue += amount;
         }
 
+        // 예산 초과시 알림 설정
+        if (currentValue < 0) {
+          isFull(user,categoryName + " : 예산을 초과 했습니다.");
+        }
+
         // 연산된 값으로 다시 저장
         categoryBalances.put(categoryName, currentValue);
       }
       // 업데이트된 categoryBalances를 다시 캐시에 저장
-      redisTemplate.opsForHash().put("categoryBalances", userId.toString(), categoryBalances);
+      redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
     }
   }
 
+  // 예산 초과 시
+  private void isFull(UserEntity user, String message) {
+
+      sseService.sendEventToClient(user.getId().toString(), "Full!",message);
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+      String recivedDateTime = LocalDateTime.now().format(formatter);
+      waringMessageRepository.save(WaringMessageEntity.builder()
+          .user(user)
+          .message(message)
+          .recivedDateTime(recivedDateTime)
+          .build());
+
+  }
 
   // 수입 / 지출 내역
   public TransactionPage getTransactionList(Long userId, String categoryName, Pageable page) {
