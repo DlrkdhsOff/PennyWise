@@ -32,7 +32,7 @@ public class UserController {
   }
 
   // 로그인
-  @PostMapping("/login")
+  @PostMapping(value = "/login") //, produces = MediaType.TEXT_EVENT_STREAM_VALUE
   public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
       HttpServletRequest request) {
 

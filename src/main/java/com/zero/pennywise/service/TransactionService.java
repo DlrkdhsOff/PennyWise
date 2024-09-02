@@ -6,7 +6,6 @@ import static com.zero.pennywise.utils.PageUtils.page;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.transaction.TransactionDTO;
 import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
-import com.zero.pennywise.model.entity.BudgetEntity;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.TransactionEntity;
 import com.zero.pennywise.model.entity.UserEntity;
@@ -23,10 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.Cache;
-import org.springframework.cache.Cache.ValueWrapper;
-import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -39,7 +36,7 @@ public class TransactionService {
   private final TransactionRepository transactionRepository;
   private final UserRepository userRepository;
   private final TransactionQueryRepository transactionQueryRepository;
-  private final CacheManager cacheManager;
+  private final RedisTemplate<String, Object> redisTemplate;
 
   // 수입/지출 등록
   public String transaction(Long userId, TransactionDTO transactionDTO) {
@@ -52,7 +49,12 @@ public class TransactionService {
               TransactionDTO.of(user, category.getCategoryId(), transactionDTO)
           );
 
-          updateCategoryBalanceCache(user.getId(), category.getCategoryName(), transactionDTO.getType(), transactionDTO.getAmount());
+          updateCategoryBalanceCache(
+              user.getId(),
+              category,
+              transactionDTO.getType(),
+              transactionDTO.getAmount()
+          );
           return "거래 등록 성공";
         })
 
@@ -62,28 +64,29 @@ public class TransactionService {
 
 
   // 캐시 업데이트 메서드
-  private void updateCategoryBalanceCache(Long userId, String categoryName, String type, Long amount) {
+  private void updateCategoryBalanceCache(Long userId, CategoriesEntity category, String type, Long amount) {
+
+    String categoryName = category.getCategoryName();
     // 기존 캐시 가져오기
-    List<Map<String, Long>> categoryBalances = cacheManager.getCache("categoryBalances").get(userId, List.class);
+    @SuppressWarnings("unchecked")
+    Map<String, Long> categoryBalances = (Map<String, Long>) redisTemplate.opsForHash()
+        .get("categoryBalances", userId.toString());
 
     if (categoryBalances != null) {
-      for (Map<String, Long> balance : categoryBalances) {
-        // 카테고리 이름을 키로 가진 데이터의 value 값 가져오기
-        if (balance.containsKey(categoryName)) {
-          Long currentValue = balance.get(categoryName);
+      if (categoryBalances.containsKey(categoryName)) {
+        Long currentValue = categoryBalances.get(categoryName);
 
-          if ("지출".equals(type)) {
-            currentValue -= amount;
-          } else {
-            currentValue += amount;
-          }
-
-          // 연산된 값으로 다시 저장
-          balance.put(categoryName, currentValue);
+        if ("지출".equals(type)) {
+          currentValue -= amount;
+        } else {
+          currentValue += amount;
         }
+
+        // 연산된 값으로 다시 저장
+        categoryBalances.put(categoryName, currentValue);
       }
       // 업데이트된 categoryBalances를 다시 캐시에 저장
-      cacheManager.getCache("categoryBalances").put(userId, categoryBalances);
+      redisTemplate.opsForHash().put("categoryBalances", userId.toString(), categoryBalances);
     }
   }
 
