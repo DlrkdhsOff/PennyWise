@@ -30,7 +30,7 @@ public class RedisCacheConfig {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory());
     template.setKeySerializer(new StringRedisSerializer());
-    template.setValueSerializer(new StringRedisSerializer()); // 원하는 대로 직렬화 설정
+    template.setValueSerializer(new StringRedisSerializer());
     return template;
   }
 

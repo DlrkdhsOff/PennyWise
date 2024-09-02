@@ -66,8 +66,8 @@ public class UserService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
     }
 
+    // 해당 사용자가 설정한 카테고리별 예산 남은 금액 레디스 데이터에 저장
     Map<String, Long> categoryBalances = getUserCategoryBalances(user);
-
     if (categoryBalances != null) {
       redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
     }
