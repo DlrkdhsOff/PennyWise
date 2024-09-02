@@ -4,14 +4,14 @@ import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.budget.BudgetDTO;
-import com.zero.pennywise.model.entity.BudgetEntity;
-import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserRepository;
-import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
+import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BudgetService {
+public class BudgetService  {
 
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
@@ -29,7 +29,6 @@ public class BudgetService {
 
   // 카테고리별 예산 설정
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
-
     UserEntity user = getUserById(userId);
 
     return categoriesRepository.findByCategoryName(budgetDTO.getCategoryName())
@@ -37,7 +36,9 @@ public class BudgetService {
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
   }
 
-  private String existingCategory(UserEntity user, CategoriesEntity category, Long amount) {
+  private String existingCategory(UserEntity user,
+      CategoriesEntity category, Long amount) {
+
     if (budgetRepository.existsByUserIdAndCategoryCategoryId(user.getId(),
         category.getCategoryId())) {
 
@@ -61,7 +62,10 @@ public class BudgetService {
 
     CategoriesEntity category = getCategoryByName(budgetDTO.getCategoryName());
 
-    BudgetEntity budget = getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
+    BudgetEntity budget = getBudgetByUserIdAndCategoryId(
+        user.getId(),
+        category.getCategoryId()
+    );
 
     budget.setAmount(budgetDTO.getAmount());
     budgetRepository.save(budget);
@@ -76,7 +80,8 @@ public class BudgetService {
 
     Pageable pageable = page(page);
 
-    return BudgetPage.of(budgetQueryRepository.findAllBudgetByUserId(userId, pageable));
+    return BudgetPage.of(budgetQueryRepository
+        .findAllBudgetByUserId(userId, pageable));
   }
 
 
@@ -86,27 +91,31 @@ public class BudgetService {
 
     CategoriesEntity category = getCategoryByName(categoryName);
 
-    BudgetEntity budget = getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
+    BudgetEntity budget = getBudgetByUserIdAndCategoryId(
+        user.getId(),
+        category.getCategoryId()
+    );
 
     budgetRepository.deleteByBudgetId(budget.getBudgetId());
 
     return "예산을 성공적으로 삭제 하였습니다.";
   }
 
+  // 공통 메서드
 
-  // 공통 메서드: 사용자 조회
+  // 사용자 조회
   private UserEntity getUserById(Long userId) {
     return userRepository.findById(userId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
   }
 
-  // 공통 메서드: 카테고리 조회
+  // 카테고리 조회
   private CategoriesEntity getCategoryByName(String categoryName) {
     return categoriesRepository.findByCategoryName(categoryName)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
   }
 
-  // 공통 메서드: 예산 조회
+  // 예산 조회
   private BudgetEntity getBudgetByUserIdAndCategoryId(Long userId, Long categoryId) {
     return budgetRepository.findByUserIdAndCategoryCategoryId(userId, categoryId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));

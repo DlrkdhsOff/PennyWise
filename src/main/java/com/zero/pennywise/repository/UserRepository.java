@@ -1,6 +1,6 @@
 package com.zero.pennywise.repository;
 
-import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.entity.UserEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

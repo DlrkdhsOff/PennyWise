@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,5 +73,20 @@ public class TransactionController {
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(transactionService.updateTransaction(userId, updateTransactionDTO));
+  }
+
+  // 거래 삭제
+  @DeleteMapping("/transaction")
+  public ResponseEntity<?> deleteTransaction(
+      @RequestParam(name = "trasactionId", required = false) Long trasactionId,
+      HttpServletRequest request) {
+
+    Long userId = (Long) request.getSession().getAttribute("userId");
+
+    if (userId == null) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
+    }
+
+    return ResponseEntity.ok().body(transactionService.deleteTransaction(userId, trasactionId));
   }
 }

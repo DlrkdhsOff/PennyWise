@@ -1,15 +1,13 @@
-package com.zero.pennywise.repository.querydsl;
+package com.zero.pennywise.repository.querydsl.budget;
 
-import static com.zero.pennywise.model.entity.QBudgetEntity.budgetEntity;
-import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity;
 
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.zero.pennywise.entity.QBudgetEntity;
+import com.zero.pennywise.entity.QCategoriesEntity;
 import com.zero.pennywise.model.dto.budget.BudgetDTO;
-import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.QBudgetEntity;
-import com.zero.pennywise.model.entity.QCategoriesEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,8 +23,8 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
 
   @Override
   public Page<BudgetDTO> findAllBudgetByUserId(Long userId, Pageable pageable) {
-    QBudgetEntity b = budgetEntity;
-    QCategoriesEntity c = categoriesEntity;
+    QBudgetEntity b = QBudgetEntity.budgetEntity;
+    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     List<BudgetDTO> list = jpaQueryFactory
         .select(selectBudgetAndCategory(c, b))
@@ -37,13 +35,13 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
         .offset(pageable.getOffset())
         .fetch();
 
-    Long total = countBudgetsByUserId(userId);  // 메서드 이름 변경
+    Long total = countBudgetsByUserId(userId);
     return new PageImpl<>(list, pageable, total);
   }
 
   @Override
   public void updateCategoryId(Long userId, Long categoryId, CategoriesEntity updatedCategory) {
-    QBudgetEntity b = budgetEntity;
+    QBudgetEntity b = QBudgetEntity.budgetEntity;
 
     jpaQueryFactory
         .update(b)
@@ -64,7 +62,7 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
 
   // 총 데이터 개수
   private Long countBudgetsByUserId(Long userId) {
-    QBudgetEntity b = budgetEntity;
+    QBudgetEntity b = QBudgetEntity.budgetEntity;
 
     return jpaQueryFactory
         .select(b.count())

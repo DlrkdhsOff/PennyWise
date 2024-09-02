@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.entity;
+package com.zero.pennywise.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

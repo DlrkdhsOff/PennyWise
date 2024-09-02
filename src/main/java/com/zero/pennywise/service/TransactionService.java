@@ -6,17 +6,18 @@ import static com.zero.pennywise.utils.PageUtils.page;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.transaction.TransactionDTO;
 import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
-import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.TransactionEntity;
-import com.zero.pennywise.model.entity.UserEntity;
-import com.zero.pennywise.model.entity.WaringMessageEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.TransactionEntity;
+import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.model.response.TransactionPage;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
-import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
+import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -41,13 +43,13 @@ public class TransactionService {
   private final UserRepository userRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final WaringMessageRepository waringMessageRepository;
+
   private final SseService sseService;
   private final RedisTemplate<String, Object> redisTemplate;
 
   // 수입/지출 등록
   public String transaction(Long userId, TransactionDTO transactionDTO) {
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+    UserEntity user = getUserById(userId);
 
     return categoriesRepository.findByCategoryName(transactionDTO.getCategoryName())
         .map(category -> {
@@ -58,7 +60,7 @@ public class TransactionService {
           updateCategoryBalanceCache(
               user,
               category.getCategoryName(),
-              transactionDTO.getType(),
+              castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()),
               transactionDTO.getAmount()
           );
           return "거래 등록 성공";
@@ -68,48 +70,41 @@ public class TransactionService {
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
   }
 
-
   // 캐시 업데이트 메서드
-  public void updateCategoryBalanceCache(UserEntity user, String categoryName, String type, Long amount) {
+  public void updateCategoryBalanceCache(UserEntity user, String categoryName, TransactionStatus type, Long amount) {
     String key = "lock:" + user.getId().toString();
     String value = UUID.randomUUID().toString();
     Long ttl = 30000L;
 
-    // 락 설정
-    if (lock(key, value, ttl)) {
-      try {
-        // 기존 캐시 가져오기
-        @SuppressWarnings("unchecked")
-        Map<String, Long> categoryBalances = (Map<String, Long>) redisTemplate.opsForHash()
-            .get("categoryBalances", user.getId().toString());
-
-        if (categoryBalances != null) {
-          if (categoryBalances.containsKey(categoryName)) {
-            Long currentValue = categoryBalances.get(categoryName);
-
-            if ("지출".equals(type)) {
-              currentValue -= amount;
-            } else {
-              currentValue += amount;
-            }
-
-            // 예산 초과시 알림 설정
-            if (currentValue < 0) {
-              isFull(user, categoryName + " : 예산을 초과 했습니다.");
-            }
-
-            // 연산된 값으로 다시 저장
-            categoryBalances.put(categoryName, currentValue);
-          }
-          // 업데이트된 categoryBalances를 다시 캐시에 저장
-          redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
-        }
-      } finally {
-        // 락 해제
-        unlock(key, value);
-      }
-    } else {
+    if (!lock(key, value, ttl)) {
       throw new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, "캐시 업데이트 실패했습니다.");
+    }
+    try {
+      updateCache(user, categoryName, type, amount);
+    } finally {
+      unlock(key, value);
+    }
+
+  }
+
+  @SuppressWarnings("unchecked")
+  private void updateCache(UserEntity user, String categoryName, TransactionStatus type, Long amount) {
+    Map<String, Long> categoryBalances = (Map<String, Long>) redisTemplate.opsForHash()
+        .get("categoryBalances", user.getId().toString());
+
+    if (categoryBalances != null && categoryBalances.containsKey(categoryName)) {
+
+      // TransactionStatus에서 연산
+      Long currentValue = type.calculate(categoryBalances.get(categoryName), amount);
+
+      // 예산 초과시 알림 설정
+      if (currentValue < 0) {
+        isFull(user, categoryName + " : 예산을 초과 했습니다.");
+      }
+
+      // 연산된 값으로 다시 저장
+      categoryBalances.put(categoryName, currentValue);
+      redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
     }
   }
 
@@ -130,22 +125,21 @@ public class TransactionService {
   // 예산 초과 시
   private void isFull(UserEntity user, String message) {
 
-      sseService.sendEventToClient(user.getId().toString(), "Full!",message);
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    sseService.sendEventToClient(user.getId().toString(), "Full!",message);
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-      String recivedDateTime = LocalDateTime.now().format(formatter);
-      waringMessageRepository.save(WaringMessageEntity.builder()
-          .user(user)
-          .message(message)
-          .recivedDateTime(recivedDateTime)
-          .build());
+    String recivedDateTime = LocalDateTime.now().format(formatter);
+    waringMessageRepository.save(WaringMessageEntity.builder()
+        .user(user)
+        .message(message)
+        .recivedDateTime(recivedDateTime)
+        .build());
 
   }
 
   // 수입 / 지출 내역
   public TransactionPage getTransactionList(Long userId, String categoryName, Pageable page) {
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+    UserEntity user = getUserById(userId);
 
     Pageable pageable = page(page);
 
@@ -228,6 +222,28 @@ public class TransactionService {
     return "거래 정보를 수정하였습니다.";
   }
 
+
+  // 거래 삭제
+  public String deleteTransaction(Long userId, Long trasactionId) {
+    UserEntity user = getUserById(userId);
+
+    TransactionEntity transaction = getTransaction(trasactionId);
+
+    transactionRepository.deleteByUserIdAndTransactionId(user.getId(),
+        transaction.getTransactionId());
+
+    return "거래를 성공적으로 삭제 하였습니다.";
+  }
+
+
+  // 공통 메서드
+
+  // 사용자 조회
+  private UserEntity getUserById(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  }
+
   // 거래 조회
   private TransactionEntity getTransaction(Long transactionId) {
     return transactionRepository.findByTransactionId(transactionId)
@@ -239,5 +255,4 @@ public class TransactionService {
     return categoriesRepository.findByCategoryName(categoryName)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
   }
-
 }

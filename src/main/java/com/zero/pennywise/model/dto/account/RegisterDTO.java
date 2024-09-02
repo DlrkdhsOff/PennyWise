@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.dto.account;
 
-import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;

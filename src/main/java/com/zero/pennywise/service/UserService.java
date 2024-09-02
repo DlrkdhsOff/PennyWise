@@ -6,13 +6,13 @@ import com.zero.pennywise.model.dto.account.RegisterDTO;
 import com.zero.pennywise.model.dto.account.UpdateDTO;
 import com.zero.pennywise.model.dto.budget.BalanceDTO;
 import com.zero.pennywise.model.dto.transaction.CategoryAmountDTO;
-import com.zero.pennywise.model.entity.BudgetEntity;
-import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
-import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
+import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -110,8 +110,7 @@ public class UserService {
 
   // 회원 정보 수정
   public String update(Long userId, UpdateDTO updateDTO) {
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원 입니다."));
+    UserEntity user = getUserById(userId);
 
     validatePhoneNumber(updateDTO.getPhone());
 

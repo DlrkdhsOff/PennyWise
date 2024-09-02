@@ -15,4 +15,11 @@ public enum TransactionStatus {
       return TransactionStatus.INCOME;
     }
   }
+
+  public Long calculate(Long currentValue, Long amount) {
+    return switch (this) {
+      case EXPENSES, FIXED_EXPENSES -> currentValue - amount;
+      case INCOME, FIXED_INCOME -> currentValue + amount;
+    };
+  }
 }
