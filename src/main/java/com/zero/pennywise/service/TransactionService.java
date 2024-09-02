@@ -125,19 +125,10 @@ public class TransactionService {
     // 오늘 날짜
     String todayDate = LocalDateTime.now().format(formatter);
     // 한 달 전 날짜
-    LocalDate lastMonthsDate = LocalDate.now().minusMonths(1);
-
-    // 한 달 전의 마지막 날짜 계산
-    YearMonth yearMonth = YearMonth.of(lastMonthsDate.getYear(), lastMonthsDate.getMonth());
-    LocalDate lastDayOfLastMonth = yearMonth.atEndOfMonth();
-
-    // 마지막 날에 맞춰 날짜를 조정
-    if (lastMonthsDate.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth()) {
-      lastMonthsDate = lastDayOfLastMonth;
-    }
+    String lastMonthsDate = getLastMonthsDate();
 
     List<TransactionEntity> transactions = transactionRepository
-        .findByDateTimeStartingWith(lastMonthsDate.toString());
+        .findByDateTimeStartingWith(lastMonthsDate);
 
     for (TransactionEntity transaction : transactions) {
       transactionRepository.save(TransactionEntity.builder()
@@ -151,6 +142,21 @@ public class TransactionService {
     }
   }
 
+  // 지난날 마지막 날짜 구하기
+  public String getLastMonthsDate() {
+    LocalDate lastMonthsDate = LocalDate.now().minusMonths(1);
+
+    // 한 달 전의 마지막 날짜 계산
+    YearMonth yearMonth = YearMonth.of(lastMonthsDate.getYear(), lastMonthsDate.getMonth());
+    LocalDate lastDayOfLastMonth = yearMonth.atEndOfMonth();
+
+    // 마지막 날에 맞춰 날짜를 조정
+    if (lastMonthsDate.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth()) {
+      lastMonthsDate = lastDayOfLastMonth;
+    }
+    return lastMonthsDate.toString();
+  }
+
 
   // 거래 목록 수정
   public String updateTransaction(Long userId, UpdateTransactionDTO updateTransactionDTO) {
@@ -158,13 +164,9 @@ public class TransactionService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "거래내역이 존재하지 않습니다.");
     }
 
-    TransactionEntity transaction = transactionRepository
-            .findByTransactionId(updateTransactionDTO.getTransactionId())
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 거래 아이디 입니다."));
+    TransactionEntity transaction = getTransaction(updateTransactionDTO.getTransactionId());
 
-    CategoriesEntity categories = categoriesRepository
-            .findByCategoryName(updateTransactionDTO.getCategoryName())
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 카테고리 입니다."));
+    CategoriesEntity categories = getCategoryByName(updateTransactionDTO.getCategoryName());
 
     transaction.setCategoryId(categories.getCategoryId());
     transaction.setType(castToTransactionStatus(updateTransactionDTO.getType(), updateTransactionDTO.getIsFixed()));
@@ -173,6 +175,18 @@ public class TransactionService {
     transactionRepository.save(transaction);
 
     return "거래 정보를 수정하였습니다.";
+  }
+
+  // 거래 조회
+  private TransactionEntity getTransaction(Long transactionId) {
+    return transactionRepository.findByTransactionId(transactionId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 거래 아이디 입니다."));
+  }
+
+  // 카테고리 조회
+  private CategoriesEntity getCategoryByName(String categoryName) {
+    return categoriesRepository.findByCategoryName(categoryName)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
   }
 
 }

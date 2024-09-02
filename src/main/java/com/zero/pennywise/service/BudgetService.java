@@ -54,7 +54,6 @@ public class BudgetService {
   }
 
 
-
   // 카테고리별 예산 수정
   @Transactional
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
