@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.category;
+package com.zero.pennywise.model.request.category;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

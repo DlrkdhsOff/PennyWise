@@ -1,8 +1,8 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.budget.BudgetDTO;
-import com.zero.pennywise.model.dto.category.CategoryDTO;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
+import com.zero.pennywise.model.request.category.CategoryDTO;
 import com.zero.pennywise.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

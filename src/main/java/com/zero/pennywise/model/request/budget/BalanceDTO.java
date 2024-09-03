@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.budget;
+package com.zero.pennywise.model.request.budget;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

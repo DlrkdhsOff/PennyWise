@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.response;
 
-import com.zero.pennywise.model.dto.budget.BudgetDTO;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;

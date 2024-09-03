@@ -6,7 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QBudgetEntity;
 import com.zero.pennywise.entity.QCategoriesEntity;
-import com.zero.pennywise.model.dto.budget.BudgetDTO;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.entity.CategoriesEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.account;
+package com.zero.pennywise.model.request.account;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.transaction;
+package com.zero.pennywise.model.request.transaction;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

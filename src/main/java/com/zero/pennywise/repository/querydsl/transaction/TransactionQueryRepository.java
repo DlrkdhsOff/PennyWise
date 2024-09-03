@@ -1,6 +1,6 @@
 package com.zero.pennywise.repository.querydsl.transaction;
 
-import com.zero.pennywise.model.dto.transaction.CategoryAmountDTO;
+import com.zero.pennywise.model.request.transaction.CategoryAmountDTO;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.TransactionsDTO;

@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.transaction;
+package com.zero.pennywise.model.request.transaction;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
