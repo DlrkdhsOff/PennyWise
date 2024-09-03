@@ -11,8 +11,10 @@ public class SchedulerConfig {
   private final TransactionService transactionService;
 
 
-//  @Scheduled(cron = "0/9 * * * * ?")
+//  @Scheduled(cron = "0 0 0 * * ?")
   public void run() {
+
+    // 고정 지출/수입 자동 등록
     transactionService.updateFixedTransaction();
   }
 }

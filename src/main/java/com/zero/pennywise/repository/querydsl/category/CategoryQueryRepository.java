@@ -1,6 +1,6 @@
-package com.zero.pennywise.repository.querydsl;
+package com.zero.pennywise.repository.querydsl.category;
 
-import com.zero.pennywise.model.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;

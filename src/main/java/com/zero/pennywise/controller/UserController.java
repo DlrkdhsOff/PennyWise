@@ -7,11 +7,8 @@ import com.zero.pennywise.model.dto.account.UpdateDTO;
 import com.zero.pennywise.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +28,8 @@ public class UserController {
   @PostMapping("/register")
   public ResponseEntity<String> register(@RequestBody @Valid RegisterDTO registerDTO) {
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(registerDTO));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(userService.register(registerDTO));
   }
 
   // 로그인
@@ -40,7 +37,7 @@ public class UserController {
   public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
       HttpServletRequest request) {
 
-    return ResponseEntity.status(HttpStatus.OK)
+    return ResponseEntity.ok()
         .body(userService.login(loginDTO, request));
   }
 
@@ -56,7 +53,7 @@ public class UserController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    return ResponseEntity.status(HttpStatus.OK)
+    return ResponseEntity.ok()
         .body(userService.update(userId, updateDTO));
   }
 
@@ -68,7 +65,7 @@ public class UserController {
     if (userId == null) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
-    return ResponseEntity.status(HttpStatus.OK).body(userService.delete(userId));
+    return ResponseEntity.ok().body(userService.delete(userId));
   }
 }
 

@@ -2,8 +2,8 @@ package com.zero.pennywise.model.dto.transaction;
 
 import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
 
-import com.zero.pennywise.model.entity.TransactionEntity;
-import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.entity.TransactionEntity;
+import com.zero.pennywise.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;

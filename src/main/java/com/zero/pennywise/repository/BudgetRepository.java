@@ -1,6 +1,6 @@
 package com.zero.pennywise.repository;
 
-import com.zero.pennywise.model.entity.BudgetEntity;
+import com.zero.pennywise.entity.BudgetEntity;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -72,6 +72,7 @@ public class BudgetController {
         .body(budgetService.getBudget(userId, page));
   }
 
+  // 예산 삭제
   @DeleteMapping("/budgets")
   public ResponseEntity<?> deleteBudget(@RequestBody @Valid CategoryDTO categoryDTO,
       HttpServletRequest request) {
@@ -84,16 +85,4 @@ public class BudgetController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.deleteBudget(userId, categoryDTO.getCategoryName()));
   }
-
-//  @GetMapping("/budgets/balance")
-//  public ResponseEntity<?> getUserBalance(HttpServletRequest request) {
-//    Long userId = (Long) request.getSession().getAttribute("userId");
-//
-//    if (userId == null) {
-//      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-//    }
-//
-//    return ResponseEntity.ok()
-//        .body(budgetService.getUserBalance(userId));
-//  }
 }

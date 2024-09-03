@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.entity;
+package com.zero.pennywise.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

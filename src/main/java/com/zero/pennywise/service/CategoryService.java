@@ -5,16 +5,16 @@ import static com.zero.pennywise.utils.PageUtils.page;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.dto.category.CategoryDTO;
 import com.zero.pennywise.model.dto.category.UpdateCategoryDTO;
-import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.UserCategoryEntity;
-import com.zero.pennywise.model.entity.UserEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.UserCategoryEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.CategoriesPage;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
-import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
-import com.zero.pennywise.repository.querydsl.CategoryQueryRepository;
-import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
+import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
+import com.zero.pennywise.repository.querydsl.category.CategoryQueryRepository;
+import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -41,11 +41,10 @@ public class CategoryService {
         .of(categoryQueryRepository.getAllCategory(userId, pageable));
   }
 
+
   // 카테고리 생성
   public String createCategory(Long userId, CategoryDTO categoryDTO) {
-
-    UserEntity user = userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
+    UserEntity user = getUserById(userId);
 
     return categoriesRepository.findByCategoryName(categoryDTO.getCategoryName())
         .map(category -> existingCategory(user, category))
@@ -59,26 +58,20 @@ public class CategoryService {
         category.getCategoryId())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리 입니다.");
     }
+    saveUserCategory(category, user);
 
-    userCategoryRepository.save(UserCategoryEntity.builder()
-        .category(category)
-        .user(user)
-        .build());
     return "카테고리를 생성하였습니다.";
   }
 
   // category 테이블에 존재하지 않은 새로운 카테고리 일 경우
   private String createNewCategory(UserEntity user, CategoryDTO categoryDTO) {
-    CategoriesEntity category = categoriesRepository.save(
-        CategoriesEntity.builder()
+    CategoriesEntity category = categoriesRepository
+        .save(CategoriesEntity.builder()
             .categoryName(categoryDTO.getCategoryName())
             .build()
     );
 
-    userCategoryRepository.save(UserCategoryEntity.builder()
-        .category(category)
-        .user(user)
-        .build());
+    saveUserCategory(category, user);
 
     return "카테고리를 생성하였습니다.";
   }
@@ -152,10 +145,20 @@ public class CategoryService {
     return "성공적으로 카테고리를 삭제하였습니다.";
   }
 
-  // 공통 메서드: 사용자 조회
+  // 공통 메서드
+
+  // 사용자 조회
   private UserEntity getUserById(Long userId) {
     return userRepository.findById(userId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  }
+
+  // 사용자 카테고리 저장
+  public void saveUserCategory(CategoriesEntity category, UserEntity user) {
+    userCategoryRepository.save(UserCategoryEntity.builder()
+        .category(category)
+        .user(user)
+        .build());
   }
 
   // 카테고리 조회

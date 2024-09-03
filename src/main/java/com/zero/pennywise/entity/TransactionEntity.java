@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.entity;
+package com.zero.pennywise.entity;
 
 import com.zero.pennywise.status.TransactionStatus;
 import jakarta.persistence.Column;

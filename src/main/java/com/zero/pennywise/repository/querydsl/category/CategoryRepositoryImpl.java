@@ -1,12 +1,10 @@
-package com.zero.pennywise.repository.querydsl;
+package com.zero.pennywise.repository.querydsl.category;
 
-import static com.zero.pennywise.model.entity.QCategoriesEntity.categoriesEntity;
-import static com.zero.pennywise.model.entity.QUserCategoryEntity.userCategoryEntity;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.model.entity.CategoriesEntity;
-import com.zero.pennywise.model.entity.QCategoriesEntity;
-import com.zero.pennywise.model.entity.QUserCategoryEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.QCategoriesEntity;
+import com.zero.pennywise.entity.QUserCategoryEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,8 +30,8 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
 
   @Override
   public Page<String> getAllCategory(Long userId, Pageable page) {
-    QUserCategoryEntity uC = userCategoryEntity;
-    QCategoriesEntity c = categoriesEntity;
+    QUserCategoryEntity uC = QUserCategoryEntity.userCategoryEntity;
+    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     List<String> list = jpaQueryFactory
         .select(c.categoryName)

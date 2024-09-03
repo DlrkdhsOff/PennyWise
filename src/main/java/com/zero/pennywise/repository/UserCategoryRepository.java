@@ -1,8 +1,8 @@
 package com.zero.pennywise.repository;
 
-import com.zero.pennywise.model.entity.UserCategoryEntity;
-import com.zero.pennywise.model.entity.UserEntity;
-import java.util.List;
+import com.zero.pennywise.entity.UserCategoryEntity;
+import com.zero.pennywise.entity.UserEntity;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserCategoryRepository extends JpaRepository<UserCategoryEntity, Long> {
@@ -14,5 +14,5 @@ public interface UserCategoryRepository extends JpaRepository<UserCategoryEntity
 
   boolean existsByUserNotAndCategoryCategoryId(UserEntity user, Long categoryId);
 
-  List<UserCategoryEntity> findAllByUserId(Long userId);
+  Optional<UserCategoryEntity> findByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
 }
