@@ -10,6 +10,7 @@ import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
+import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,15 @@ public class BudgetService  {
   private final BudgetRepository budgetRepository;
   private final UserRepository userRepository;
   private final BudgetQueryRepository budgetQueryRepository;
+  private final UserCategoryRepository userCategoryRepository;
 
   // 카테고리별 예산 설정
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = getUserById(userId);
+    CategoriesEntity categories = getCategoryByName(budgetDTO.getCategoryName());
 
-    return categoriesRepository.findByCategoryName(budgetDTO.getCategoryName())
-        .map(category -> existingCategory(user, category, budgetDTO.getAmount()))
+    return userCategoryRepository.findByUserIdAndCategoryCategoryId(user.getId(), categories.getCategoryId())
+        .map(category -> existingCategory(user, categories, budgetDTO.getAmount()))
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
   }
 

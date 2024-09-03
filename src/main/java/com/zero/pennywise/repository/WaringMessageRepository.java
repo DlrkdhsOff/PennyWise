@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WaringMessageRepository extends JpaRepository<WaringMessageEntity, Long> {
 
+  void deleteAllByUserId(Long userId);
+
 }

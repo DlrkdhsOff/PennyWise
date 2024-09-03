@@ -14,6 +14,7 @@ import com.zero.pennywise.model.response.TransactionPage;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
+import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
@@ -39,6 +40,7 @@ import org.springframework.util.StringUtils;
 public class TransactionService {
 
   private final CategoriesRepository categoriesRepository;
+  private final UserCategoryRepository userCategoryRepository;
   private final TransactionRepository transactionRepository;
   private final UserRepository userRepository;
   private final TransactionQueryRepository transactionQueryRepository;
@@ -51,15 +53,18 @@ public class TransactionService {
   public String transaction(Long userId, TransactionDTO transactionDTO) {
     UserEntity user = getUserById(userId);
 
-    return categoriesRepository.findByCategoryName(transactionDTO.getCategoryName())
+    CategoriesEntity categories = getCategoryByName(transactionDTO.getCategoryName());
+
+    return userCategoryRepository.findByUserIdAndCategoryCategoryId(user.getId(), categories.getCategoryId())
         .map(category -> {
+          Long categoryId = category.getCategory().getCategoryId();
           transactionRepository.save(
-              TransactionDTO.of(user, category.getCategoryId(), transactionDTO)
+              TransactionDTO.of(user, categoryId, transactionDTO)
           );
 
           updateCategoryBalanceCache(
               user,
-              category.getCategoryName(),
+              transactionDTO.getCategoryName(),
               castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()),
               transactionDTO.getAmount()
           );
