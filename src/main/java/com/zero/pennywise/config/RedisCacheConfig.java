@@ -10,7 +10,6 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -26,17 +25,12 @@ public class RedisCacheConfig {
   public RedisConnectionFactory redisConnectionFactory() {
     return new LettuceConnectionFactory(host, port);
   }
-
   @Bean
   public RedisTemplate<String, Object> redisTemplate() {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory());
-
-    // JSON 직렬화기 설정
-    Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-    template.setValueSerializer(serializer);
     template.setKeySerializer(new StringRedisSerializer());
-
+    template.setValueSerializer(new StringRedisSerializer());
     return template;
   }
 

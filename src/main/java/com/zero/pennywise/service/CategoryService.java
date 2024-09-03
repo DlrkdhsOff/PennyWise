@@ -3,7 +3,8 @@ package com.zero.pennywise.service;
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.CategoryDTO;
+import com.zero.pennywise.model.dto.category.CategoryDTO;
+import com.zero.pennywise.model.dto.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.entity.CategoriesEntity;
 import com.zero.pennywise.model.entity.UserCategoryEntity;
 import com.zero.pennywise.model.entity.UserEntity;
@@ -11,11 +12,14 @@ import com.zero.pennywise.model.response.CategoriesPage;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
+import com.zero.pennywise.repository.querydsl.BudgetQueryRepository;
 import com.zero.pennywise.repository.querydsl.CategoryQueryRepository;
+import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,9 @@ public class CategoryService {
   private final CategoriesRepository categoriesRepository;
   private final CategoryQueryRepository categoryQueryRepository;
   private final UserRepository userRepository;
+  private final TransactionQueryRepository transactionQueryRepository;
+  private final BudgetQueryRepository budgetQueryRepository;
+
 
   // 카테고리 목록
   public CategoriesPage getCategoryList(Long userId, Pageable page) {
@@ -48,7 +55,8 @@ public class CategoryService {
   // 카테고리 존재 여부 확인
   private String existingCategory(UserEntity user, CategoriesEntity category) {
     // 사용자가 이미 등록한 카테고리일 경우
-    if (userCategoryRepository.existsByUserIdAndCategoryCategoryId(user.getId(), category.getCategoryId())) {
+    if (userCategoryRepository.existsByUserIdAndCategoryCategoryId(user.getId(),
+        category.getCategoryId())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리 입니다.");
     }
 
@@ -73,6 +81,93 @@ public class CategoryService {
         .build());
 
     return "카테고리를 생성하였습니다.";
+  }
+
+
+  // 카테고리 수정
+  @Transactional
+  public String updateCategoryName(Long userId, UpdateCategoryDTO updateCategoryDTO) {
+    UserEntity user = getUserById(userId);
+    CategoriesEntity existingCategory = getCategoryByName(updateCategoryDTO.getCategoryName());
+
+    boolean isUsedByOtherUser = isCategoryUsedByOtherUser(user, existingCategory);
+    CategoriesEntity updatedCategory = updateOrCreateNewCategory(user.getId(), existingCategory,
+        updateCategoryDTO.getNewCategoryName(), isUsedByOtherUser);
+
+    // 카테고리 정보 수정
+    categoryQueryRepository.updateCategory(user.getId(), existingCategory.getCategoryId(),
+        updatedCategory);
+
+    // 거래 정보 수정
+    transactionQueryRepository.updateCategoryId(user.getId(), existingCategory.getCategoryId(),
+        updatedCategory);
+
+    // 예산 정보 수정
+    budgetQueryRepository.updateCategoryId(user.getId(), existingCategory.getCategoryId(),
+        updatedCategory);
+
+
+    return "성공적으로 카테고리를 수정하였습니다.";
+  }
+
+  // 카테고리 업데이트 또는 새로운 카테고리 생성
+  private CategoriesEntity updateOrCreateNewCategory(Long userId, CategoriesEntity currentCategory,
+      String newCategoryName, boolean isUsedByOtherUser) {
+
+    return categoriesRepository.findByCategoryName(newCategoryName)
+        .map(category -> {
+          if (userCategoryRepository.existsByUserIdAndCategoryCategoryId(userId,
+              category.getCategoryId())) {
+            throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리입니다.");
+          }
+          return category;
+        })
+        .orElseGet(() -> {
+          if (isUsedByOtherUser) {
+            return categoriesRepository.save(CategoriesEntity.builder()
+                .categoryName(newCategoryName)
+                .build());
+          } else {
+            currentCategory.setCategoryName(newCategoryName);
+            return categoriesRepository.save(currentCategory);
+          }
+        });
+  }
+
+
+  // 카테고리 삭제
+  @Transactional
+  public String deleteCategory(Long userId, String categoryName) {
+    UserEntity user = getUserById(userId);
+    CategoriesEntity existingCategory = getCategoryByName(categoryName);
+
+    boolean isUsedByOtherUser = isCategoryUsedByOtherUser(user, existingCategory);
+
+    if (!isUsedByOtherUser) {
+      categoriesRepository.deleteByCategoryId(existingCategory.getCategoryId());
+    }
+    userCategoryRepository.deleteAllByUserIdAndCategoryCategoryId(user.getId(),
+        existingCategory.getCategoryId());
+
+    return "성공적으로 카테고리를 삭제하였습니다.";
+  }
+
+  // 공통 메서드: 사용자 조회
+  private UserEntity getUserById(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  }
+
+  // 카테고리 조회
+  private CategoriesEntity getCategoryByName(String categoryName) {
+    return categoriesRepository.findByCategoryName(categoryName)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
+  }
+
+  // 다른 사용자가 카테고리를 사용하는지 확인
+  private boolean isCategoryUsedByOtherUser(UserEntity user, CategoriesEntity category) {
+    return userCategoryRepository.existsByUserNotAndCategoryCategoryId(user,
+        category.getCategoryId());
   }
 
 }

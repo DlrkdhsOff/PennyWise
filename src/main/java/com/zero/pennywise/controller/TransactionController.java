@@ -1,8 +1,8 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.TransactionDTO;
-import com.zero.pennywise.model.dto.UpdateTransactionDTO;
+import com.zero.pennywise.model.dto.transaction.TransactionDTO;
+import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class TransactionController {
 
   private final TransactionService transactionService;

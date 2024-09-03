@@ -14,26 +14,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "budgets")
+@Entity(name = "waringmessage")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
-public class BudgetEntity extends DateEntity{
+public class WaringMessageEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long budgetId;
+  private Long waringMessageId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "category_id", nullable = false)
-  private CategoriesEntity category;
+  private String message;
 
-  @Column(nullable = true)
-  private Long amount;
+  private String recivedDateTime;
+
 }
