@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.account;
+package com.zero.pennywise.model.request.account;
 
 import com.zero.pennywise.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;

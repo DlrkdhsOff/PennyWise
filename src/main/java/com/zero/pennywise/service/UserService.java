@@ -1,11 +1,11 @@
 package com.zero.pennywise.service;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.account.LoginDTO;
-import com.zero.pennywise.model.dto.account.RegisterDTO;
-import com.zero.pennywise.model.dto.account.UpdateDTO;
-import com.zero.pennywise.model.dto.budget.BalanceDTO;
-import com.zero.pennywise.model.dto.transaction.CategoryAmountDTO;
+import com.zero.pennywise.model.request.account.LoginDTO;
+import com.zero.pennywise.model.request.account.RegisterDTO;
+import com.zero.pennywise.model.request.account.UpdateDTO;
+import com.zero.pennywise.model.request.budget.BalanceDTO;
+import com.zero.pennywise.model.request.transaction.CategoryAmountDTO;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.repository.BudgetRepository;
@@ -39,14 +39,12 @@ public class UserService {
 
   // 회원 가입
   public String register(RegisterDTO registerDTO) {
-
     // 중복 아이디 체크
     if (userRepository.existsByEmail(registerDTO.getEmail())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디 입니다.");
     }
 
     validatePhoneNumber(registerDTO.getPhone());
-    registerDTO.setPhone(registerDTO.getPhone());
 
     try {
       userRepository.save(RegisterDTO.of(registerDTO));
@@ -59,7 +57,6 @@ public class UserService {
 
   // 로그인
   public String login(LoginDTO loginDTO, HttpServletRequest request) {
-
     UserEntity user = userRepository.findByEmail(loginDTO.getEmail())
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다."));
 
@@ -96,7 +93,6 @@ public class UserService {
 
   // 카테고리 남은 금액
   public BalanceDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-
     Long categoryId = budget.getCategory().getCategoryId();
     String thisMonths = LocalDate.now().toString();
 
@@ -108,7 +104,6 @@ public class UserService {
 
     return new BalanceDTO(categoryAmountDTO.getCategoryName(), balance);
   }
-
 
   // 회원 정보 수정
   public String update(Long userId, UpdateDTO updateDTO) {
@@ -127,7 +122,6 @@ public class UserService {
   // 회원 탈퇴
   @Transactional
   public String delete(Long userId) {
-
     if (!userRepository.existsById(userId)) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "회원 탈퇴 실패하였습니다.");
     }
@@ -137,6 +131,7 @@ public class UserService {
     userCategoryRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
     userRepository.deleteById(userId);
+
     return "계정이 영구적으로 삭제 되었습니다.";
   }
 

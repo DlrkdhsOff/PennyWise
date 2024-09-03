@@ -1,8 +1,8 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.category.CategoryDTO;
-import com.zero.pennywise.model.dto.category.UpdateCategoryDTO;
+import com.zero.pennywise.model.request.category.CategoryDTO;
+import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -66,7 +66,8 @@ public class CategoryController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    return ResponseEntity.ok().body(categoryService.updateCategoryName(userId, updateCategoryDTO));
+    return ResponseEntity.ok()
+        .body(categoryService.updateCategoryName(userId, updateCategoryDTO));
   }
 
   // 카테고리 삭제
@@ -80,6 +81,7 @@ public class CategoryController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    return ResponseEntity.ok().body(categoryService.deleteCategory(userId, categoryDTO.getCategoryName()));
+    return ResponseEntity.ok()
+        .body(categoryService.deleteCategory(userId, categoryDTO.getCategoryName()));
   }
 }

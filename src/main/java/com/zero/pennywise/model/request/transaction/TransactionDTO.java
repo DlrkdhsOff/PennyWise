@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.dto.transaction;
+package com.zero.pennywise.model.request.transaction;
 
 import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
 

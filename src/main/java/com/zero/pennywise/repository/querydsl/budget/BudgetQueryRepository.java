@@ -1,6 +1,6 @@
 package com.zero.pennywise.repository.querydsl.budget;
 
-import com.zero.pennywise.model.dto.budget.BudgetDTO;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.entity.CategoriesEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

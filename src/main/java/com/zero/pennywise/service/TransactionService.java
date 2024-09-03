@@ -4,8 +4,8 @@ import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatu
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.transaction.TransactionDTO;
-import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
+import com.zero.pennywise.model.request.transaction.TransactionDTO;
+import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -52,16 +51,12 @@ public class TransactionService {
   // 수입/지출 등록
   public String transaction(Long userId, TransactionDTO transactionDTO) {
     UserEntity user = getUserById(userId);
-
     CategoriesEntity categories = getCategoryByName(transactionDTO.getCategoryName());
 
     return userCategoryRepository.findByUserIdAndCategoryCategoryId(user.getId(), categories.getCategoryId())
         .map(category -> {
           Long categoryId = category.getCategory().getCategoryId();
-          transactionRepository.save(
-              TransactionDTO.of(user, categoryId, transactionDTO)
-          );
-
+          transactionRepository.save(TransactionDTO.of(user, categoryId, transactionDTO));
           updateCategoryBalanceCache(
               user,
               transactionDTO.getCategoryName(),
@@ -70,8 +65,6 @@ public class TransactionService {
           );
           return "거래 등록 성공";
         })
-
-        // 사용자가 등록한 카테고리가 아닐 경우
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
   }
 
@@ -89,7 +82,6 @@ public class TransactionService {
     } finally {
       unlock(key, value);
     }
-
   }
 
   @SuppressWarnings("unchecked")
@@ -98,8 +90,6 @@ public class TransactionService {
         .get("categoryBalances", user.getId().toString());
 
     if (categoryBalances != null && categoryBalances.containsKey(categoryName)) {
-
-      // TransactionStatus에서 연산
       Long currentValue = type.calculate(categoryBalances.get(categoryName), amount);
 
       // 예산 초과시 알림 설정
@@ -129,8 +119,7 @@ public class TransactionService {
 
   // 예산 초과 시
   private void isFull(UserEntity user, String message) {
-
-    sseService.sendEventToClient(user.getId().toString(), "Full!",message);
+    sseService.sendEventToClient(user.getId().toString(), "Full!", message);
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     String recivedDateTime = LocalDateTime.now().format(formatter);
@@ -139,18 +128,15 @@ public class TransactionService {
         .message(message)
         .recivedDateTime(recivedDateTime)
         .build());
-
   }
 
   // 수입 / 지출 내역
   public TransactionPage getTransactionList(Long userId, String categoryName, Pageable page) {
     UserEntity user = getUserById(userId);
-
     Pageable pageable = page(page);
 
     TransactionPage transactions = (StringUtils.hasText(categoryName))
-        ? TransactionsDTO.of(
-        transactionQueryRepository.getTransactionsByCategory(user, categoryName, pageable))
+        ? TransactionsDTO.of(transactionQueryRepository.getTransactionsByCategory(user, categoryName, pageable))
         : TransactionsDTO.of(transactionQueryRepository.getAllTransaction(user, pageable));
 
     validateTransactions(transactions.getTransactions(), categoryName);
@@ -167,7 +153,6 @@ public class TransactionService {
     }
   }
 
-
   // 매일 00시에 자동으로 현재를 기준으로 고정 수입/지출 자동 등록
   public void updateFixedTransaction() {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -177,8 +162,7 @@ public class TransactionService {
     // 한 달 전 날짜
     String lastMonthsDate = getLastMonthsDate();
 
-    List<TransactionEntity> transactions = transactionRepository
-        .findByDateTimeStartingWith(lastMonthsDate);
+    List<TransactionEntity> transactions = transactionRepository.findByDateTimeStartingWith(lastMonthsDate);
 
     for (TransactionEntity transaction : transactions) {
       transactionRepository.save(TransactionEntity.builder()
@@ -207,7 +191,6 @@ public class TransactionService {
     return lastMonthsDate.toString();
   }
 
-
   // 거래 목록 수정
   public String updateTransaction(Long userId, UpdateTransactionDTO updateTransactionDTO) {
     if (!transactionRepository.existsByUserId(userId)) {
@@ -215,7 +198,6 @@ public class TransactionService {
     }
 
     TransactionEntity transaction = getTransaction(updateTransactionDTO.getTransactionId());
-
     CategoriesEntity categories = getCategoryByName(updateTransactionDTO.getCategoryName());
 
     transaction.setCategoryId(categories.getCategoryId());
@@ -227,19 +209,15 @@ public class TransactionService {
     return "거래 정보를 수정하였습니다.";
   }
 
-
   // 거래 삭제
   public String deleteTransaction(Long userId, Long trasactionId) {
     UserEntity user = getUserById(userId);
-
     TransactionEntity transaction = getTransaction(trasactionId);
 
-    transactionRepository.deleteByUserIdAndTransactionId(user.getId(),
-        transaction.getTransactionId());
+    transactionRepository.deleteByUserIdAndTransactionId(user.getId(), transaction.getTransactionId());
 
     return "거래를 성공적으로 삭제 하였습니다.";
   }
-
 
   // 공통 메서드
 

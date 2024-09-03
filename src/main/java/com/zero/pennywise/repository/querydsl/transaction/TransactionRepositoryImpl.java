@@ -1,12 +1,11 @@
 package com.zero.pennywise.repository.querydsl.transaction;
 
-
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QCategoriesEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
-import com.zero.pennywise.model.dto.transaction.CategoryAmountDTO;
+import com.zero.pennywise.model.request.transaction.CategoryAmountDTO;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.TransactionsDTO;
@@ -27,17 +26,16 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
-  public final JPAQueryFactory jpaQueryFactory;
+  private final JPAQueryFactory jpaQueryFactory;
   private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
-
-  // 전체 거래 내역
+  // 전체 거래 내역 조회
   @Override
   public Page<TransactionsDTO> getAllTransaction(UserEntity user, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
-    List<TransactionsDTO> list =  jpaQueryFactory
+    List<TransactionsDTO> list = jpaQueryFactory
         .select(selectTransactionAndCategoryColumn())
         .from(t)
         .join(c).on(t.categoryId.eq(c.categoryId))
@@ -50,7 +48,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return new PageImpl<>(list, page, total);
   }
 
-  // 카테고리별 거래 내역
+  // 카테고리별 거래 내역 조회
   @Override
   public Page<TransactionsDTO> getTransactionsByCategory(UserEntity user, String categoryName, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
@@ -69,7 +67,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return new PageImpl<>(list, page, total);
   }
 
-  // 총 데이터의 개수
+  // 총 데이터 개수 조회
   private Long getTransactionCount(UserEntity user, String categoryName) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
@@ -91,8 +89,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     }
   }
 
-
-  // 중복 코드 메서드로 추출(사용할 컬럼)
+  // 선택할 컬럼 추출
   private Expression<TransactionsDTO> selectTransactionAndCategoryColumn() {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
@@ -106,8 +103,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         t.dateTime.as("dateTime"));
   }
 
-
-  // 카테고리 변경시 해당 변경된 categoryId로 변경
+  // 카테고리 변경 시 해당 categoryId 업데이트
   @Override
   public void updateCategoryId(Long userId, Long categoryId, CategoriesEntity updatedCategory) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
@@ -122,10 +118,9 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .execute();
   }
 
+  // 사용자와 카테고리 ID로 수입/지출 합계 조회
   @Override
-  public CategoryAmountDTO getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId,
-      String thisMonth) {
-
+  public CategoryAmountDTO getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId, String thisMonth) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
@@ -147,8 +142,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return new CategoryAmountDTO(categoryName, totalIncome, totalExpenses);
   }
 
-
-  // 공통 메서드 : 해당 값과 일치하는 데이터의 합계
+  // 공통 메서드: 해당 값과 일치하는 데이터의 합계 조회
   private Long getAmount(Long userId, Long categoryId, String thisMonths,
       TransactionStatus notFixed, TransactionStatus fixed) {
 
@@ -160,12 +154,10 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .where(
             t.user.id.eq(userId),
             t.dateTime.startsWith(thisMonths),
-            t.type.eq(fixed)
-                .or( t.type.eq(notFixed)),
+            t.type.eq(fixed).or(t.type.eq(notFixed)),
             categoryId != null ? t.categoryId.eq(categoryId) : null
         )
         .fetchOne();
   }
-
 
 }

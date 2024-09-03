@@ -1,8 +1,8 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.transaction.TransactionDTO;
-import com.zero.pennywise.model.dto.transaction.UpdateTransactionDTO;
+import com.zero.pennywise.model.request.transaction.TransactionDTO;
+import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -29,42 +29,43 @@ public class TransactionController {
 
   // 수입 / 지출 등록
   @PostMapping("/transaction")
-  public ResponseEntity<?> transaction(@RequestBody @Valid TransactionDTO transactionDTO,
-      HttpServletRequest request) {
-
+  public ResponseEntity<?> transaction(
+      @RequestBody @Valid TransactionDTO transactionDTO,
+      HttpServletRequest request)
+  {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
-
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(transactionService.transaction(userId, transactionDTO));
   }
 
-  // 거래 목록 출력(전체 / 카테고리별)
+  // 거래 목록 출력 (전체 / 카테고리별)
   @GetMapping("/transaction")
   public ResponseEntity<?> getTransactionList(
       @RequestParam(name = "categoryName", required = false) String categoryName,
       @PageableDefault(page = 0, size = 10) Pageable page,
-      HttpServletRequest request) {
-
+      HttpServletRequest request)
+  {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
-    return ResponseEntity.ok(transactionService.getTransactionList(userId, categoryName, page));
-  }
 
+    return ResponseEntity.ok()
+        .body(transactionService.getTransactionList(userId, categoryName, page));
+  }
 
   // 거래 수정
   @PatchMapping("/transaction")
   public ResponseEntity<?> updateTransaction(
       @RequestBody @Valid UpdateTransactionDTO updateTransactionDTO,
-      HttpServletRequest request) {
-
+      HttpServletRequest request)
+  {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
@@ -79,14 +80,15 @@ public class TransactionController {
   @DeleteMapping("/transaction")
   public ResponseEntity<?> deleteTransaction(
       @RequestParam(name = "trasactionId", required = false) Long trasactionId,
-      HttpServletRequest request) {
-
+      HttpServletRequest request)
+  {
     Long userId = (Long) request.getSession().getAttribute("userId");
 
     if (userId == null) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    return ResponseEntity.ok().body(transactionService.deleteTransaction(userId, trasactionId));
+    return ResponseEntity.ok()
+        .body(transactionService.deleteTransaction(userId, trasactionId));
   }
 }

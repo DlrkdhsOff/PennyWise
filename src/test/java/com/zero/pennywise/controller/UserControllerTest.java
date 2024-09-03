@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zero.pennywise.PennyWiseApplication;
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.account.RegisterDTO;
-import com.zero.pennywise.model.dto.account.UpdateDTO;
+import com.zero.pennywise.model.request.account.RegisterDTO;
+import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.service.UserService;

@@ -3,7 +3,7 @@ package com.zero.pennywise.service;
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.dto.budget.BudgetDTO;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class BudgetService  {
+public class BudgetService {
 
   private final CategoriesRepository categoriesRepository;
   private final BudgetRepository budgetRepository;
@@ -39,12 +39,8 @@ public class BudgetService  {
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다."));
   }
 
-  private String existingCategory(UserEntity user,
-      CategoriesEntity category, Long amount) {
-
-    if (budgetRepository.existsByUserIdAndCategoryCategoryId(user.getId(),
-        category.getCategoryId())) {
-
+  private String existingCategory(UserEntity user, CategoriesEntity category, Long amount) {
+    if (budgetRepository.existsByUserIdAndCategoryCategoryId(user.getId(), category.getCategoryId())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 등록한 예산입니다.");
     }
 
@@ -57,18 +53,13 @@ public class BudgetService  {
     return "성공적으로 예산을 등록하였습니다.";
   }
 
-
   // 카테고리별 예산 수정
   @Transactional
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = getUserById(userId);
-
     CategoriesEntity category = getCategoryByName(budgetDTO.getCategoryName());
 
-    BudgetEntity budget = getBudgetByUserIdAndCategoryId(
-        user.getId(),
-        category.getCategoryId()
-    );
+    BudgetEntity budget = getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
 
     budget.setAmount(budgetDTO.getAmount());
     budgetRepository.save(budget);
@@ -76,28 +67,20 @@ public class BudgetService  {
     return "성공적으로 예산을 수정하였습니다.";
   }
 
-
   // 예산 목록
   public BudgetPage getBudget(Long userId, Pageable page) {
     UserEntity user = getUserById(userId);
-
     Pageable pageable = page(page);
 
-    return BudgetPage.of(budgetQueryRepository
-        .findAllBudgetByUserId(userId, pageable));
+    return BudgetPage.of(budgetQueryRepository.findAllBudgetByUserId(userId, pageable));
   }
-
 
   // 예산 삭제
   public String deleteBudget(Long userId, String categoryName) {
     UserEntity user = getUserById(userId);
-
     CategoriesEntity category = getCategoryByName(categoryName);
 
-    BudgetEntity budget = getBudgetByUserIdAndCategoryId(
-        user.getId(),
-        category.getCategoryId()
-    );
+    BudgetEntity budget = getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
 
     budgetRepository.deleteByBudgetId(budget.getBudgetId());
 
