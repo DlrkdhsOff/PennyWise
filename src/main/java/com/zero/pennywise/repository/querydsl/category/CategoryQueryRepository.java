@@ -12,5 +12,5 @@ public interface CategoryQueryRepository {
 
   List<Categories> getAllCategory(Long userId, Pageable page);
 
-  void updateCategory(Long userId, Long categoryId, CategoriesEntity newCategory);
+  void updateCategory(Long userId, Long categoryId, Long newCategoryId);
 }

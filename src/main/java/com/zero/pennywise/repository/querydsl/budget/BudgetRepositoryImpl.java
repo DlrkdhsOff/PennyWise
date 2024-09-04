@@ -40,12 +40,13 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
   }
 
   @Override
-  public void updateCategoryId(Long userId, Long categoryId, CategoriesEntity updatedCategory) {
+  public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
     QBudgetEntity b = QBudgetEntity.budgetEntity;
+    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     jpaQueryFactory
         .update(b)
-        .set(b.category.categoryId, updatedCategory.getCategoryId())
+        .set(b.category.categoryId, newCategoryId)
         .where(
             b.user.id.eq(userId),
             b.category.categoryId.eq(categoryId)

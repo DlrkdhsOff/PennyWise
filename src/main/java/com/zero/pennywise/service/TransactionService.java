@@ -235,7 +235,7 @@ public class TransactionService {
 
   // 카테고리 조회
   private CategoriesEntity getCategoryByName(String categoryName) {
-    return categoriesRepository.findByCategoryName(categoryName)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
+    return categoriesRepository.findByCategoryName(categoryName);
+//        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 카테고리입니다."));
   }
 }

@@ -11,5 +11,5 @@ public interface BudgetQueryRepository {
 
   Page<BudgetDTO> findAllBudgetByUserId(Long userId, Pageable pageable);
 
-  void updateCategoryId(Long useId, Long categoryId, CategoriesEntity updatedCategory);
+  void updateCategory(Long userId, Long categoryId, Long newCategoryId);
 }

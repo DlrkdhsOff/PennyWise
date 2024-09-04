@@ -17,5 +17,5 @@ public interface TransactionQueryRepository {
 
   CategoryAmountDTO getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId, String thisMonth);
 
-  void updateCategoryId(Long useId, Long categoryId, CategoriesEntity updatedCategory);
+  void updateCategory(Long useId, Long categoryId, Long newCategoryId);
 }

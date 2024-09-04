@@ -105,12 +105,12 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 카테고리 변경 시 해당 categoryId 업데이트
   @Override
-  public void updateCategoryId(Long userId, Long categoryId, CategoriesEntity updatedCategory) {
+  public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
 
     jpaQueryFactory
         .update(t)
-        .set(t.categoryId, updatedCategory.getCategoryId())
+        .set(t.categoryId, newCategoryId)
         .where(
             t.user.id.eq(userId),
             t.categoryId.eq(categoryId)

@@ -3,13 +3,10 @@ package com.zero.pennywise.redis;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.model.response.Categories;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 @RequiredArgsConstructor
@@ -38,6 +35,16 @@ public class CategoryCache {
       categories.add(new Categories(category.getCategoryId(), category.getCategoryName()));
       putCategoriesInCache(userId, categories);
     }
+  }
+
+  public void updateCategory(List<Categories> categories, Long userId, String categoryName, CategoriesEntity newCategory) {
+    for (Categories category : categories) {
+      if (category.getCategoryName().equals(categoryName)) {
+        category.setCategoryId(newCategory.getCategoryId());
+        category.setCategoryName(newCategory.getCategoryName());
+      }
+    }
+    putCategoriesInCache(userId, categories);
   }
 
 }
