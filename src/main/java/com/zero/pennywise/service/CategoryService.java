@@ -43,22 +43,21 @@ public class CategoryService {
     if (cachedData != null) {
       return CategoriesPage.of(getPagedData(cachedData, pageable));
     }
-
     List<Categories> categories = categoryQueryRepository.getAllCategory(userId, pageable);
     categoryCache.putCategoriesInCache(userId, categories);
 
     return CategoriesPage.of(getPagedData(categories, pageable));
   }
 
+
   // 카테고리 생성
   public String createCategory(Long userId, String categoryName) {
     UserEntity user = getUserById(userId);
     List<Categories> categories = categoryCache.getCategoriesFromCache(user.getId());
 
-    if (isCategoryNameExists(categories, categoryName)) {
+    if (categoryCache.isCategoryNameExists(categories, categoryName)) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리 입니다.");
     }
-
     CategoriesEntity newCategory = categoriesRepository.findByCategoryName(categoryName);
 
     if (newCategory == null) {
@@ -69,25 +68,6 @@ public class CategoryService {
     saveUserCategory(newCategory, user);
 
     return "카테고리를 생성하였습니다.";
-  }
-
-  // category 테이블에 존재하지 않은 새로운 카테고리 일 경우
-  private CategoriesEntity createNewCategory(String categoryName) {
-    return categoriesRepository.save(
-        CategoriesEntity.builder()
-            .categoryName(categoryName)
-            .build()
-    );
-  }
-
-  // 사용자 카테고리 저장
-  public void saveUserCategory(CategoriesEntity category, UserEntity user) {
-    userCategoryRepository.save(
-        UserCategoryEntity.builder()
-            .category(category)
-            .user(user)
-            .build()
-    );
   }
 
 
@@ -112,16 +92,69 @@ public class CategoryService {
     return "성공적으로 카테고리를 수정하였습니다.";
   }
 
+
+  // 카테고리 삭제
+  @Transactional
+  public String deleteCategory(Long userId, String categoryName) {
+    UserEntity user = getUserById(userId);
+    List<Categories> categoriesList = categoryCache.getCategoriesFromCache(user.getId());
+
+    Categories categories = categoryCache.getCategory(categoriesList, categoryName);
+
+    userCategoryRepository
+        .deleteAllByUserIdAndCategoryCategoryId(user.getId(), categories.getCategoryId());
+
+    // 아무도 사용하지 않는 카테고리는 categories 테이블에서도 삭제
+    if (!isCategoryUsedByOtherUser(user, categories.getCategoryId())) {
+      categoriesRepository.deleteByCategoryId(categories.getCategoryId());
+    }
+
+    categoryCache.deleteCategory(categoriesList, user.getId(), categoryName);
+
+    return "성공적으로 카테고리를 삭제하였습니다.";
+  }
+
+
+
+
+  // 사용자 조회
+  private UserEntity getUserById(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  }
+
+
+  // category 테이블에 존재하지 않은 새로운 카테고리 일 경우
+  private CategoriesEntity createNewCategory(String categoryName) {
+    return categoriesRepository.save(
+        CategoriesEntity.builder()
+            .categoryName(categoryName)
+            .build()
+    );
+  }
+
+
+  // 사용자 카테고리 저장
+  public void saveUserCategory(CategoriesEntity category, UserEntity user) {
+    userCategoryRepository.save(
+        UserCategoryEntity.builder()
+            .category(category)
+            .user(user)
+            .build()
+    );
+  }
+
+
   // 유효값 검증 및 캐시 데이터 수정
   private CategoriesEntity validateCategoryUpdate(UserEntity user, List<Categories> categoriesList,
       CategoriesEntity category, String newCategoryName) {
 
-    if (category == null || !isCategoryNameExists(categoriesList, category.getCategoryName())) {
+    if (category == null || !categoryCache.isCategoryNameExists(categoriesList, category.getCategoryName())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다.");
     }
 
     // 새 카테고리가 이미 존재하는지 확인
-    if (isCategoryNameExists(categoriesList, newCategoryName)) {
+    if (categoryCache.isCategoryNameExists(categoriesList, newCategoryName)) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리 입니다.");
     }
 
@@ -141,6 +174,16 @@ public class CategoryService {
     return category;
   }
 
+
+  // 다른 사용자가 카테고리를 사용하는지 확인
+  private boolean isCategoryUsedByOtherUser(UserEntity user, Long categoryId) {
+    return userCategoryRepository
+        .existsByUserNotAndCategoryCategoryId(user, categoryId
+        );
+  }
+
+
+  // 사용자 카테고리, 거래, 예산 카테고리 id 변경
   private void updateOther(Long userId, Long categoryId, Long newCategoryId) {
     categoryQueryRepository
         .updateCategory(userId, categoryId, newCategoryId);
@@ -150,61 +193,5 @@ public class CategoryService {
 
     budgetQueryRepository
         .updateCategory(userId, categoryId, newCategoryId);
-  }
-
-
-
-//  // 카테고리 삭제
-//  @Transactional
-//  public String deleteCategory(Long userId, String categoryName) {
-//    UserEntity user = getUserById(userId);
-//    CategoriesEntity existingCategory = getCategoryByName(categoryName);
-//
-//    boolean isUsedByOtherUser = isCategoryUsedByOtherUser(user, existingCategory);
-//
-//    if (!isUsedByOtherUser) {
-//      categoriesRepository.deleteByCategoryId(existingCategory.getCategoryId());
-//    }
-//    userCategoryRepository.deleteAllByUserIdAndCategoryCategoryId(
-//        user.getId(),
-//        existingCategory.getCategoryId()
-//    );
-//
-//    return "성공적으로 카테고리를 삭제하였습니다.";
-//  }
-
-  // 공통 메서드
-
-  // 사용자 조회
-  private UserEntity getUserById(Long userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
-  }
-
-  // 해당 카테고리가 존재하는지 확인
-  public boolean isCategoryNameExists(List<Categories> categories, String categoryName) {
-    for (Categories category : categories) {
-      if (category.getCategoryName().equals(categoryName)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // 해당 카테고리가 존재하는지 확인
-  public Categories getCategory(List<Categories> categories, String categoryName) {
-    for (Categories category : categories) {
-      if (category.getCategoryName().equals(categoryName)) {
-        return category;
-      }
-    }
-    return null;
-  }
-
-  // 다른 사용자가 카테고리를 사용하는지 확인
-  private boolean isCategoryUsedByOtherUser(UserEntity user, Long categoryId) {
-    return userCategoryRepository
-        .existsByUserNotAndCategoryCategoryId(user, categoryId
-    );
   }
 }

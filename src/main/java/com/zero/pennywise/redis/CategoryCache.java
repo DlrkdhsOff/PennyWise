@@ -1,11 +1,14 @@
 package com.zero.pennywise.redis;
 
 import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.response.Categories;
+import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,6 +40,7 @@ public class CategoryCache {
     }
   }
 
+  // 캐시 데이터 업데이트
   public void updateCategory(List<Categories> categories, Long userId, String categoryName, CategoriesEntity newCategory) {
     for (Categories category : categories) {
       if (category.getCategoryName().equals(categoryName)) {
@@ -45,6 +49,34 @@ public class CategoryCache {
       }
     }
     putCategoriesInCache(userId, categories);
+  }
+
+  // 캐시 데이터 삭제
+  public void deleteCategory(List<Categories> categories, Long userId, String categoryName) {
+    categories.removeIf(category -> category.getCategoryName().equals(categoryName));
+
+    // 삭제 후 캐시에 업데이트
+    putCategoriesInCache(userId, categories);
+  }
+
+  // 해당 카테고리가 존재하는지 확인
+  public boolean isCategoryNameExists(List<Categories> categories, String categoryName) {
+    for (Categories category : categories) {
+      if (category.getCategoryName().equals(categoryName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Categories 객체 반환
+  public Categories getCategory(List<Categories> categories, String categoryName) {
+    for (Categories category : categories) {
+      if (category.getCategoryName().equals(categoryName)) {
+        return category;
+      }
+    }
+    throw new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 카테고리 입니다.");
   }
 
 }

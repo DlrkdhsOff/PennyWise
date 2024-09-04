@@ -72,19 +72,19 @@ public class CategoryController {
     return ResponseEntity.ok()
         .body(categoryService.updateCategory(userId, updateCategoryDTO));
   }
-//
-//  // 카테고리 삭제
-//  @DeleteMapping("/categories")
-//  public ResponseEntity<?> deleteCategory(@RequestBody @Valid CategoryDTO categoryDTO,
-//      HttpServletRequest request) {
-//
-//    Long userId = (Long) request.getSession().getAttribute("userId");
-//
-//    if (userId == null) {
-//      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-//    }
-//
-//    return ResponseEntity.ok()
-//        .body(categoryService.deleteCategory(userId, categoryDTO.getCategoryName()));
-//  }
+
+  // 카테고리 삭제
+  @DeleteMapping("/categories")
+  public ResponseEntity<?> deleteCategory(@RequestBody @Valid CategoryDTO categoryDTO,
+      HttpServletRequest request) {
+
+    Long userId = (Long) request.getSession().getAttribute("userId");
+
+    if (userId == null) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
+    }
+
+    return ResponseEntity.ok()
+        .body(categoryService.deleteCategory(userId, categoryDTO.getCategoryName()));
+  }
 }
