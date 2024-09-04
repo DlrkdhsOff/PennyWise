@@ -1,20 +1,24 @@
 package com.zero.pennywise.service;
 
-import static com.zero.pennywise.utils.PageUtils.page;
+import static com.zero.pennywise.utils.PageUtils.getPagedData;
 
-import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.category.CategoryDTO;
-import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserCategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.exception.GlobalException;
+import com.zero.pennywise.model.request.category.CategoryDTO;
+import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
+import com.zero.pennywise.model.response.Categories;
 import com.zero.pennywise.model.response.CategoriesPage;
+import com.zero.pennywise.redis.CategoryCache;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
 import com.zero.pennywise.repository.querydsl.category.CategoryQueryRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,11 +35,21 @@ public class CategoryService {
   private final UserRepository userRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final BudgetQueryRepository budgetQueryRepository;
+  private final CategoryCache categoryCache;
 
   // 카테고리 목록
-  public CategoriesPage getCategoryList(Long userId, Pageable page) {
-    Pageable pageable = page(page);
-    return CategoriesPage.of(categoryQueryRepository.getAllCategory(userId, pageable));
+  public CategoriesPage getCategoryList(Long userId, Pageable pageable) {
+    List<Categories> cachedData = categoryCache.getCategoriesFromCache(userId);
+
+    // 캐시에 데이터가 있으면 캐시 데이터를 반환
+    if (cachedData != null) {
+      return CategoriesPage.of(getPagedData(cachedData, pageable));
+    }
+
+    List<Categories> categories = categoryQueryRepository.getAllCategory(userId, pageable);
+    categoryCache.putCategoriesInCache(userId, categories);
+
+    return CategoriesPage.of(getPagedData(categories, pageable));
   }
 
   // 카테고리 생성
@@ -49,10 +63,12 @@ public class CategoryService {
 
   // 카테고리 존재 여부 확인
   private String existingCategory(UserEntity user, CategoriesEntity category) {
-    if (userCategoryRepository.existsByUserIdAndCategoryCategoryId(user.getId(),
-        category.getCategoryId())) {
+    List<Categories> categories = categoryCache.getCategoriesFromCache(user.getId());
+    if (isCategoryNameExists(categories, category.getCategoryName())) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리 입니다.");
     }
+
+    categoryCache.putNewCategoryInCache(categories, user.getId(), category);
     saveUserCategory(category, user);
     return "카테고리를 생성하였습니다.";
   }
@@ -64,6 +80,10 @@ public class CategoryService {
             .categoryName(categoryDTO.getCategoryName())
             .build()
     );
+
+    List<Categories> categories = categoryCache.getCategoriesFromCache(user.getId());
+    categoryCache.putNewCategoryInCache(categories, user.getId(), category);
+
     saveUserCategory(category, user);
     return "카테고리를 생성하였습니다.";
   }
@@ -123,10 +143,9 @@ public class CategoryService {
         })
         .orElseGet(() -> {
           if (isUsedByOtherUser) {
-            return categoriesRepository.save(
-                CategoriesEntity.builder()
-                    .categoryName(newCategoryName)
-                    .build()
+            return categoriesRepository.save(CategoriesEntity.builder()
+                .categoryName(newCategoryName)
+                .build()
             );
           } else {
             currentCategory.setCategoryName(newCategoryName);
@@ -170,6 +189,16 @@ public class CategoryService {
             .user(user)
             .build()
     );
+  }
+
+  // 해당 카테고리가 존재하는지 확인
+  public boolean isCategoryNameExists(List<Categories> categories, String categoryName) {
+    for (Categories category : categories) {
+      if (category.getCategoryName().equals(categoryName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // 카테고리 조회

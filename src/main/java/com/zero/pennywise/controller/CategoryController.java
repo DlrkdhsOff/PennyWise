@@ -1,5 +1,7 @@
 package com.zero.pennywise.controller;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.category.CategoryDTO;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
@@ -37,7 +39,8 @@ public class CategoryController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    return ResponseEntity.ok(categoryService.getCategoryList(userId, page));
+    Pageable pageable = page(page);
+    return ResponseEntity.ok(categoryService.getCategoryList(userId, pageable));
   }
 
   // 카테고리 생성
