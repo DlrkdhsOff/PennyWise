@@ -5,9 +5,10 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class BalanceDTO {
+public class Balances {
 
   private String categoryName;
+  private Long amount;
   private Long balance;
 
 }

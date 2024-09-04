@@ -1,6 +1,7 @@
 package com.zero.pennywise.utils;
 
-import com.zero.pennywise.model.response.Categories;
+import com.zero.pennywise.entity.CategoriesEntity;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -16,21 +17,33 @@ public class PageUtils {
     return PageRequest.of(pageNumber, page.getPageSize());
   }
 
-  public static Page<Categories> getPagedData(List<Categories> categories, Pageable pageable) {
+  // 캐시 데이터 페이징 처리
+  public static Page<String> getPagedData(List<CategoriesEntity> categories, Pageable pageable) {
     int pageSize = pageable.getPageSize();
     int currentPage = pageable.getPageNumber();
     int start = currentPage * pageSize;
 
-    List<Categories> pagedList;
+    List<String> categoriesList = of(categories);
 
     // 데이터 범위 확인 및 페이징 처리
     if (categories.size() < start) {
-      pagedList = Collections.emptyList();
+      categoriesList = Collections.emptyList();
     } else {
       int end = Math.min(start + pageSize, categories.size());
-      pagedList = categories.subList(start, end);
+      categoriesList = categoriesList.subList(start, end);
     }
 
-    return new PageImpl<>(pagedList, pageable, categories.size());
+    return new PageImpl<>(categoriesList, pageable, categories.size());
+  }
+
+
+  // 카테고리명만 출력
+  private static List<String> of(List<CategoriesEntity> categories) {
+    List<String> result = new ArrayList<>();
+    for (CategoriesEntity category : categories) {
+      result.add(category.getCategoryName());
+    }
+
+    return result;
   }
 }

@@ -5,9 +5,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QCategoriesEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
-import com.zero.pennywise.model.request.transaction.CategoryAmountDTO;
-import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.model.request.transaction.CategoryBalance;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.service.TransactionService;
 import com.zero.pennywise.status.TransactionStatus;
@@ -20,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -105,6 +105,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 카테고리 변경 시 해당 categoryId 업데이트
   @Override
+  @Transactional
   public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
 
@@ -120,7 +121,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 사용자와 카테고리 ID로 수입/지출 합계 조회
   @Override
-  public CategoryAmountDTO getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId, String thisMonth) {
+  public CategoryBalance getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId, String thisMonth) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
@@ -139,7 +140,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     totalExpenses = (totalExpenses == null) ? 0 : totalExpenses;
     totalIncome = (totalIncome == null) ? 0 : totalIncome;
 
-    return new CategoryAmountDTO(categoryName, totalIncome, totalExpenses);
+    return new CategoryBalance(categoryName, totalIncome - totalExpenses);
   }
 
   // 공통 메서드: 해당 값과 일치하는 데이터의 합계 조회

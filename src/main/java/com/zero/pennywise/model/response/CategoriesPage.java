@@ -13,9 +13,9 @@ public class CategoriesPage {
   private int pageNumber;
   private int totalPage;
   private Long totalData;
-  private List<Categories> categories;
+  private List<String> categories;
 
-  public static CategoriesPage of(Page<Categories> pageList) {
+  public static CategoriesPage of(Page<String> pageList) {
     return new CategoriesPage(
         pageList.getNumber() + 1,
         pageList.getTotalPages(),

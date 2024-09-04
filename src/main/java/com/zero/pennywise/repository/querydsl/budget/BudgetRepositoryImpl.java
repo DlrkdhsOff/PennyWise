@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,6 +41,7 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
   }
 
   @Override
+  @Transactional
   public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
     QBudgetEntity b = QBudgetEntity.budgetEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;

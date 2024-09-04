@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryAmountDTO {
+public class CategoryBalance {
 
   private String categoryName;
-  private Long totalIncome;
-  private Long totalExpenses;
+  private Long balance;
 
 }

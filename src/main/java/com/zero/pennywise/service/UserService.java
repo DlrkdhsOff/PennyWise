@@ -1,13 +1,14 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.account.LoginDTO;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
-import com.zero.pennywise.model.request.budget.BalanceDTO;
-import com.zero.pennywise.model.request.transaction.CategoryAmountDTO;
-import com.zero.pennywise.entity.BudgetEntity;
-import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.model.request.budget.Balances;
+import com.zero.pennywise.model.request.transaction.CategoryBalance;
+import com.zero.pennywise.redis.BudgetCache;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
@@ -16,11 +17,9 @@ import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +34,7 @@ public class UserService {
   private final UserCategoryRepository userCategoryRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final WaringMessageRepository waringMessageRepository;
-  private final RedisTemplate<String, Object> redisTemplate;
+  private final BudgetCache budgetCache;
 
   // 회원 가입
   public String register(RegisterDTO registerDTO) {
@@ -66,44 +65,13 @@ public class UserService {
     }
 
     // 해당 사용자가 설정한 카테고리별 예산 남은 금액 레디스 데이터에 저장
-    Map<String, Long> categoryBalances = getUserCategoryBalances(user);
-    if (categoryBalances != null) {
-      redisTemplate.opsForHash().put("categoryBalances", user.getId().toString(), categoryBalances);
-    }
+    List<Balances> balances = getUserCategoryBalances(user);
+    budgetCache.putBalanceInCache(user.getId(), balances);
 
     request.getSession().setAttribute("userId", user.getId());
     return "로그인 성공";
   }
 
-  // 카테고리별 남은 금액
-  private Map<String, Long> getUserCategoryBalances(UserEntity user) {
-    List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
-    if (userBudget == null) {
-      return null;
-    }
-
-    Map<String, Long> result = new HashMap<>();
-
-    for (BudgetEntity budget : userBudget) {
-      BalanceDTO balanceDTO = getCategoryBalances(user.getId(), budget);
-      result.put(balanceDTO.getCategoryName(), balanceDTO.getBalance());
-    }
-    return result;
-  }
-
-  // 카테고리 남은 금액
-  public BalanceDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-    Long categoryId = budget.getCategory().getCategoryId();
-    String thisMonths = LocalDate.now().toString();
-
-    CategoryAmountDTO categoryAmountDTO = transactionQueryRepository
-        .getTotalAmountByUserIdAndCategoryId(userId, categoryId, thisMonths);
-
-    Long balance = budget.getAmount();
-    balance += (categoryAmountDTO.getTotalIncome() - categoryAmountDTO.getTotalExpenses());
-
-    return new BalanceDTO(categoryAmountDTO.getCategoryName(), balance);
-  }
 
   // 회원 정보 수정
   public String update(Long userId, UpdateDTO updateDTO) {
@@ -133,6 +101,36 @@ public class UserService {
     userRepository.deleteById(userId);
 
     return "계정이 영구적으로 삭제 되었습니다.";
+  }
+
+  // 카테고리별 남은 금액
+  private List<Balances> getUserCategoryBalances(UserEntity user) {
+    List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
+    if (userBudget == null) {
+      return null;
+    }
+
+    List<Balances> result = new ArrayList<>();
+
+    for (BudgetEntity budget : userBudget) {
+      result.add(getCategoryBalances(user.getId(), budget));
+    }
+    return result;
+  }
+
+  // 카테고리 남은 금액
+  public Balances getCategoryBalances(Long userId, BudgetEntity budget) {
+    Long categoryId = budget.getCategory().getCategoryId();
+    String thisMonths = LocalDate.now().toString();
+
+    CategoryBalance  categoryBalance = transactionQueryRepository
+        .getTotalAmountByUserIdAndCategoryId(userId, categoryId, thisMonths);
+
+    Long amount = budget.getAmount();
+    String categoryName = categoryBalance.getCategoryName();
+    Long balance = categoryBalance.getBalance();
+
+    return new Balances(categoryBalance.getCategoryName(), amount, balance);
   }
 
   // 전화 번호 유효성 확인
