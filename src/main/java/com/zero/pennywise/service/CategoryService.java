@@ -1,6 +1,6 @@
 package com.zero.pennywise.service;
 
-import static com.zero.pennywise.utils.PageUtils.getPagedData;
+import static com.zero.pennywise.utils.PageUtils.getPagedCategoryData;
 
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserCategoryEntity;
@@ -15,9 +15,7 @@ import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
 import com.zero.pennywise.repository.querydsl.category.CategoryQueryRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,7 +42,7 @@ public class CategoryService {
       categories = getCategories(userId);
     }
 
-    return CategoriesPage.of(getPagedData(categories, pageable));
+    return CategoriesPage.of(getPagedCategoryData(categories, pageable));
   }
 
   // 카테고리 생성
@@ -70,6 +68,7 @@ public class CategoryService {
     return "카테고리를 생성하였습니다.";
   }
 
+  // 카테고리 수정
   @Transactional
   public String updateCategory(Long userId, UpdateCategoryDTO updateCategoryDTO) {
     UserEntity user = getUserById(userId);
