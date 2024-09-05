@@ -7,7 +7,9 @@
 - **Spring Boot**
 - **JPA**
 - **MySQL**
+- **QueryDsl**
 - **Redis**
+- **SSE**
 - **Git**
 
 
