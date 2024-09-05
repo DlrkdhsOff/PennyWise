@@ -1,11 +1,13 @@
-package com.zero.pennywise.model.response;
+package com.zero.pennywise.model.request.budget;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class BudgetsDTO {
+@NoArgsConstructor
+public class Balances {
 
   private String categoryName;
   private Long amount;

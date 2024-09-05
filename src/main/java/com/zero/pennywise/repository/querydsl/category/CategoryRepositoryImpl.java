@@ -7,9 +7,6 @@ import com.zero.pennywise.entity.QCategoriesEntity;
 import com.zero.pennywise.entity.QUserCategoryEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,43 +15,29 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
 
   public final JPAQueryFactory jpaQueryFactory;
 
-
-  // 총 데이터의 개수
-  private Long getBudgetCount(QUserCategoryEntity uC, Long userId) {
-    return jpaQueryFactory
-        .select(uC.count())
-        .from(uC)
-        .where(uC.user.id.eq(userId))
-        .fetchOne();
-  }
-
   @Override
-  public Page<String> getAllCategory(Long userId, Pageable page) {
+  public List<CategoriesEntity> getAllCategory(Long userId) {
     QUserCategoryEntity uC = QUserCategoryEntity.userCategoryEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
-    List<String> list = jpaQueryFactory
-        .select(c.categoryName)
+    return jpaQueryFactory
+        .select(c)
         .from(c)
         .join(uC).on(c.categoryId.eq(uC.category.categoryId))
         .where(uC.user.id.eq(userId))
-        .limit(page.getPageSize())
-        .offset(page.getOffset())
         .fetch();
 
-    Long total = getBudgetCount(uC, userId);
-    return new PageImpl<>(list, page, total);
   }
 
   @Override
-  public void updateCategory(Long userId, Long categoryId, CategoriesEntity newCategory) {
+  public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
 
     QUserCategoryEntity uC = QUserCategoryEntity.userCategoryEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     jpaQueryFactory
         .update(uC)
-        .set(uC.category.categoryId, newCategory.getCategoryId())
+        .set(uC.category.categoryId, newCategoryId)
         .where(
             uC.user.id.eq(userId),
             uC.category.categoryId.eq(categoryId)

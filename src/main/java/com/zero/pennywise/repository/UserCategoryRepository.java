@@ -10,8 +10,6 @@ public interface UserCategoryRepository extends JpaRepository<UserCategoryEntity
 
   void deleteAllByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
 
-  boolean existsByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
-
   boolean existsByUserNotAndCategoryCategoryId(UserEntity user, Long categoryId);
 
   Optional<UserCategoryEntity> findByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
