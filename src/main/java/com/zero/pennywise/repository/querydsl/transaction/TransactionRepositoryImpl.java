@@ -6,7 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QCategoriesEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.model.request.transaction.CategoryBalance;
+import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
 import com.zero.pennywise.model.response.TransactionsDTO;
 import com.zero.pennywise.service.TransactionService;
 import com.zero.pennywise.status.TransactionStatus;
@@ -121,7 +121,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   // 사용자와 카테고리 ID로 수입/지출 합계 조회
   @Override
-  public CategoryBalance getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId, String thisMonth) {
+  public CategoryBalanceDTO getTotalAmountByUserIdAndCategoryId(Long userId, Long categoryId, String thisMonth) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
     QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
@@ -131,21 +131,15 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .where(c.categoryId.eq(categoryId))
         .fetchOne();
 
-    Long totalExpenses = getAmount(userId, categoryId, thisMonth,
-        TransactionStatus.EXPENSES, TransactionStatus.FIXED_EXPENSES);
-
-    Long totalIncome = getAmount(userId, categoryId, thisMonth,
-        TransactionStatus.INCOME, TransactionStatus.FIXED_INCOME);
+    Long totalExpenses = getAmount(userId, categoryId, thisMonth);
 
     totalExpenses = (totalExpenses == null) ? 0 : totalExpenses;
-    totalIncome = (totalIncome == null) ? 0 : totalIncome;
 
-    return new CategoryBalance(categoryName, totalIncome - totalExpenses);
+    return new CategoryBalanceDTO(categoryName, totalExpenses);
   }
 
   // 공통 메서드: 해당 값과 일치하는 데이터의 합계 조회
-  private Long getAmount(Long userId, Long categoryId, String thisMonths,
-      TransactionStatus notFixed, TransactionStatus fixed) {
+  private Long getAmount(Long userId, Long categoryId, String thisMonths) {
 
     QTransactionEntity t = QTransactionEntity.transactionEntity;
 
@@ -155,7 +149,8 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .where(
             t.user.id.eq(userId),
             t.dateTime.startsWith(thisMonths),
-            t.type.eq(fixed).or(t.type.eq(notFixed)),
+            t.type.eq(TransactionStatus.EXPENSES)
+                .or(t.type.eq(TransactionStatus.FIXED_EXPENSES)),
             categoryId != null ? t.categoryId.eq(categoryId) : null
         )
         .fetchOne();

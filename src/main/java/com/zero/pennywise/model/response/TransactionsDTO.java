@@ -1,5 +1,6 @@
 package com.zero.pennywise.model.response;
 
+import com.zero.pennywise.status.TransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,15 +20,12 @@ public class TransactionsDTO {
 
   public static TransactionPage of(Page<TransactionsDTO> list) {
     for (TransactionsDTO transaction : list.getContent()) {
-      if ("FIXED_EXPENSES".equals(transaction.getType())) {
-        transaction.setType("고정 지출");
-      } else if ("FIXED_INCOME".equals(transaction.getType())) {
-        transaction.setType("고정 수입");
-      } else if ("EXPENSES".equals(transaction.getType())) {
-        transaction.setType("지출");
-      } else {
-        transaction.setType("수입");
-      }
+      switch (transaction.getType()) {
+        case "EXPENSES" -> transaction.setType("지출");
+        case "FIXED_EXPENSES" -> transaction.setType("고정 지출");
+        case "INCOME" -> transaction.setType("수입");
+        case "FIXED_INCOME" -> transaction.setType("고정 수입");
+      };
     }
 
     return new TransactionPage(

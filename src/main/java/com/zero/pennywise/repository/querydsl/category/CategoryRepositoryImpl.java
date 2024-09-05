@@ -33,7 +33,6 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
   public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
 
     QUserCategoryEntity uC = QUserCategoryEntity.userCategoryEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     jpaQueryFactory
         .update(uC)

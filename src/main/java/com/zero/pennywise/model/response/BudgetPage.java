@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.response;
 
-import com.zero.pennywise.model.request.budget.Balances;
+import com.zero.pennywise.model.request.budget.BalancesDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,9 +13,9 @@ public class BudgetPage {
   private int pageNumber;
   private int totalPage;
   private Long totalData;
-  private List<Balances> budgetList;
+  private List<BalancesDTO> budgetList;
 
-  public static BudgetPage of(Page<Balances> pageList) {
+  public static BudgetPage of(Page<BalancesDTO> pageList) {
     return new BudgetPage(
         pageList.getNumber() + 1,
         pageList.getTotalPages(),

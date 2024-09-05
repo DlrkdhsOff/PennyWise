@@ -3,7 +3,6 @@ package com.zero.pennywise.repository.querydsl.budget;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QBudgetEntity;
-import com.zero.pennywise.entity.QCategoriesEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ public class BudgetRepositoryImpl implements BudgetQueryRepository {
   @Transactional
   public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
     QBudgetEntity b = QBudgetEntity.budgetEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
 
     jpaQueryFactory
         .update(b)
