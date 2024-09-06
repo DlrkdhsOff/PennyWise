@@ -1,7 +1,7 @@
 package com.zero.pennywise.utils;
 
 import com.zero.pennywise.entity.CategoriesEntity;
-import com.zero.pennywise.model.request.budget.Balances;
+import com.zero.pennywise.model.request.budget.BalancesDTO;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +51,7 @@ public class PageUtils {
   }
 
   // 예산 페이징 처리
-  public static Page<Balances> getPagedBalanceData(List<Balances> balances, Pageable pageable) {
+  public static Page<BalancesDTO> getPagedBalanceData(List<BalancesDTO> balances, Pageable pageable) {
     return getPagedData(balances, pageable); // 공통 페이징 처리 메서드 사용
   }
 

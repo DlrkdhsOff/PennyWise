@@ -60,7 +60,7 @@ public class CategoryController {
 
   // 카테고리 수정
   @PatchMapping("/categories")
-  public ResponseEntity<?> updateCategory(@RequestBody @Valid UpdateCategoryDTO updateCategoryDTO,
+  public ResponseEntity<?> updateCategory(@RequestBody @Valid UpdateCategoryDTO updateCategory,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -70,7 +70,7 @@ public class CategoryController {
     }
 
     return ResponseEntity.ok()
-        .body(categoryService.updateCategory(userId, updateCategoryDTO));
+        .body(categoryService.updateCategory(userId, updateCategory));
   }
 
   // 카테고리 삭제

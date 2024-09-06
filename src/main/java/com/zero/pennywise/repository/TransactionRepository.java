@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
   void deleteAllByUserId(Long userId);
 
-  boolean existsByUserId(Long userId);
-
   Optional<TransactionEntity> findByTransactionId(Long transactionId);
 
   List<TransactionEntity> findByDateTimeStartingWith(String lastMonthsDate);

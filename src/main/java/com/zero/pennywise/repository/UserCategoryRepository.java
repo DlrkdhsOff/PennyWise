@@ -12,5 +12,4 @@ public interface UserCategoryRepository extends JpaRepository<UserCategoryEntity
 
   boolean existsByUserNotAndCategoryCategoryId(UserEntity user, Long categoryId);
 
-  Optional<UserCategoryEntity> findByUserIdAndCategoryCategoryId(Long userId, Long categoryId);
 }
