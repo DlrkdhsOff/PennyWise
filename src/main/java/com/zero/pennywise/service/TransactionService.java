@@ -14,13 +14,12 @@ import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryReposi
 import com.zero.pennywise.service.component.handler.TransactionHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
 import com.zero.pennywise.service.component.redis.CategoryCache;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +38,7 @@ public class TransactionService {
         transactionDTO.getCategoryName());
 
     transactionRepository.save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
-    transactionHandler.updateBalance(user.getId(), transactionDTO, category.getCategoryName());
+    transactionHandler.updateBalance(user, transactionDTO, category.getCategoryName());
 
     return "성공적으로 거래를 등록하였습니다.";
   }
@@ -49,10 +48,8 @@ public class TransactionService {
     UserEntity user = userHandler.getUserById(userId);
     Pageable pageable = page(page);
 
-    TransactionPage transactions = StringUtils.hasText(categoryName)
-        ? TransactionsDTO.of(
-        transactionQueryRepository.getTransactionsByCategory(user, categoryName, pageable))
-        : TransactionsDTO.of(transactionQueryRepository.getAllTransaction(user, pageable));
+    TransactionPage transactions = TransactionsDTO
+        .of(transactionQueryRepository.getAllTransaction(user, categoryName,  pageable));
 
     transactionHandler.validateTransactions(transactions.getTransactions(), categoryName);
 
@@ -62,21 +59,12 @@ public class TransactionService {
   // 매일 00시 고정 수입/지출 자동 등록
   public void updateFixedTransaction() {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String todayDate = LocalDateTime.now().format(formatter);  // 오늘 날짜
-    String lastMonthsDate = transactionHandler.getLastMonthsDate();  // 한 달 전 날짜
+    String lastMonthsDate = LocalDate.now().minusMonths(1).toString();  // 한 달 전 날짜
 
-    List<TransactionEntity> transactions = transactionRepository.findByDateTimeStartingWith(
-        lastMonthsDate);
-    for (TransactionEntity transaction : transactions) {
-      transactionRepository.save(TransactionEntity.builder()
-          .user(transaction.getUser())
-          .categoryId(transaction.getCategoryId())
-          .type(transaction.getType())
-          .amount(transaction.getAmount())
-          .description(transaction.getDescription())
-          .dateTime(todayDate)
-          .build());
-    }
+    List<TransactionEntity> transactions = transactionQueryRepository
+        .findByLastMonthTransaction(lastMonthsDate);
+
+    transactionHandler.updateFixedTransactionDetail(transactions);
   }
 
   // 거래 정보 수정
@@ -106,4 +94,5 @@ public class TransactionService {
 
     return "거래를 성공적으로 삭제하였습니다.";
   }
+
 }

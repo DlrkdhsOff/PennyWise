@@ -1,6 +1,7 @@
 package com.zero.pennywise.service.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
@@ -11,6 +12,7 @@ import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import com.zero.pennywise.service.component.redis.CategoryCache;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class UserHandler {
   private final UserCategoryRepository userCategoryRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final WaringMessageRepository waringMessageRepository;
+  private final CategoryCache categoryCache;
 
 
 
@@ -97,16 +100,19 @@ public class UserHandler {
 
   // 카테고리 남은 금액
   public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-    Long categoryId = budget.getCategory().getCategoryId();
+    CategoriesEntity category = categoryCache
+        .getCategoryByCategoryId(userId, budget.getCategory().getCategoryId());
+
     String thisMonths = LocalDate.now().toString();
 
-    CategoryBalanceDTO categoryBalance = transactionQueryRepository
-        .getTotalAmountByUserIdAndCategoryId(userId, categoryId, thisMonths);
+    Long totalExpenses = transactionQueryRepository
+        .getExpenses(userId, category.getCategoryId(), thisMonths);
 
-    String categoryName = categoryBalance.getCategoryName();
+    String categoryName = category.getCategoryName();
     Long amount = budget.getAmount();
-    Long totalExpenses = amount - categoryBalance.getTotalExpenses();
 
-    return new BalancesDTO(categoryBalance.getCategoryName(), amount, totalExpenses);
+    totalExpenses = (amount - totalExpenses < 0) ? 0 : (amount - totalExpenses);
+
+    return new BalancesDTO(categoryName, amount, totalExpenses);
   }
 }

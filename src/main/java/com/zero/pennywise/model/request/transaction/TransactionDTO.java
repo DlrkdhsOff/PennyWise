@@ -34,15 +34,9 @@ public class TransactionDTO {
         .type(castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()))
         .amount(transactionDTO.getAmount())
         .description(transactionDTO.getDescription())
-        .dateTime(dateTimeFormatting(LocalDateTime.now()))
+        .dateTime(LocalDateTime.now())
         .build();
   }
 
-   // "yyyy-MM-dd HH:mm:ss" 형식
-    public static String dateTimeFormatting(LocalDateTime date) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    return date.format(formatter);
-  }
 
 }

@@ -4,6 +4,7 @@ import static com.zero.pennywise.utils.PageUtils.getPagedCategoryData;
 
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.response.CategoriesPage;
 import com.zero.pennywise.repository.CategoriesRepository;
@@ -14,6 +15,7 @@ import com.zero.pennywise.service.component.redis.CategoryCache;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,14 +57,18 @@ public class CategoryService {
     String beforeCategoryName = updateCategory.getCategoryName();
     String newCategoryName = updateCategory.getNewCategoryName();
 
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(user.getId(),
-        beforeCategoryName);
+    CategoriesEntity category = categoryCache.getCategoryByCategoryName(user.getId(), beforeCategoryName);
+
+    if (category.isShared()) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "기본 카테고리는 수정할 수 없습니다.");
+    }
     Long categoryId = category.getCategoryId();
 
     categoryCache.isCategoryNameExists(user.getId(), newCategoryName);
 
     CategoriesEntity newCategory = categoryHandler.updateOrCreateCategory(user, category,
         newCategoryName);
+
     categoryHandler.updateOther(user.getId(), categoryId, newCategory.getCategoryId());
 
     categoryCache.updateCategory(user.getId(), beforeCategoryName, newCategory);
@@ -76,6 +82,10 @@ public class CategoryService {
     UserEntity user = userHandler.getUserById(userId);
     CategoriesEntity category = categoryCache
         .getCategoryByCategoryName(user.getId(), categoryName);
+
+    if (category.isShared()) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "기본 카테고리는 삭제 할 수 없습니다.");
+    }
 
     userCategoryRepository.deleteAllByUserIdAndCategoryCategoryId(user.getId(),
         category.getCategoryId());

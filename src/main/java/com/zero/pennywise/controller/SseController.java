@@ -30,6 +30,6 @@ public class SseController {
     }
 
     // 새로운 SseEmitter 생성
-    return sseService.createEmitter(userId.toString(), lastEventId);
+    return sseService.createEmitter(userId);
   }
 }

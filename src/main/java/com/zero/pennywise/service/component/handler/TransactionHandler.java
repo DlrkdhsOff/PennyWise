@@ -4,18 +4,24 @@ import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatu
 
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.TransactionEntity;
+import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.response.TransactionsDTO;
+import com.zero.pennywise.model.response.WaringMessageDTO;
 import com.zero.pennywise.repository.TransactionRepository;
+import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.service.component.redis.BudgetCache;
 import com.zero.pennywise.service.component.redis.CategoryCache;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -27,20 +33,36 @@ public class TransactionHandler {
   private final BudgetCache budgetCache;
   private final CategoryCache categoryCache;
   private final TransactionRepository transactionRepository;
+  private final RedisTemplate<String, Object> redisTemplate;
+  private final WaringMessageRepository waringMessageRepository;
 
   // 잔액 업데이트 필요시 처리
-  public void updateBalance(Long userId, TransactionDTO transactionDTO,
+  public void updateBalance(UserEntity user, TransactionDTO transactionDTO,
       String categoryName) {
 
-    BalancesDTO balance = budgetCache.getBalances(userId, categoryName);
+    BalancesDTO balance = budgetCache.getBalances(user.getId(), categoryName);
     if (balance == null) {
       return;
     }
     if ("지출".equals(transactionDTO.getType())) {
-      balance.setBalance(balance.getBalance() - transactionDTO.getAmount());
+      long totalBalance = balance.getBalance() - transactionDTO.getAmount();
+      if (totalBalance < 0) {
+        sendMessage(new WaringMessageDTO(user, categoryName + " 예산을 초과 했습니다."));
+        totalBalance = 0L;
+      }
+      balance.setBalance(totalBalance);
     }
 
-    budgetCache.updateBalance(userId, balance.getBalance(), categoryName);
+    budgetCache.updateBalance(user.getId(), balance.getBalance(), categoryName);
+  }
+
+  public void sendMessage(WaringMessageDTO waringMessage) {
+    waringMessageRepository.save(WaringMessageEntity.builder()
+        .user(waringMessage.getUser())
+        .message(waringMessage.getMessage())
+        .recivedDateTime(LocalDateTime.now())
+        .build());
+    redisTemplate.convertAndSend("topic", waringMessage);
   }
 
   // 거래 목록 유효값 검증
@@ -141,4 +163,18 @@ public class TransactionHandler {
     budgetCache.updateBalance(userId, beforeBalance.getBalance(), beforeBalance.getCategoryName());
   }
 
+  // 고정 지출 / 수입 재등록
+  public void updateFixedTransactionDetail(List<TransactionEntity> transactions) {
+    for (TransactionEntity transaction : transactions) {
+      System.out.println(transaction.getDateTime());
+      transactionRepository.save(TransactionEntity.builder()
+          .user(transaction.getUser())
+          .categoryId(transaction.getCategoryId())
+          .type(transaction.getType())
+          .amount(transaction.getAmount())
+          .description(transaction.getDescription())
+          .dateTime(LocalDateTime.now())
+          .build());
+    }
+  }
 }
