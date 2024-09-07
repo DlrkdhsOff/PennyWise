@@ -1,6 +1,7 @@
 package com.zero.pennywise.repository;
 
 import com.zero.pennywise.entity.TransactionEntity;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +13,6 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
   Optional<TransactionEntity> findByTransactionId(Long transactionId);
 
-  List<TransactionEntity> findByDateTimeStartingWith(String lastMonthsDate);
-
   void deleteByUserIdAndTransactionId(Long userId, Long transactionId);
+
 }

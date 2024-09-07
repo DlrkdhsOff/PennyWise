@@ -7,11 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
-public class SseService {
+public class SseService  {
+  private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-  private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-
-  public SseEmitter createEmitter(String userId, String lastEventId) {
+  public SseEmitter createEmitter(Long userId) {
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 무한대 타임아웃 설정
     emitters.put(userId, emitter);
 
@@ -23,14 +22,19 @@ public class SseService {
     return emitter;
   }
 
-  public void sendEventToClient(String userId, String eventName, String message) {
+  public void sendEventToClient(Long userId, String eventName, String message) {
     SseEmitter emitter = emitters.get(userId);
     if (emitter != null) {
       try {
+        System.out.println("Emitter found for userId: " + userId + " -> " + emitters.containsKey(userId));
+
         emitter.send(SseEmitter.event().name(eventName).data(message));
       } catch (IOException e) {
+        System.out.println("Failed to send message to emitter for userId: " + userId + " due to: " + e.getMessage());
         emitters.remove(userId); // 메시지 전송 실패 시 처리
       }
     }
+    System.out.println("userId = " + userId);
   }
+
 }
