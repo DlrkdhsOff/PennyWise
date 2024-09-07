@@ -7,8 +7,8 @@ import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
-import com.zero.pennywise.model.response.TransactionPage;
-import com.zero.pennywise.model.response.TransactionsDTO;
+import com.zero.pennywise.model.response.transaction.TransactionPage;
+import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import com.zero.pennywise.service.component.handler.TransactionHandler;
@@ -34,12 +34,14 @@ public class TransactionService {
   // 수입/지출 등록
   public String transaction(Long userId, TransactionDTO transactionDTO) {
     UserEntity user = userHandler.getUserById(userId);
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(userId,
-        transactionDTO.getCategoryName());
 
-    transactionRepository.save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
-    transactionHandler.updateBalance(user, transactionDTO, category.getCategoryName());
+    CategoriesEntity category = categoryCache
+        .getCategoryByCategoryName(userId, transactionDTO.getCategoryName());
 
+    TransactionEntity transaction = transactionRepository
+        .save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
+
+    transactionHandler.updateBalance(user, transaction, category.getCategoryName());
     return "성공적으로 거래를 등록하였습니다.";
   }
 
@@ -70,13 +72,13 @@ public class TransactionService {
   // 거래 정보 수정
   public String updateTransaction(Long userId, UpdateTransactionDTO updateTransaction) {
     UserEntity user = userHandler.getUserById(userId);
-    TransactionEntity transaction = transactionHandler.getTransaction(
-        updateTransaction.getTransactionId());
+    TransactionEntity transaction = transactionHandler
+        .getTransaction(updateTransaction.getTransactionId());
 
-    CategoriesEntity newCategory = categoryCache.getCategoryByCategoryName(user.getId(),
-        updateTransaction.getCategoryName());
+    CategoriesEntity newCategory = categoryCache
+        .getCategoryByCategoryName(user.getId(), updateTransaction.getCategoryName());
 
-    transactionHandler.updateBalanceCacheData(userId, transaction, updateTransaction);
+    transactionHandler.updateBalanceCacheData(user, transaction, updateTransaction);
     transactionHandler.updateTransactionDetails(transaction, newCategory, updateTransaction);
 
     transactionRepository.save(transaction);

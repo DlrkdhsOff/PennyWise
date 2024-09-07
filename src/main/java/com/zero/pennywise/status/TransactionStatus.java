@@ -1,6 +1,7 @@
 package com.zero.pennywise.status;
 
 import com.zero.pennywise.exception.GlobalException;
+import javax.swing.plaf.BorderUIResource.EtchedBorderUIResource;
 import org.springframework.http.HttpStatus;
 
 public enum TransactionStatus {
@@ -19,6 +20,14 @@ public enum TransactionStatus {
     return switch (this) {
       case EXPENSES, FIXED_EXPENSES -> true;
       case INCOME, FIXED_INCOME -> false;
+    };
+  }
+
+  public boolean isExpensesStr(String type) {
+    return switch (type) {
+      case "지출" -> true;
+      case "수입" -> false;
+      default -> throw new GlobalException(HttpStatus.BAD_REQUEST, "수입/지출 타입을 정확하게 입력해주세요");
     };
   }
 }

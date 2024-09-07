@@ -5,7 +5,6 @@ import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
-import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;

@@ -8,7 +8,7 @@ import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
-import com.zero.pennywise.model.response.BudgetPage;
+import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.service.component.handler.BudgetHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
@@ -32,9 +32,10 @@ public class BudgetService {
 
   // 카테고리별 예산 설정
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
+
     UserEntity user = userHandler.getUserById(userId);
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(userId,
-        budgetDTO.getCategoryName());
+    CategoriesEntity category = categoryCache
+        .getCategoryByCategoryName(userId, budgetDTO.getCategoryName());
 
     budgetHandler.validateBudget(user.getId(), category.getCategoryId());
 
@@ -55,11 +56,13 @@ public class BudgetService {
   @Transactional
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = userHandler.getUserById(userId);
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(user.getId(),
-        budgetDTO.getCategoryName());
 
-    BudgetEntity budget = budgetHandler.getBudgetByUserIdAndCategoryId(user.getId(),
-        category.getCategoryId());
+    CategoriesEntity category = categoryCache
+        .getCategoryByCategoryName(user.getId(), budgetDTO.getCategoryName());
+
+    BudgetEntity budget = budgetHandler
+        .getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
+
     budget.setAmount(budgetDTO.getAmount());
 
     budgetRepository.save(budget);
@@ -81,10 +84,12 @@ public class BudgetService {
   @Transactional
   public String deleteBudget(Long userId, String categoryName) {
     UserEntity user = userHandler.getUserById(userId);
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(user.getId(), categoryName);
 
-    BudgetEntity budget = budgetHandler.getBudgetByUserIdAndCategoryId(user.getId(),
-        category.getCategoryId());
+    CategoriesEntity category = categoryCache
+        .getCategoryByCategoryName(user.getId(), categoryName);
+
+    BudgetEntity budget = budgetHandler
+        .getBudgetByUserIdAndCategoryId(user.getId(), category.getCategoryId());
 
     budgetRepository.deleteByBudgetId(budget.getBudgetId());
     budgetCache.deleteBalance(user.getId(), categoryName);

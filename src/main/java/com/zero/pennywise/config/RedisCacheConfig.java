@@ -1,8 +1,8 @@
 package com.zero.pennywise.config;
 
 
-import com.zero.pennywise.model.response.WaringMessageDTO;
-import com.zero.pennywise.service.RedisService;
+import com.zero.pennywise.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +21,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisCacheConfig {
 
   @Value("${spring.data.redis.host}")
@@ -28,6 +29,8 @@ public class RedisCacheConfig {
 
   @Value("${spring.data.redis.port}")
   private int port;
+
+  private final NotificationService notificationService;
 
   @Bean
   public RedisConnectionFactory redisConnectionFactory() {
@@ -39,7 +42,7 @@ public class RedisCacheConfig {
     RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
     redisTemplate.setConnectionFactory(redisConnectionFactory());
     redisTemplate.setKeySerializer(new StringRedisSerializer());
-    redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(WaringMessageDTO.class));
+    redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
     return redisTemplate;
   }
 
@@ -56,24 +59,19 @@ public class RedisCacheConfig {
         .build();
   }
 
-  //리스너어댑터 설정
   @Bean
-  MessageListenerAdapter messageListenerAdapter() {
-    return new MessageListenerAdapter(new RedisService());
+  public MessageListenerAdapter messageListener() {
+    return new MessageListenerAdapter(notificationService);
   }
+
 
   //컨테이너 설정
   @Bean
   RedisMessageListenerContainer redisContainer() {
     RedisMessageListenerContainer container = new RedisMessageListenerContainer();
     container.setConnectionFactory(redisConnectionFactory());
-    container.addMessageListener(messageListenerAdapter(), topic());
+    container.addMessageListener(messageListener(), new ChannelTopic("notifications"));
     return container;
   }
 
-  //pub/sub 토픽 설정
-  @Bean
-  ChannelTopic topic() {
-    return new ChannelTopic("topic");
-  }
 }

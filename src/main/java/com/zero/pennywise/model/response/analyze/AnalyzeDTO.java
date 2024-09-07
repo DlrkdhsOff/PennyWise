@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.response;
+package com.zero.pennywise.model.response.analyze;
 
 import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
 import java.util.List;

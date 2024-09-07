@@ -1,6 +1,5 @@
-package com.zero.pennywise.model.response;
+package com.zero.pennywise.model.response.waring;
 
-import com.zero.pennywise.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WaringMessageDTO {
 
-  private UserEntity user;
+  private Long userId;
   private String message;
 
 }

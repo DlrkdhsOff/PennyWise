@@ -2,7 +2,6 @@ package com.zero.pennywise.repository;
 
 import com.zero.pennywise.entity.UserCategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserCategoryRepository extends JpaRepository<UserCategoryEntity, Long> {

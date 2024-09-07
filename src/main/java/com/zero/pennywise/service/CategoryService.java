@@ -6,7 +6,7 @@ import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
-import com.zero.pennywise.model.response.CategoriesPage;
+import com.zero.pennywise.model.response.category.CategoriesPage;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.service.component.handler.CategoryHandler;
@@ -53,11 +53,13 @@ public class CategoryService {
   // 카테고리 수정
   @Transactional
   public String updateCategory(Long userId, UpdateCategoryDTO updateCategory) {
+
     UserEntity user = userHandler.getUserById(userId);
     String beforeCategoryName = updateCategory.getCategoryName();
     String newCategoryName = updateCategory.getNewCategoryName();
 
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(user.getId(), beforeCategoryName);
+    CategoriesEntity category = categoryCache
+        .getCategoryByCategoryName(user.getId(), beforeCategoryName);
 
     if (category.isShared()) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "기본 카테고리는 수정할 수 없습니다.");
@@ -66,8 +68,8 @@ public class CategoryService {
 
     categoryCache.isCategoryNameExists(user.getId(), newCategoryName);
 
-    CategoriesEntity newCategory = categoryHandler.updateOrCreateCategory(user, category,
-        newCategoryName);
+    CategoriesEntity newCategory = categoryHandler
+        .updateOrCreateCategory(user, category, newCategoryName);
 
     categoryHandler.updateOther(user.getId(), categoryId, newCategory.getCategoryId());
 
@@ -89,6 +91,7 @@ public class CategoryService {
 
     userCategoryRepository.deleteAllByUserIdAndCategoryCategoryId(user.getId(),
         category.getCategoryId());
+
     categoryHandler.isCategoryUsedByOtherUser(user, category.getCategoryId(), category);
     categoryCache.deleteCategory(user.getId(), categoryName);
     return "성공적으로 카테고리를 삭제하였습니다.";
