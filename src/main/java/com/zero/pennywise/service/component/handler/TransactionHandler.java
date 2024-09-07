@@ -13,8 +13,8 @@ import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
-import com.zero.pennywise.service.component.redis.BudgetCache;
-import com.zero.pennywise.service.component.redis.CategoryCache;
+import com.zero.pennywise.service.component.cache.BudgetCache;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,7 @@ public class TransactionHandler {
   // 잔액 업데이트 필요시 처리
   public void updateBalance(UserEntity user, TransactionEntity transaction, String categoryName) {
     BalancesDTO balance = budgetCache.getBalances(user.getId(), categoryName);
+
     if (balance == null) {
       return;
     }
@@ -52,13 +53,14 @@ public class TransactionHandler {
   }
 
   // 남은 예산 금액 계산
-  private long calculateBalance(UserEntity user, BalancesDTO balance, Long amount,
-      String categoryName) {
+  private long calculateBalance(UserEntity user, BalancesDTO balance, Long amount, String categoryName) {
     long totalBalance = balance.getBalance() - amount;
+
     if (totalBalance < 0) {
       sendMessage(user, categoryName + " 예산을 초과 했습니다.");
       totalBalance = 0L;
     }
+
     return totalBalance;
   }
 
@@ -90,20 +92,20 @@ public class TransactionHandler {
   }
 
   // 입력한 데이터 수정
-  public void updateTransactionDetails(TransactionEntity transaction, CategoriesEntity category,
-      UpdateTransactionDTO updateTransaction) {
+  public void updateTransactionDetails(TransactionEntity transaction,
+      CategoriesEntity category, UpdateTransactionDTO updateTransaction) {
+
     transaction.setCategoryId(category.getCategoryId());
-    transaction.setType(
-        castToTransactionStatus(updateTransaction.getType(), updateTransaction.getIsFixed()));
+    transaction.setType(castToTransactionStatus(updateTransaction.getType(), updateTransaction.getIsFixed()));
     transaction.setAmount(updateTransaction.getAmount());
     transaction.setDescription(updateTransaction.getDescription());
   }
 
   // 캐시에 저장 되어 있는 예산 수정
   public void updateBalanceCacheData(UserEntity user, TransactionEntity transaction, UpdateTransactionDTO updateTransaction) {
-
     CategoriesEntity beforeCategory = categoryCache
         .getCategoryByCategoryId(user.getId(), transaction.getCategoryId());
+
     BalancesDTO balance = budgetCache.getBalances(user.getId(), beforeCategory.getCategoryName());
 
     // 캐시 데이터 원상 복구
@@ -124,7 +126,6 @@ public class TransactionHandler {
 
   // 같은 카테고리를 수정할 경우
   private void updateBalanceForSameCategory(UserEntity user, BalancesDTO balance, UpdateTransactionDTO updateTransaction) {
-
     if (isExpense(updateTransaction.getType())) {
       long totalBalance = calculateBalance(
           user,
@@ -139,7 +140,6 @@ public class TransactionHandler {
 
   // 다른 카테고리로 수정하는 경우
   private void updateBalanceForNewCategory(UserEntity user, UpdateTransactionDTO updateTransaction) {
-
     CategoriesEntity newCategory = categoryCache
         .getCategoryByCategoryName(user.getId(), updateTransaction.getCategoryName());
 
@@ -165,15 +165,16 @@ public class TransactionHandler {
 
   // 거래 삭제시 남은 금액 변경
   public void deleteBalanceCacheData(Long userId, TransactionEntity transaction) {
-
     if (!transaction.getType().isExpenses()) {
       return;
     }
+
     CategoriesEntity beforeCategory = categoryCache
         .getCategoryByCategoryId(userId, transaction.getCategoryId());
 
     BalancesDTO balance = budgetCache.getBalances(userId, beforeCategory.getCategoryName());
     balance.setBalance(balance.getBalance() + transaction.getAmount());
+
     budgetCache.updateBalance(userId, balance.getBalance(), balance.getCategoryName());
   }
 

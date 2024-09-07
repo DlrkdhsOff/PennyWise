@@ -48,8 +48,7 @@ public class NotificationService implements MessageListener {
     }
   }
 
-
-
+  @Override
   public void onMessage(Message message, byte[] pattern) {
     try {
       WaringMessageDTO waringMessage = mapper.readValue(message.getBody(), WaringMessageDTO.class);

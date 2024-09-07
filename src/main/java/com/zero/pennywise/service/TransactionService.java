@@ -13,7 +13,7 @@ import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import com.zero.pennywise.service.component.handler.TransactionHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
-import com.zero.pennywise.service.component.redis.CategoryCache;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -50,8 +50,8 @@ public class TransactionService {
     UserEntity user = userHandler.getUserById(userId);
     Pageable pageable = page(page);
 
-    TransactionPage transactions = TransactionsDTO
-        .of(transactionQueryRepository.getAllTransaction(user, categoryName,  pageable));
+    TransactionPage transactions = TransactionsDTO.of(transactionQueryRepository
+        .getAllTransaction(user, categoryName,  pageable));
 
     transactionHandler.validateTransactions(transactions.getTransactions(), categoryName);
 

@@ -3,6 +3,7 @@ package com.zero.pennywise.controller;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.request.category.CategoryDTO;
+import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -28,7 +29,7 @@ public class BudgetController {
 
   // 카테고리별 예산 설정
   @PostMapping("/budgets")
-  public ResponseEntity<?> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
+  public ResponseEntity<String> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -43,7 +44,7 @@ public class BudgetController {
 
   // 카테고리별 예산 수정
   @PatchMapping("/budgets")
-  public ResponseEntity<?> updateBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
+  public ResponseEntity<String> updateBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -58,7 +59,7 @@ public class BudgetController {
 
   // 예산 목록
   @GetMapping("/budgets")
-  public ResponseEntity<?> getbudget(
+  public ResponseEntity<BudgetPage> getbudget(
       @PageableDefault(page = 0, size = 10) Pageable page,
       HttpServletRequest request) {
 
@@ -74,7 +75,7 @@ public class BudgetController {
 
   // 예산 삭제
   @DeleteMapping("/budgets")
-  public ResponseEntity<?> deleteBudget(@RequestBody @Valid CategoryDTO categoryDTO,
+  public ResponseEntity<String> deleteBudget(@RequestBody @Valid CategoryDTO categoryDTO,
       HttpServletRequest request) {
     Long userId = (Long) request.getSession().getAttribute("userId");
 

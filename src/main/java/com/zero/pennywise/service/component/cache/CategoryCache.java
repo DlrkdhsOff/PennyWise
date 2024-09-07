@@ -1,4 +1,4 @@
-package com.zero.pennywise.service.component.redis;
+package com.zero.pennywise.service.component.cache;
 
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.exception.GlobalException;

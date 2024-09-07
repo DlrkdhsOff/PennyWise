@@ -11,7 +11,7 @@ import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.service.component.handler.CategoryHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
-import com.zero.pennywise.service.component.redis.CategoryCache;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +64,7 @@ public class CategoryService {
     if (category.isShared()) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "기본 카테고리는 수정할 수 없습니다.");
     }
+
     Long categoryId = category.getCategoryId();
 
     categoryCache.isCategoryNameExists(user.getId(), newCategoryName);
@@ -82,6 +83,7 @@ public class CategoryService {
   @Transactional
   public String deleteCategory(Long userId, String categoryName) {
     UserEntity user = userHandler.getUserById(userId);
+
     CategoriesEntity category = categoryCache
         .getCategoryByCategoryName(user.getId(), categoryName);
 

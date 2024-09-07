@@ -8,7 +8,7 @@ import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
-import com.zero.pennywise.service.component.redis.CategoryCache;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;

@@ -12,8 +12,8 @@ import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.service.component.handler.BudgetHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
-import com.zero.pennywise.service.component.redis.BudgetCache;
-import com.zero.pennywise.service.component.redis.CategoryCache;
+import com.zero.pennywise.service.component.cache.BudgetCache;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +32,8 @@ public class BudgetService {
 
   // 카테고리별 예산 설정
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
-
     UserEntity user = userHandler.getUserById(userId);
+
     CategoriesEntity category = categoryCache
         .getCategoryByCategoryName(userId, budgetDTO.getCategoryName());
 
