@@ -35,20 +35,6 @@ public class PageUtils {
     return new PageImpl<>(dataList, pageable, dataList.size());
   }
 
-  // 카테고리명만 출력하는 메서드
-  private static List<String> getCategoryNames(List<CategoriesEntity> categories) {
-    List<String> result = new ArrayList<>();
-    for (CategoriesEntity category : categories) {
-      result.add(category.getCategoryName());
-    }
-    return result;
-  }
-
-  // 카테고리 페이징 처리
-  public static Page<String> getPagedCategoryData(List<CategoriesEntity> categories, Pageable pageable) {
-    List<String> categoryNames = getCategoryNames(categories); // 카테고리명을 추출
-    return getPagedData(categoryNames, pageable); // 공통 페이징 처리 메서드 사용
-  }
 
   // 예산 페이징 처리
   public static Page<BalancesDTO> getPagedBalanceData(List<BalancesDTO> balances, Pageable pageable) {

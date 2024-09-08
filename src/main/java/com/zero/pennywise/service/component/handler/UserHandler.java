@@ -10,8 +10,8 @@ import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
-import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
-import com.zero.pennywise.service.component.cache.CategoryCache;
+//import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+//import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,9 @@ public class UserHandler {
   private final TransactionRepository transactionRepository;
   private final BudgetRepository budgetRepository;
   private final UserCategoryRepository userCategoryRepository;
-  private final TransactionQueryRepository transactionQueryRepository;
+//  private final TransactionQueryRepository transactionQueryRepository;
   private final WaringMessageRepository waringMessageRepository;
-  private final CategoryCache categoryCache;
+//  private final CategoryCache categoryCache;
 
 
 
@@ -80,38 +80,38 @@ public class UserHandler {
     userCategoryRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
   }
-
-
-  // 카테고리별 남은 금액
-  public List<BalancesDTO> getUserCategoryBalances(UserEntity user) {
-    List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
-    if (userBudget == null) {
-      return null;
-    }
-
-    List<BalancesDTO> result = new ArrayList<>();
-
-    for (BudgetEntity budget : userBudget) {
-      result.add(getCategoryBalances(user.getId(), budget));
-    }
-    return result;
-  }
-
-  // 카테고리 남은 금액
-  public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-    CategoriesEntity category = categoryCache
-        .getCategoryByCategoryId(userId, budget.getCategory().getCategoryId());
-
-    String thisMonths = LocalDate.now().toString();
-
-    Long totalExpenses = transactionQueryRepository
-        .getExpenses(userId, category.getCategoryId(), thisMonths);
-
-    String categoryName = category.getCategoryName();
-    Long amount = budget.getAmount();
-
-    totalExpenses = (amount - totalExpenses < 0) ? 0 : (amount - totalExpenses);
-
-    return new BalancesDTO(categoryName, amount, totalExpenses);
-  }
+//
+//
+//  // 카테고리별 남은 금액
+//  public List<BalancesDTO> getUserCategoryBalances(UserEntity user) {
+//    List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
+//    if (userBudget == null) {
+//      return null;
+//    }
+//
+//    List<BalancesDTO> result = new ArrayList<>();
+//
+//    for (BudgetEntity budget : userBudget) {
+//      result.add(getCategoryBalances(user.getId(), budget));
+//    }
+//    return result;
+//  }
+//
+//  // 카테고리 남은 금액
+//  public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
+//    CategoriesEntity category = categoryCache
+//        .getCategoryByCategoryId(userId, budget.getCategory().getCategoryId());
+//
+//    String thisMonths = LocalDate.now().toString();
+//
+//    Long totalExpenses = transactionQueryRepository
+//        .getExpenses(userId, category.getCategoryId(), thisMonths);
+//
+//    String categoryName = category.getCategoryName();
+//    Long amount = budget.getAmount();
+//
+//    totalExpenses = (amount - totalExpenses < 0) ? 0 : (amount - totalExpenses);
+//
+//    return new BalancesDTO(categoryName, amount, totalExpenses);
+//  }
 }
