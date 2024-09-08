@@ -27,8 +27,11 @@ public class AnalyzeService {
 
     // 이번달 지출금액이 지난 3달간 평균 지출 금액보다 150% 이상일 경우
     if (lastThreeMonth.getTotalExpenses() * 2.5 < thisMonth.getTotalExpenses()) {
-      // 임시
-      analyzeHandler.sendMessage(user, "이번달 지출 금액이 지난 3달 평균금액보다 150%이상 사용했습니다.");
+      Long lastTotalAmount = lastThreeMonth.getTotalExpenses();
+      Long thisMonthAmount = thisMonth.getTotalExpenses();
+
+      long result = (long) (((double) (thisMonthAmount - lastTotalAmount) / lastTotalAmount ) * 100);
+      analyzeHandler.sendMessage(user, "이번달 지출 금액이 지난 3달 평균금액보다 " + result + "%이상 사용했습니다.");
     }
     return null;
   }

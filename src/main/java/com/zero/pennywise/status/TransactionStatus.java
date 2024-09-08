@@ -1,7 +1,6 @@
 package com.zero.pennywise.status;
 
 import com.zero.pennywise.exception.GlobalException;
-import javax.swing.plaf.BorderUIResource.EtchedBorderUIResource;
 import org.springframework.http.HttpStatus;
 
 public enum TransactionStatus {

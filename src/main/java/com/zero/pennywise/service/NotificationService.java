@@ -27,8 +27,8 @@ public class NotificationService implements MessageListener {
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
     emitters.put(userId, emitter);
 
-    emitter.onCompletion(emitter::complete);
-    emitter.onTimeout(emitter::complete);
+    emitter.onCompletion(() -> emitters.remove(userId));
+    emitter.onTimeout(() -> emitters.remove(userId));
 
     sendNotification(userId, "connect!");
     return emitter;
@@ -45,6 +45,7 @@ public class NotificationService implements MessageListener {
       }
     } else {
       logger.info("emitters.get(userId): {}", emitters.get(userId));
+      emitters.remove(userId);
     }
   }
 

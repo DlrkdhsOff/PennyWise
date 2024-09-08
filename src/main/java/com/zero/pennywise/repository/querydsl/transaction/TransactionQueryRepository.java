@@ -14,8 +14,6 @@ public interface TransactionQueryRepository {
 
   Page<TransactionsDTO> getAllTransaction(UserEntity user, String categoryName, Pageable page);
 
-  void updateCategory(Long useId, Long categoryId, Long newCategoryId);
-
   List<TransactionEntity> findByLastMonthTransaction(String lastMonthsDate);
 
   Long getTracsactionAvgLastThreeMonth(Long userId, Long categoryId, LocalDateTime startDateTime, LocalDateTime endDateTime);

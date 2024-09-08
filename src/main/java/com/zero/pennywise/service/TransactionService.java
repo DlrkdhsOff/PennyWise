@@ -11,9 +11,9 @@ import com.zero.pennywise.model.response.transaction.TransactionPage;
 import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import com.zero.pennywise.service.component.handler.TransactionHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
-import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,7 +41,7 @@ public class TransactionService {
     TransactionEntity transaction = transactionRepository
         .save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
 
-    transactionHandler.updateBalance(user, transaction, category.getCategoryName());
+    transactionHandler.addBalance(user, transaction, category.getCategoryName());
     return "성공적으로 거래를 등록하였습니다.";
   }
 

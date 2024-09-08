@@ -28,19 +28,4 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
         .fetch();
 
   }
-
-  @Override
-  public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
-
-    QUserCategoryEntity uC = QUserCategoryEntity.userCategoryEntity;
-
-    jpaQueryFactory
-        .update(uC)
-        .set(uC.category.categoryId, newCategoryId)
-        .where(
-            uC.user.id.eq(userId),
-            uC.category.categoryId.eq(categoryId)
-        )
-        .execute();
-  }
 }

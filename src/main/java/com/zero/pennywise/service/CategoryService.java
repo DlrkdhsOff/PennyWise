@@ -5,13 +5,12 @@ import static com.zero.pennywise.utils.PageUtils.getPagedCategoryData;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.response.category.CategoriesPage;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.UserCategoryRepository;
+import com.zero.pennywise.service.component.cache.CategoryCache;
 import com.zero.pennywise.service.component.handler.CategoryHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
-import com.zero.pennywise.service.component.cache.CategoryCache;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -50,34 +49,6 @@ public class CategoryService {
     return "카테고리를 생성하였습니다.";
   }
 
-  // 카테고리 수정
-  @Transactional
-  public String updateCategory(Long userId, UpdateCategoryDTO updateCategory) {
-
-    UserEntity user = userHandler.getUserById(userId);
-    String beforeCategoryName = updateCategory.getCategoryName();
-    String newCategoryName = updateCategory.getNewCategoryName();
-
-    CategoriesEntity category = categoryCache
-        .getCategoryByCategoryName(user.getId(), beforeCategoryName);
-
-    if (category.isShared()) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "기본 카테고리는 수정할 수 없습니다.");
-    }
-
-    Long categoryId = category.getCategoryId();
-
-    categoryCache.isCategoryNameExists(user.getId(), newCategoryName);
-
-    CategoriesEntity newCategory = categoryHandler
-        .updateOrCreateCategory(user, category, newCategoryName);
-
-    categoryHandler.updateOther(user.getId(), categoryId, newCategory.getCategoryId());
-
-    categoryCache.updateCategory(user.getId(), beforeCategoryName, newCategory);
-
-    return "카테고리를 성공적으로 수정하였습니다.";
-  }
 
   // 카테고리 삭제
   @Transactional

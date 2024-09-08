@@ -36,7 +36,7 @@ public class TransactionHandler {
   private final WaringMessageRepository waringMessageRepository;
 
   // 잔액 업데이트 필요시 처리
-  public void updateBalance(UserEntity user, TransactionEntity transaction, String categoryName) {
+  public void addBalance(UserEntity user, TransactionEntity transaction, String categoryName) {
     BalancesDTO balance = budgetCache.getBalances(user.getId(), categoryName);
 
     if (balance == null) {

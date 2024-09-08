@@ -49,20 +49,6 @@ public class CategoryCache {
     putCategoriesInCache(userId, categories);
   }
 
-  // 캐시에서 카테고리 업데이트
-  public void updateCategory(Long userId, String categoryName, CategoriesEntity newCategory) {
-    List<CategoriesEntity> categories = getCategoriesFromCache(userId);
-
-    for (CategoriesEntity category : categories) {
-      if (category.getCategoryName().equals(categoryName)) {
-        category.setCategoryId(newCategory.getCategoryId());
-        category.setCategoryName(newCategory.getCategoryName());
-        category.setShared(newCategory.isShared());
-      }
-    }
-
-    putCategoriesInCache(userId, categories);
-  }
 
   // 캐시에서 카테고리 삭제
   public void deleteCategory(Long userId, String categoryName) {

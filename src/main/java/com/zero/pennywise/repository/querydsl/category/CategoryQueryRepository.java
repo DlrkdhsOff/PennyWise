@@ -9,5 +9,4 @@ public interface CategoryQueryRepository {
 
   List<CategoriesEntity> getAllCategory(Long userId);
 
-  void updateCategory(Long userId, Long categoryId, Long newCategoryId);
 }

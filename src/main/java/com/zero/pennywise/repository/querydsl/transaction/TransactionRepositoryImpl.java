@@ -21,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -84,21 +83,6 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", t.dateTime).as("dateTime"));
   }
 
-  // 카테고리 변경 시 해당 categoryId 업데이트
-  @Override
-  @Transactional
-  public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-
-    jpaQueryFactory
-        .update(t)
-        .set(t.categoryId, newCategoryId)
-        .where(
-            t.user.id.eq(userId),
-            t.categoryId.eq(categoryId)
-        )
-        .execute();
-  }
 
   @Override
   public List<TransactionEntity> findByLastMonthTransaction(String lastMonthsDate) {
