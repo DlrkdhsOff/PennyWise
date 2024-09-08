@@ -8,7 +8,6 @@ import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
-import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
@@ -27,9 +26,9 @@ public class UserHandler {
   private final TransactionRepository transactionRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final BudgetRepository budgetRepository;
-  private final UserCategoryRepository userCategoryRepository;
-  private final WaringMessageRepository waringMessageRepository;
   private final CategoriesRepository categoriesRepository;
+  private final WaringMessageRepository waringMessageRepository;
+  private final CategoryHandler categoryHandler;
 
 
 
@@ -77,7 +76,7 @@ public class UserHandler {
   public void deleteOtherData(Long userId) {
     budgetRepository.deleteAllByUserId(userId);
     transactionRepository.deleteAllByUserId(userId);
-    userCategoryRepository.deleteAllByUserId(userId);
+    categoriesRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
   }
 
@@ -99,8 +98,8 @@ public class UserHandler {
 
   // 카테고리 남은 금액
   public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-    CategoriesEntity category = categoriesRepository
-        .findByUserIdAndCategoryId(userId, budget.getCategory().getCategoryId());
+    CategoriesEntity category = categoryHandler
+        .getCateogryById(userId, budget.getCategory().getCategoryId());
 
     String thisMonths = LocalDate.now().toString();
 

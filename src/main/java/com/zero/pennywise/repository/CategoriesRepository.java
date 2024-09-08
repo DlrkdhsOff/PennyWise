@@ -11,9 +11,13 @@ public interface CategoriesRepository extends JpaRepository<CategoriesEntity, Lo
 
   Optional<CategoriesEntity> findByUserIdAndCategoryName(Long userId, String categoryName);
 
-  CategoriesEntity findByUserIdAndCategoryId(Long userId, Long cateogryId);
+  Optional<CategoriesEntity> findByUserIdAndCategoryId(Long userId, Long cateogryId);
 
   boolean existsByUserIdAndCategoryName(Long userId, String categoryName);
 
   void deleteByUserIdAndCategoryName(Long userId, String categoryName);
+
+  List<CategoriesEntity> findAllByUserId(Long userId);
+
+  void deleteAllByUserId(Long userId);
 }
