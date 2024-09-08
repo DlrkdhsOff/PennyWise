@@ -53,6 +53,7 @@ public class CategoryService {
   }
 
   // 카테고리 수정
+  @Transactional
   public String updateCategory(Long userId, UpdateCategoryDTO updateCategory) {
     UserEntity user = userHandler.getUserById(userId);
 

@@ -44,8 +44,8 @@ public class UserService {
     UserEntity user = userHandler.getUserByEmail(loginDTO.getEmail());
     userHandler.validatePassword(user, loginDTO.getPassword());
 
-//    List<BalancesDTO> balances = userHandler.getUserCategoryBalances(user);
-//    budgetCache.putBalanceInCache(user.getId(), balances);
+    List<BalancesDTO> balances = userHandler.getUserCategoryBalances(user);
+    budgetCache.putBalanceInCache(user.getId(), balances);
 
     request.getSession().setAttribute("userId", user.getId());
     return "로그인 성공";
