@@ -1,8 +1,10 @@
 package com.zero.pennywise.model.request.category;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class UpdateCategoryDTO {
 
   private String categoryName;

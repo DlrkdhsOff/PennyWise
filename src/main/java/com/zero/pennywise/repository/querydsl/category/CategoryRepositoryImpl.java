@@ -2,10 +2,7 @@ package com.zero.pennywise.repository.querydsl.category;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.QCategoriesEntity;
-import com.zero.pennywise.entity.QUserCategoryEntity;
-import com.zero.pennywise.entity.UserEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

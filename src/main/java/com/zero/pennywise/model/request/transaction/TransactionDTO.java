@@ -7,9 +7,11 @@ import com.zero.pennywise.entity.UserEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class TransactionDTO {
 
   @NotBlank(message = "카테고리명을 입력해주세요.")

@@ -3,12 +3,14 @@ package com.zero.pennywise.model.response.analyze;
 import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class UserExpensesDTO {
 
   private Long totalExpenses;

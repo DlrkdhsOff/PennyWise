@@ -1,4 +1,4 @@
-package com.zero.pennywise.service.component.handler;
+package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoriesEntity;

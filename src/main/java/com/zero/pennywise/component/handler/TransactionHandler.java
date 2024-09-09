@@ -1,4 +1,4 @@
-package com.zero.pennywise.service.component.handler;
+package com.zero.pennywise.component.handler;
 
 import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
 
@@ -14,7 +14,7 @@ import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
-import com.zero.pennywise.service.component.cache.BudgetCache;
+import com.zero.pennywise.component.cache.BudgetCache;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -194,16 +194,4 @@ public class TransactionHandler {
     budgetCache.updateBalance(userId, balance.getBalance(), balance.getCategoryName());
   }
 
-  // 고정 지출 / 수입 재등록
-  public void updateFixedTransactionDetail(List<TransactionEntity> transactions) {
-    transactions.forEach(transaction -> transactionRepository.save(
-        TransactionEntity.builder()
-            .user(transaction.getUser())
-            .categoryId(transaction.getCategoryId())
-            .type(transaction.getType())
-            .amount(transaction.getAmount())
-            .description(transaction.getDescription())
-            .dateTime(LocalDateTime.now())
-            .build()));
-  }
 }

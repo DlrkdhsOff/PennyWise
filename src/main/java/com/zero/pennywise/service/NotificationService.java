@@ -21,6 +21,7 @@ public class NotificationService implements MessageListener {
 
   private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
+  private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
   public SseEmitter createEmitter(Long userId) {
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
@@ -43,7 +44,7 @@ public class NotificationService implements MessageListener {
         emitters.remove(userId);
       }
     } else {
-//      logger.info("emitters.get(userId): {}", emitters.get(userId));
+      logger.info("emitters.get(userId): {}", emitters.get(userId));
       emitters.remove(userId);
     }
   }
@@ -53,7 +54,7 @@ public class NotificationService implements MessageListener {
     try {
       WaringMessageDTO waringMessage = mapper.readValue(message.getBody(), WaringMessageDTO.class);
 
-//      logger.info("waringMessage.toString(): {}", waringMessage.toString());
+      logger.info("waringMessage.toString(): {}", waringMessage.toString());
       sendNotification(waringMessage.getUserId(), waringMessage.getMessage());
     } catch (IOException e) {
       e.printStackTrace();

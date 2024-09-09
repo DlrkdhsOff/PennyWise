@@ -2,10 +2,12 @@ package com.zero.pennywise.model.response.category;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class CategoriesPage {
 

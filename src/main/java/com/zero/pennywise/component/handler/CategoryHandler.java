@@ -1,4 +1,4 @@
-package com.zero.pennywise.service.component.handler;
+package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.exception.GlobalException;
