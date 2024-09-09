@@ -125,7 +125,7 @@ public class TransactionHandler {
   // 캐시에 저장 되어 있는 예산 수정
   public void updateBalanceCacheData(UserEntity user, TransactionEntity transaction, UpdateTransactionDTO updateTransaction) {
     CategoriesEntity beforeCategory = categoryHandler
-        .getCateogryById(user.getId(), transaction.getCategoryId());
+        .getCateogryByUserIdAndId(user.getId(), transaction.getCategoryId());
 
     BalancesDTO balance = budgetCache.getBalances(user.getId(), beforeCategory.getCategoryName());
 
@@ -186,7 +186,7 @@ public class TransactionHandler {
       return;
     }
     CategoriesEntity beforeCategory = categoryHandler
-        .getCateogryById(userId, transaction.getCategoryId());
+        .getCateogryByUserIdAndId(userId, transaction.getCategoryId());
 
     BalancesDTO balance = budgetCache.getBalances(userId, beforeCategory.getCategoryName());
     balance.setBalance(balance.getBalance() + transaction.getAmount());

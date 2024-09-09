@@ -99,7 +99,7 @@ public class UserHandler {
   // 카테고리 남은 금액
   public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
     CategoriesEntity category = categoryHandler
-        .getCateogryById(userId, budget.getCategory().getCategoryId());
+        .getCateogryByUserIdAndId(userId, budget.getCategory().getCategoryId());
 
     String thisMonths = LocalDate.now().toString();
 

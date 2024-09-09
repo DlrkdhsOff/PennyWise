@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public enum TransactionStatus {
 
-  FIXED_EXPENSES ,FIXED_INCOME, EXPENSES ,INCOME;
+  FIXED_EXPENSES ,FIXED_INCOME, EXPENSES ,INCOME, END;
 
   public static TransactionStatus castToTransactionStatus(String type, String isFixed) {
     return switch (type) {
@@ -18,7 +18,7 @@ public enum TransactionStatus {
   public boolean isExpenses() {
     return switch (this) {
       case EXPENSES, FIXED_EXPENSES -> true;
-      case INCOME, FIXED_INCOME -> false;
+      case INCOME, FIXED_INCOME, END -> false;
     };
   }
 

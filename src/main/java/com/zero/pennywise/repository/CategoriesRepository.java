@@ -20,4 +20,6 @@ public interface CategoriesRepository extends JpaRepository<CategoriesEntity, Lo
   List<CategoriesEntity> findAllByUserId(Long userId);
 
   void deleteAllByUserId(Long userId);
+
+  CategoriesEntity findByCategoryId(Long categoryId);
 }

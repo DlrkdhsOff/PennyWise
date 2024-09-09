@@ -1,5 +1,7 @@
 package com.zero.pennywise.component.scheduler;
 
+import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.SavingHandler;
 import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.TransactionEntity;
@@ -24,32 +26,33 @@ public class TransactionScheduler {
 
   private final TransactionQueryRepository transactionQueryRepository;
   private final TransactionRepository transactionRepository;
+  private final SavingHandler savingHandler;
 
 
-  public void schedulePayment(UserEntity user, CategoriesEntity category, SavingsEntity savings) {
+  // 지정한 기간에 새로 등록
+  public void schedulePayment(UserEntity user, SavingsEntity savings) {
     LocalDateTime startDate = savings.getStartDate().atStartOfDay();
     Instant paymentTime = startDate.atZone(ZoneId.systemDefault()).toInstant();
 
     TaskScheduler taskScheduler = setTreadPool();
-    taskScheduler.schedule(() -> Payment(user, category, savings), paymentTime);
+    taskScheduler.schedule(() -> savingHandler.payment(user, savings), paymentTime);
   }
+
+
+  public void scheduleEnd(UserEntity user, SavingsEntity savings) {
+    LocalDateTime endDate = savings.getEndDate().atStartOfDay();
+    Instant paymentTime = endDate.atZone(ZoneId.systemDefault()).toInstant();
+
+    TaskScheduler taskScheduler = setTreadPool();
+    taskScheduler.schedule(() -> savingHandler.endDeposit(user, savings), paymentTime);
+  }
+
 
   public TaskScheduler setTreadPool() {
     ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
     scheduler.setPoolSize(10);
     scheduler.initialize();
     return scheduler;
-  }
-
-  private void Payment(UserEntity user, CategoriesEntity category, SavingsEntity savings) {
-    transactionRepository.save(TransactionEntity.builder()
-        .user(user)
-        .amount(savings.getAmount())
-        .type(TransactionStatus.FIXED_EXPENSES)
-        .categoryId(category.getCategoryId())
-        .dateTime(LocalDateTime.now())
-        .description(savings.getName() + savings.getDescription())
-        .build());
   }
 
 

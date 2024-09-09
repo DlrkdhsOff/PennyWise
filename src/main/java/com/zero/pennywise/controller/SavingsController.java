@@ -3,6 +3,7 @@ package com.zero.pennywise.controller;
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.exception.GlobalException;
+import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.service.SavingsService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +37,7 @@ public class SavingsController {
     }
 
     return ResponseEntity.ok()
-        .body(savingsService.setSabings(userId, savings));
+        .body(savingsService.setSavings(userId, savings));
   }
 
   @GetMapping("/savings")
@@ -49,5 +51,17 @@ public class SavingsController {
     }
 
     return ResponseEntity.ok().body(savingsService.getSavings(userId, page(page)));
+  }
+
+  @DeleteMapping("/savings")
+  public ResponseEntity<?> deleteSavings(@RequestBody @Valid DeleteSavingsDTO deleteSavingsDTO,
+      HttpServletRequest request) {
+
+    Long userId = (Long) request.getSession().getAttribute("userId");
+    if (userId == null) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
+    }
+
+    return ResponseEntity.ok().body(savingsService.deleteSavings(userId, deleteSavingsDTO));
   }
 }

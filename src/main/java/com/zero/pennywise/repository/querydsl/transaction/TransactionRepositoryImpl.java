@@ -113,6 +113,48 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   }
 
   @Override
+  public Long getCurrentAmount(UserEntity user, Long categoryId, String description) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+
+    Long currentAmount = jpaQueryFactory
+        .select(t.amount.sum())
+        .from(t)
+        .where(
+            t.user.id.eq(user.getId()),
+            t.categoryId.eq(categoryId),
+            t.description.eq(description)
+        )
+        .fetchOne();
+
+    updateSavingTransaction(user.getId(), categoryId, description);
+
+    return currentAmount == null ? 0L : currentAmount;
+  }
+
+  public void updateSavingTransaction(Long userId, Long categoryId, String description) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+    Long transactionId = jpaQueryFactory
+        .select(t.transactionId)
+        .from(t)
+        .where(
+            t.user.id.eq(userId),
+            t.categoryId.eq(categoryId),
+            t.description.eq(description)
+        )
+        .orderBy(t.dateTime.desc())
+        .limit(1)
+        .fetchOne();
+
+    if (transactionId != null) {
+      jpaQueryFactory
+          .update(t)
+          .set(t.type, TransactionStatus.END)
+          .where(t.transactionId.eq(transactionId))
+          .execute();
+    }
+  }
+
+  @Override
   public Long getTracsactionAvgLastThreeMonth(Long userId, Long categoryId, LocalDateTime startDateTime,
       LocalDateTime endDateTime) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;

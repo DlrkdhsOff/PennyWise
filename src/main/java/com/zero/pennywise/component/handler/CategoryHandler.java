@@ -26,7 +26,7 @@ public class CategoryHandler {
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));
   }
 
-  public CategoriesEntity getCateogryById(Long userId, Long categoryId) {
+  public CategoriesEntity getCateogryByUserIdAndId(Long userId, Long categoryId) {
     return categoriesRepository.findByUserIdAndCategoryId(userId, categoryId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));
   }
@@ -35,4 +35,7 @@ public class CategoryHandler {
     return categoriesRepository.findAllByUserId(userId);
   }
 
+  public CategoriesEntity getCategoryById(Long categoryId) {
+    return categoriesRepository.findByCategoryId(categoryId);
+  }
 }
