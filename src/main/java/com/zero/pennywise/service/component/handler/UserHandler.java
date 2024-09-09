@@ -5,14 +5,12 @@ import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
-import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
 import com.zero.pennywise.repository.BudgetRepository;
+import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
-import com.zero.pennywise.repository.UserCategoryRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
-import com.zero.pennywise.service.component.redis.CategoryCache;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +24,11 @@ public class UserHandler {
 
   private final UserRepository userRepository;
   private final TransactionRepository transactionRepository;
-  private final BudgetRepository budgetRepository;
-  private final UserCategoryRepository userCategoryRepository;
   private final TransactionQueryRepository transactionQueryRepository;
+  private final BudgetRepository budgetRepository;
+  private final CategoriesRepository categoriesRepository;
   private final WaringMessageRepository waringMessageRepository;
-  private final CategoryCache categoryCache;
+  private final CategoryHandler categoryHandler;
 
 
 
@@ -78,7 +76,7 @@ public class UserHandler {
   public void deleteOtherData(Long userId) {
     budgetRepository.deleteAllByUserId(userId);
     transactionRepository.deleteAllByUserId(userId);
-    userCategoryRepository.deleteAllByUserId(userId);
+    categoriesRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
   }
 
@@ -100,8 +98,8 @@ public class UserHandler {
 
   // 카테고리 남은 금액
   public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-    CategoriesEntity category = categoryCache
-        .getCategoryByCategoryId(userId, budget.getCategory().getCategoryId());
+    CategoriesEntity category = categoryHandler
+        .getCateogryById(userId, budget.getCategory().getCategoryId());
 
     String thisMonths = LocalDate.now().toString();
 

@@ -4,18 +4,13 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.entity.CategoriesEntity;
 import com.zero.pennywise.entity.QCategoriesEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
-import com.zero.pennywise.model.response.AnalyzeDTO;
-import com.zero.pennywise.model.response.TransactionsDTO;
-import com.zero.pennywise.service.TransactionService;
+import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
-  private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
   // 전체 거래 내역 조회
   @Override
@@ -88,21 +81,6 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", t.dateTime).as("dateTime"));
   }
 
-  // 카테고리 변경 시 해당 categoryId 업데이트
-  @Override
-  @Transactional
-  public void updateCategory(Long userId, Long categoryId, Long newCategoryId) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-
-    jpaQueryFactory
-        .update(t)
-        .set(t.categoryId, newCategoryId)
-        .where(
-            t.user.id.eq(userId),
-            t.categoryId.eq(categoryId)
-        )
-        .execute();
-  }
 
   @Override
   public List<TransactionEntity> findByLastMonthTransaction(String lastMonthsDate) {

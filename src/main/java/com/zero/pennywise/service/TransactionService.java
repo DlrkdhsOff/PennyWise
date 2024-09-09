@@ -7,40 +7,41 @@ import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
-import com.zero.pennywise.model.response.TransactionPage;
-import com.zero.pennywise.model.response.TransactionsDTO;
+import com.zero.pennywise.model.response.transaction.TransactionPage;
+import com.zero.pennywise.model.response.transaction.TransactionsDTO;
+import com.zero.pennywise.repository.CategoriesRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import com.zero.pennywise.service.component.handler.CategoryHandler;
 import com.zero.pennywise.service.component.handler.TransactionHandler;
 import com.zero.pennywise.service.component.handler.UserHandler;
-import com.zero.pennywise.service.component.redis.CategoryCache;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
 
   private final TransactionRepository transactionRepository;
+  private final CategoriesRepository categoriesRepository;
   private final TransactionQueryRepository transactionQueryRepository;
-  private final CategoryCache categoryCache;
   private final UserHandler userHandler;
+  private final CategoryHandler categoryHandler;
   private final TransactionHandler transactionHandler;
 
   // 수입/지출 등록
   public String transaction(Long userId, TransactionDTO transactionDTO) {
     UserEntity user = userHandler.getUserById(userId);
-    CategoriesEntity category = categoryCache.getCategoryByCategoryName(userId,
-        transactionDTO.getCategoryName());
 
-    transactionRepository.save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
-    transactionHandler.updateBalance(user, transactionDTO, category.getCategoryName());
+    CategoriesEntity category = categoryHandler
+        .getCateogry(user.getId(), transactionDTO.getCategoryName());
 
-    return "성공적으로 거래를 등록하였습니다.";
+    return transactionHandler.addTransaction(user, category, transactionDTO);
   }
 
   // 수입/지출 내역 조회
@@ -48,8 +49,8 @@ public class TransactionService {
     UserEntity user = userHandler.getUserById(userId);
     Pageable pageable = page(page);
 
-    TransactionPage transactions = TransactionsDTO
-        .of(transactionQueryRepository.getAllTransaction(user, categoryName,  pageable));
+    TransactionPage transactions = TransactionsDTO.of(transactionQueryRepository
+        .getAllTransaction(user, categoryName,  pageable));
 
     transactionHandler.validateTransactions(transactions.getTransactions(), categoryName);
 
@@ -70,20 +71,18 @@ public class TransactionService {
   // 거래 정보 수정
   public String updateTransaction(Long userId, UpdateTransactionDTO updateTransaction) {
     UserEntity user = userHandler.getUserById(userId);
-    TransactionEntity transaction = transactionHandler.getTransaction(
-        updateTransaction.getTransactionId());
 
-    CategoriesEntity newCategory = categoryCache.getCategoryByCategoryName(user.getId(),
-        updateTransaction.getCategoryName());
+    TransactionEntity transaction = transactionHandler
+        .getTransaction(updateTransaction.getTransactionId());
 
-    transactionHandler.updateBalanceCacheData(userId, transaction, updateTransaction);
-    transactionHandler.updateTransactionDetails(transaction, newCategory, updateTransaction);
+    transactionHandler.updateBalanceCacheData(user, transaction, updateTransaction);
 
-    transactionRepository.save(transaction);
-    return "거래 정보를 수정하였습니다.";
+    return transactionHandler.updateTransactionDetails(user, transaction, updateTransaction);
   }
 
+
   // 거래 삭제
+  @Transactional
   public String deleteTransaction(Long userId, Long transactionId) {
     UserEntity user = userHandler.getUserById(userId);
     TransactionEntity transaction = transactionHandler.getTransaction(transactionId);

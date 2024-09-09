@@ -2,7 +2,7 @@ package com.zero.pennywise.repository.querydsl.transaction;
 
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.model.response.TransactionsDTO;
+import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface TransactionQueryRepository {
 
   Page<TransactionsDTO> getAllTransaction(UserEntity user, String categoryName, Pageable page);
-
-  void updateCategory(Long useId, Long categoryId, Long newCategoryId);
 
   List<TransactionEntity> findByLastMonthTransaction(String lastMonthsDate);
 

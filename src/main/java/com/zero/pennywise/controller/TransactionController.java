@@ -3,6 +3,7 @@ package com.zero.pennywise.controller;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
+import com.zero.pennywise.model.response.transaction.TransactionPage;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -29,7 +30,7 @@ public class TransactionController {
 
   // 수입 / 지출 등록
   @PostMapping("/transaction")
-  public ResponseEntity<?> transaction(
+  public ResponseEntity<String> transaction(
       @RequestBody @Valid TransactionDTO transactionDTO,
       HttpServletRequest request)
   {
@@ -45,7 +46,7 @@ public class TransactionController {
 
   // 거래 목록 출력 (전체 / 카테고리별)
   @GetMapping("/transaction")
-  public ResponseEntity<?> getTransactionList(
+  public ResponseEntity<TransactionPage> getTransactionList(
       @RequestParam(name = "categoryName", required = false) String categoryName,
       @PageableDefault(page = 0, size = 10) Pageable page,
       HttpServletRequest request)
@@ -62,7 +63,7 @@ public class TransactionController {
 
   // 거래 수정
   @PatchMapping("/transaction")
-  public ResponseEntity<?> updateTransaction(
+  public ResponseEntity<String> updateTransaction(
       @RequestBody @Valid UpdateTransactionDTO updateTransactionDTO,
       HttpServletRequest request)
   {
@@ -78,7 +79,7 @@ public class TransactionController {
 
   // 거래 삭제
   @DeleteMapping("/transaction")
-  public ResponseEntity<?> deleteTransaction(
+  public ResponseEntity<String> deleteTransaction(
       @RequestParam(name = "trasactionId", required = false) Long trasactionId,
       HttpServletRequest request)
   {

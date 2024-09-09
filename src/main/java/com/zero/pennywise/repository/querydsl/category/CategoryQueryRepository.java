@@ -1,13 +1,12 @@
 package com.zero.pennywise.repository.querydsl.category;
 
-import com.zero.pennywise.entity.CategoriesEntity;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryQueryRepository {
 
-  List<CategoriesEntity> getAllCategory(Long userId);
+  Page<String> getAllCategory(Long userId, Pageable pageable);
 
-  void updateCategory(Long userId, Long categoryId, Long newCategoryId);
 }

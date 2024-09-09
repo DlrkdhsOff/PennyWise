@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.response;
+package com.zero.pennywise.model.response.budget;
 
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import java.util.List;

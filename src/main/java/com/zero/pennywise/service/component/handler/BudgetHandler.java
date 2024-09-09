@@ -1,6 +1,8 @@
 package com.zero.pennywise.service.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.repository.BudgetRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +22,20 @@ public class BudgetHandler {
     }
   }
 
-  // 예산 조회
-  public BudgetEntity getBudgetByUserIdAndCategoryId(Long userId, Long categoryId) {
+  // 예산 새로 등록
+  public BudgetEntity save(UserEntity user, CategoriesEntity category, Long amount) {
+    return budgetRepository.save(
+        BudgetEntity.builder()
+            .user(user)
+            .category(category)
+            .amount(amount)
+            .build());
+  }
+
+
+  public BudgetEntity getBudget(Long userId, Long categoryId) {
     return budgetRepository.findByUserIdAndCategoryCategoryId(userId, categoryId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산이 등록되지 않은 카테고리입니다."));
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "예산을 등록하지 않은 카테고리 입니다."));
   }
 
 }

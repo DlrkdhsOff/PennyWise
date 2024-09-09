@@ -21,4 +21,12 @@ public enum TransactionStatus {
       case INCOME, FIXED_INCOME -> false;
     };
   }
+
+  public boolean isExpensesStr(String type) {
+    return switch (type) {
+      case "지출" -> true;
+      case "수입" -> false;
+      default -> throw new GlobalException(HttpStatus.BAD_REQUEST, "수입/지출 타입을 정확하게 입력해주세요");
+    };
+  }
 }

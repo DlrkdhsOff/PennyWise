@@ -5,6 +5,7 @@ import static com.zero.pennywise.utils.PageUtils.page;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.category.CategoryDTO;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
+import com.zero.pennywise.model.response.category.CategoriesPage;
 import com.zero.pennywise.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,7 +31,7 @@ public class CategoryController {
 
   // 카테고리 목록 출력
   @GetMapping("/categories")
-  public ResponseEntity<?> category(HttpServletRequest request,
+  public ResponseEntity<CategoriesPage> category(HttpServletRequest request,
       @PageableDefault(page = 0, size = 10) Pageable page) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -42,6 +43,7 @@ public class CategoryController {
     Pageable pageable = page(page);
     return ResponseEntity.ok(categoryService.getCategoryList(userId, pageable));
   }
+
 
   // 카테고리 생성
   @PostMapping("/categories")
@@ -58,9 +60,9 @@ public class CategoryController {
         .body(categoryService.createCategory(userId, categoryDTO.getCategoryName()));
   }
 
-  // 카테고리 수정
+  // 카테고리 생성
   @PatchMapping("/categories")
-  public ResponseEntity<?> updateCategory(@RequestBody @Valid UpdateCategoryDTO updateCategory,
+  public ResponseEntity<String> updateCategory(@RequestBody @Valid UpdateCategoryDTO updateCategory,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");
@@ -69,13 +71,14 @@ public class CategoryController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    return ResponseEntity.ok()
+    return ResponseEntity.status(HttpStatus.CREATED)
         .body(categoryService.updateCategory(userId, updateCategory));
   }
 
+
   // 카테고리 삭제
   @DeleteMapping("/categories")
-  public ResponseEntity<?> deleteCategory(@RequestBody @Valid CategoryDTO categoryDTO,
+  public ResponseEntity<String> deleteCategory(@RequestBody @Valid CategoryDTO categoryDTO,
       HttpServletRequest request) {
 
     Long userId = (Long) request.getSession().getAttribute("userId");

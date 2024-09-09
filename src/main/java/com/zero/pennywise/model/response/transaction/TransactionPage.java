@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.response;
+package com.zero.pennywise.model.response.transaction;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
