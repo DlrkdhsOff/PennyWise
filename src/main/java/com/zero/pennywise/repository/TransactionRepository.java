@@ -13,8 +13,4 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
   void deleteByUserIdAndTransactionId(Long userId, Long transactionId);
 
-  TransactionEntity findByUserIdAndCategoryIdAndDescription(Long userId, Long categoryId,
-      String description);
-
-
 }
