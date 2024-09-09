@@ -47,10 +47,9 @@ public class BudgetService {
   // 카테고리별 예산 목록 조회
   public BudgetPage getBudget(Long userId, Pageable page) {
     UserEntity user = userHandler.getUserById(userId);
-    Pageable pageable = page(page);
 
     List<BalancesDTO> balances = budgetCache.getBalancesFromCache(userId);
-    return BudgetPage.of(getPagedBalanceData(balances, pageable));
+    return BudgetPage.of(getPagedBalanceData(balances, page));
   }
 
   // 카테고리별 예산 수정

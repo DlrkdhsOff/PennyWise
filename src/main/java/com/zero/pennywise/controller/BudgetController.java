@@ -1,5 +1,7 @@
 package com.zero.pennywise.controller;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.request.category.CategoryDTO;
@@ -70,7 +72,7 @@ public class BudgetController {
     }
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(budgetService.getBudget(userId, page));
+        .body(budgetService.getBudget(userId, page(page)));
   }
 
   // 예산 삭제

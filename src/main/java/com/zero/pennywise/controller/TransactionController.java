@@ -1,5 +1,7 @@
 package com.zero.pennywise.controller;
 
+import static com.zero.pennywise.utils.PageUtils.page;
+
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
@@ -58,7 +60,7 @@ public class TransactionController {
     }
 
     return ResponseEntity.ok()
-        .body(transactionService.getTransactionList(userId, categoryName, page));
+        .body(transactionService.getTransactionList(userId, categoryName, page(page)));
   }
 
   // 거래 수정

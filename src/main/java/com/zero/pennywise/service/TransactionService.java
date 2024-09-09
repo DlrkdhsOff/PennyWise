@@ -42,10 +42,9 @@ public class TransactionService {
   // 수입/지출 내역 조회
   public TransactionPage getTransactionList(Long userId, String categoryName, Pageable page) {
     UserEntity user = userHandler.getUserById(userId);
-    Pageable pageable = page(page);
 
     TransactionPage transactions = TransactionsDTO.of(transactionQueryRepository
-        .getAllTransaction(user, categoryName,  pageable));
+        .getAllTransaction(user, categoryName,  page));
 
     transactionHandler.validateTransactions(transactions.getTransactions(), categoryName);
 
