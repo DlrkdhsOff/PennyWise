@@ -1,6 +1,5 @@
 package com.zero.pennywise.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -14,19 +13,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "categories")
+@Entity(name = "category")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
-public class CategoriesEntity {
+public class CategoryEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long categoryId;
 
-  @Column(nullable = false, unique = true)
   private String categoryName;
 
   @ManyToOne(fetch = FetchType.LAZY)

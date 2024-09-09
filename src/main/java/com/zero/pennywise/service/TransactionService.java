@@ -1,11 +1,9 @@
 package com.zero.pennywise.service;
 
-import static com.zero.pennywise.utils.PageUtils.page;
-
 import com.zero.pennywise.component.handler.CategoryHandler;
 import com.zero.pennywise.component.handler.TransactionHandler;
 import com.zero.pennywise.component.handler.UserHandler;
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
@@ -33,7 +31,7 @@ public class TransactionService {
   public String transaction(Long userId, TransactionDTO transactionDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category = categoryHandler
+    CategoryEntity category = categoryHandler
         .getCateogry(user.getId(), transactionDTO.getCategoryName());
 
     return transactionHandler.addTransaction(user, category, transactionDTO);

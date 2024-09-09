@@ -1,6 +1,5 @@
 package com.zero.pennywise.model.response.savings;
 
-import com.zero.pennywise.entity.UserEntity;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

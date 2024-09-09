@@ -2,15 +2,15 @@ package com.zero.pennywise.service;
 
 import static com.zero.pennywise.utils.PageUtils.page;
 
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.UserHandler;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.response.category.CategoriesPage;
-import com.zero.pennywise.repository.CategoriesRepository;
+import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.querydsl.category.CategoryQueryRepository;
-import com.zero.pennywise.component.handler.CategoryHandler;
-import com.zero.pennywise.component.handler.UserHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CategoryService {
 
-  private final CategoriesRepository categoriesRepository;
+  private final CategoryRepository categoryRepository;
   private final CategoryQueryRepository categoryQueryRepository;
   private final UserHandler userHandler;
   private final CategoryHandler categoryHandler;
@@ -44,7 +44,7 @@ public class CategoryService {
 
     categoryHandler.existsCategory(user.getId(), categoryName);
 
-    categoriesRepository.save(CategoriesEntity.builder()
+    categoryRepository.save(CategoryEntity.builder()
         .user(user)
         .categoryName(categoryName)
         .build());
@@ -57,11 +57,11 @@ public class CategoryService {
   public String updateCategory(Long userId, UpdateCategoryDTO updateCategory) {
     UserEntity user = userHandler.getUserById(userId);
 
-    return categoriesRepository.findByUserIdAndCategoryName(user.getId(), updateCategory.getCategoryName())
+    return categoryRepository.findByUserIdAndCategoryName(user.getId(), updateCategory.getCategoryName())
         .map(category -> {
           categoryHandler.existsCategory(user.getId(), updateCategory.getNewCategoryName());
           category.setCategoryName(updateCategory.getNewCategoryName());
-          categoriesRepository.save(category);
+          categoryRepository.save(category);
 
           return "성공적으로 카테고리를 수정하였습니다.";
         })
@@ -74,9 +74,9 @@ public class CategoryService {
   public String deleteCategory(Long userId, String categoryName) {
     UserEntity user = userHandler.getUserById(userId);
 
-    return categoriesRepository.findByUserIdAndCategoryName(user.getId(), categoryName)
+    return categoryRepository.findByUserIdAndCategoryName(user.getId(), categoryName)
         .map(category -> {
-          categoriesRepository.deleteByUserIdAndCategoryName(user.getId(), categoryName);
+          categoryRepository.deleteByUserIdAndCategoryName(user.getId(), categoryName);
           return "성공적으로 카테고리를 삭제하였습니다.";
         })
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));

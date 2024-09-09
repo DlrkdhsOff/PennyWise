@@ -4,7 +4,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.entity.QCategoriesEntity;
+import com.zero.pennywise.entity.QCategoryEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -30,7 +30,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   @Override
   public Page<TransactionsDTO> getAllTransaction(UserEntity user, String categoryName, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     List<TransactionsDTO> list = jpaQueryFactory
         .select(selectTransactionAndCategoryColumn())
@@ -52,7 +52,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   // 총 데이터 개수 조회
   private Long getTransactionCount(UserEntity user, String categoryName) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     return jpaQueryFactory
         .select(t.count())
@@ -68,7 +68,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   // 선택할 컬럼 추출
   private Expression<TransactionsDTO> selectTransactionAndCategoryColumn() {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     return Projections.fields(TransactionsDTO.class,
         t.transactionId.as("transactionId"),

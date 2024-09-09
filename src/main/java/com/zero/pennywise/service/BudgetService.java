@@ -1,19 +1,18 @@
 package com.zero.pennywise.service;
 
 import static com.zero.pennywise.utils.PageUtils.getPagedBalanceData;
-import static com.zero.pennywise.utils.PageUtils.page;
 
+import com.zero.pennywise.component.cache.BudgetCache;
+import com.zero.pennywise.component.handler.BudgetHandler;
+import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.BudgetEntity;
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
-import com.zero.pennywise.component.cache.BudgetCache;
-import com.zero.pennywise.component.handler.BudgetHandler;
-import com.zero.pennywise.component.handler.CategoryHandler;
-import com.zero.pennywise.component.handler.UserHandler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +33,7 @@ public class BudgetService {
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category =categoryHandler
+    CategoryEntity category =categoryHandler
         .getCateogry(user.getId(), budgetDTO.getCategoryName());
 
     budgetHandler.validateBudget(user.getId(), category.getCategoryId());
@@ -57,7 +56,7 @@ public class BudgetService {
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category = categoryHandler
+    CategoryEntity category = categoryHandler
         .getCateogry(user.getId(), budgetDTO.getCategoryName());
 
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
@@ -74,7 +73,7 @@ public class BudgetService {
   public String deleteBudget(Long userId, String categoryName) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category = categoryHandler.getCateogry(user.getId(), categoryName);
+    CategoryEntity category = categoryHandler.getCateogry(user.getId(), categoryName);
 
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
     budgetRepository.deleteByBudgetId(budget.getBudgetId());

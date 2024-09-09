@@ -1,22 +1,25 @@
 package com.zero.pennywise.config;
 
-import com.zero.pennywise.component.scheduler.TransactionScheduler;
-import com.zero.pennywise.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class SchedulerConfig {
 
-  private final TransactionScheduler transactionScheduler;
+  @Bean
+  public ThreadPoolTaskScheduler multiThreadScheduler() {
+    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+    scheduler.setPoolSize(5);
+    return scheduler;
+  }
 
-
-  @Scheduled(cron = "0 0 0 * * ?")
-  public void run() {
-
-    // 고정 지출/수입 자동 등록
-    transactionScheduler.updateFixedTransaction();
+  @Bean
+  public ThreadPoolTaskScheduler singleThreadScheduler() {
+    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+    scheduler.setPoolSize(1);
+    return scheduler;
   }
 }

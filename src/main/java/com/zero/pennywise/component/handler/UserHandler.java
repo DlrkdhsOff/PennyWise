@@ -1,12 +1,12 @@
 package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.repository.BudgetRepository;
-import com.zero.pennywise.repository.CategoriesRepository;
+import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
@@ -26,7 +26,7 @@ public class UserHandler {
   private final TransactionRepository transactionRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final BudgetRepository budgetRepository;
-  private final CategoriesRepository categoriesRepository;
+  private final CategoryRepository categoryRepository;
   private final WaringMessageRepository waringMessageRepository;
   private final CategoryHandler categoryHandler;
 
@@ -76,7 +76,7 @@ public class UserHandler {
   public void deleteOtherData(Long userId) {
     budgetRepository.deleteAllByUserId(userId);
     transactionRepository.deleteAllByUserId(userId);
-    categoriesRepository.deleteAllByUserId(userId);
+    categoryRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
   }
 
@@ -98,7 +98,7 @@ public class UserHandler {
 
   // 카테고리 남은 금액
   public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-    CategoriesEntity category = categoryHandler
+    CategoryEntity category = categoryHandler
         .getCateogryByUserIdAndId(userId, budget.getCategory().getCategoryId());
 
     String thisMonths = LocalDate.now().toString();

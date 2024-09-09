@@ -32,7 +32,7 @@ public class BudgetEntity extends DateEntity{
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id", nullable = false)
-  private CategoriesEntity category;
+  private CategoryEntity category;
 
   @Column(nullable = true)
   private Long amount;

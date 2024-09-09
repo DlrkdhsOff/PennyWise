@@ -1,12 +1,12 @@
 package com.zero.pennywise.component.handler;
 
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
-import com.zero.pennywise.repository.CategoriesRepository;
+import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
@@ -21,11 +21,13 @@ import org.springframework.stereotype.Component;
 public class SavingHandler {
 
   private final SavingsRepository savingsRepository;
-  private final CategoriesRepository categoriesRepository;
+  private final CategoryRepository categoryRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final TransactionRepository transactionRepository;
 
   public SavingsEntity save(UserEntity user, SavingsDTO savingsDTO) {
+    createCateogry(user);
+
     return savingsRepository.save(SavingsEntity.builder()
         .user(user)
         .name(savingsDTO.getName())
@@ -37,12 +39,19 @@ public class SavingHandler {
   }
 
 
-  public CategoriesEntity getOrCreateCategory(UserEntity user) {
-    return categoriesRepository.findByUserIdAndCategoryName(user.getId(), "저축")
-        .orElseGet(() -> categoriesRepository.save(CategoriesEntity.builder()
-            .user(user)
-            .categoryName("저축")
-            .build()));
+  public CategoryEntity getCategory(UserEntity user) {
+    return categoryRepository.findByUserIdAndCategoryName(user.getId(), "저축")
+        .orElseGet(() -> null);
+  }
+
+  public void createCateogry(UserEntity user) {
+    if (categoryRepository.existsByUserIdAndCategoryName(user.getId(), "저축")) {
+      return;
+    }
+    categoryRepository.save(CategoryEntity.builder()
+        .user(user)
+        .categoryName("저축")
+        .build());
   }
 
   public SavingsEntity getSavings(UserEntity user, String name) {
@@ -51,7 +60,7 @@ public class SavingHandler {
   }
 
   public void payment(UserEntity user, SavingsEntity savings) {
-    CategoriesEntity category = getOrCreateCategory(user);
+    CategoryEntity category = getCategory(user);
 
     transactionRepository.save(TransactionEntity.builder()
         .user(user)
@@ -65,7 +74,7 @@ public class SavingHandler {
 
   public void endDeposit(UserEntity user, SavingsEntity savings) {
 
-    CategoriesEntity category = getOrCreateCategory(user);
+    CategoryEntity category = getCategory(user);
     String description = savings.getName() + savings.getDescription();
 
     Long currentAmount = transactionQueryRepository

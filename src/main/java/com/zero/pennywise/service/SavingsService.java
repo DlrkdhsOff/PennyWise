@@ -3,7 +3,7 @@ package com.zero.pennywise.service;
 import com.zero.pennywise.component.handler.SavingHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.component.scheduler.TransactionScheduler;
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
@@ -42,7 +42,7 @@ public class SavingsService {
   public SavingsPage getSavings(Long userId, Pageable page) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category = savingHandler.getOrCreateCategory(user);
+    CategoryEntity category = savingHandler.getCategory(user);
 
     return SavingsPage.of(savingsQueryRepository
         .getAllSavings(user.getId(), page, category.getCategoryId()));
