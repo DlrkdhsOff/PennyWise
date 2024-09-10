@@ -21,7 +21,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-@Slf4j
 public class TransactionRepositoryImpl implements TransactionQueryRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
@@ -88,6 +87,10 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .selectFrom(t)
         .where(
             t.dateTime.stringValue().startsWith(lastMonthsDate)
+                .and(
+                    t.type.eq(TransactionStatus.FIXED_INCOME)
+                        .or(t.type.eq(TransactionStatus.FIXED_EXPENSES))
+                )
         )
         .fetch();
   }

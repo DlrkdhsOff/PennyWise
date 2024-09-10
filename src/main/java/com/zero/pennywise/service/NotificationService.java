@@ -21,7 +21,7 @@ public class NotificationService implements MessageListener {
 
   private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
-  private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
+  private final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
   public SseEmitter createEmitter(Long userId) {
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
