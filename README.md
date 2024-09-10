@@ -6,6 +6,7 @@
 - **Java**
 - **Spring Boot**
 - **JPA**
+- **Spring Batch**
 - **MySQL**
 - **QueryDsl**
 - **Redis**
@@ -77,7 +78,8 @@
 
 
 ## ERD
-![image](https://github.com/user-attachments/assets/c9b9e747-dedc-4b0f-8719-99111372282a)
+![image](https://github.com/user-attachments/assets/d5e864cd-f02b-48d6-8731-025e5ad868cf)
+
 
 
 
