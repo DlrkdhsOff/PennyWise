@@ -19,5 +19,4 @@ public interface TransactionQueryRepository {
   Long getCurrentAmount(UserEntity user, Long categoryId, String description);
 
   void endSavings(Long userId, Long categoryId, String description);
-
 }

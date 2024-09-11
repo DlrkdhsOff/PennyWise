@@ -148,4 +148,5 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return (totalExpenses != null) ? totalExpenses / 3 : 0L;
   }
 
+
 }

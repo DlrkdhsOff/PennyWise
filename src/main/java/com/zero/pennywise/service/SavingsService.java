@@ -1,6 +1,5 @@
 package com.zero.pennywise.service;
 
-import com.zero.pennywise.component.handler.AnalyzeHandler;
 import com.zero.pennywise.component.handler.SavingHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.CategoryEntity;
@@ -11,7 +10,6 @@ import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.model.response.savings.SavingsPage;
 import com.zero.pennywise.repository.querydsl.savings.SavingsQueryRepository;
-import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +23,6 @@ public class SavingsService {
   private final UserHandler userHandler;
   private final SavingHandler savingHandler;
   private final SavingsQueryRepository savingsQueryRepository;
-  private final TransactionQueryRepository transactionQueryRepository;
-  private final AnalyzeHandler analyzeHandler;
 
 
   // 저축 정보 등록
@@ -41,7 +37,7 @@ public class SavingsService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "최소 3개월 부터 등록 할 수 있습니다.");
     }
 
-    SavingsEntity savings = savingHandler.save(user, savingsDTO);
+    savingHandler.save(user, savingsDTO);
 
     return "성공적으로 저축 정보를 등록하였습니다. ";
   }
