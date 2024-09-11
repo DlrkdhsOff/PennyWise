@@ -2,10 +2,7 @@ package com.zero.pennywise.repository.querydsl.category;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.entity.CategoriesEntity;
-import com.zero.pennywise.entity.QCategoriesEntity;
-import com.zero.pennywise.entity.QUserCategoryEntity;
-import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.entity.QCategoryEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +18,7 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
 
   @Override
   public Page<String> getAllCategory(Long userId, Pageable pageable) {
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     List<String> list = jpaQueryFactory
         .select(c.categoryName)
@@ -38,7 +35,7 @@ public class CategoryRepositoryImpl implements CategoryQueryRepository {
 
 
   private Long getCategoryCount(Long userId) {
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     return jpaQueryFactory
         .select(c.count())

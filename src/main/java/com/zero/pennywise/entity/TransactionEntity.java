@@ -48,6 +48,4 @@ public class TransactionEntity {
 
   @Column(nullable = false, updatable = false)
   private LocalDateTime dateTime;
-
-
 }

@@ -40,8 +40,7 @@ public class CategoryController {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
     }
 
-    Pageable pageable = page(page);
-    return ResponseEntity.ok(categoryService.getCategoryList(userId, pageable));
+    return ResponseEntity.ok(categoryService.getCategoryList(userId, page(page)));
   }
 
 

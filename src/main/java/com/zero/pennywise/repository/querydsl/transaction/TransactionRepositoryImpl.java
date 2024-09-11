@@ -4,7 +4,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zero.pennywise.entity.QCategoriesEntity;
+import com.zero.pennywise.entity.QCategoryEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +30,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   @Override
   public Page<TransactionsDTO> getAllTransaction(UserEntity user, String categoryName, Pageable page) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     List<TransactionsDTO> list = jpaQueryFactory
         .select(selectTransactionAndCategoryColumn())
@@ -54,7 +52,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   // 총 데이터 개수 조회
   private Long getTransactionCount(UserEntity user, String categoryName) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     return jpaQueryFactory
         .select(t.count())
@@ -70,7 +68,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
   // 선택할 컬럼 추출
   private Expression<TransactionsDTO> selectTransactionAndCategoryColumn() {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    QCategoriesEntity c = QCategoriesEntity.categoriesEntity;
+    QCategoryEntity c = QCategoryEntity.categoryEntity;
 
     return Projections.fields(TransactionsDTO.class,
         t.transactionId.as("transactionId"),
@@ -112,6 +110,48 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .fetchOne();
 
     return (totalExpense != null) ? totalExpense : 0L;
+  }
+
+  @Override
+  public Long getCurrentAmount(UserEntity user, Long categoryId, String description) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+
+    Long currentAmount = jpaQueryFactory
+        .select(t.amount.sum())
+        .from(t)
+        .where(
+            t.user.id.eq(user.getId()),
+            t.categoryId.eq(categoryId),
+            t.description.eq(description)
+        )
+        .fetchOne();
+
+    updateSavingTransaction(user.getId(), categoryId, description);
+
+    return currentAmount == null ? 0L : currentAmount;
+  }
+
+  public void updateSavingTransaction(Long userId, Long categoryId, String description) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+    Long transactionId = jpaQueryFactory
+        .select(t.transactionId)
+        .from(t)
+        .where(
+            t.user.id.eq(userId),
+            t.categoryId.eq(categoryId),
+            t.description.eq(description)
+        )
+        .orderBy(t.dateTime.desc())
+        .limit(1)
+        .fetchOne();
+
+    if (transactionId != null) {
+      jpaQueryFactory
+          .update(t)
+          .set(t.type, TransactionStatus.END)
+          .where(t.transactionId.eq(transactionId))
+          .execute();
+    }
   }
 
   @Override

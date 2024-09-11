@@ -1,4 +1,4 @@
-package com.zero.pennywise.service.component.cache;
+package com.zero.pennywise.component.cache;
 
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.model.request.budget.BalancesDTO;

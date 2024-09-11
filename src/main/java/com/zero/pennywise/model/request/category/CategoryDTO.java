@@ -1,9 +1,11 @@
 package com.zero.pennywise.model.request.category;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CategoryDTO {
 
   @NotBlank(message = "카테고리를 입력해주세요.")

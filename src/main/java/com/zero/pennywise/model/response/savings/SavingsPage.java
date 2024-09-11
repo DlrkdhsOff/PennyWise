@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.response.category;
+package com.zero.pennywise.model.response.savings;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -9,15 +9,15 @@ import org.springframework.data.domain.Page;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CategoriesPage {
+public class SavingsPage {
 
   private int pageNumber;
   private int totalPage;
   private Long totalData;
-  private List<String> categories;
+  private List<SavingsDataDTO> categories;
 
-  public static CategoriesPage of(Page<String> pageList) {
-    return new CategoriesPage(
+  public static SavingsPage of(Page<SavingsDataDTO> pageList) {
+    return new SavingsPage(
         pageList.getNumber() + 1,
         pageList.getTotalPages(),
         pageList.getTotalElements(),

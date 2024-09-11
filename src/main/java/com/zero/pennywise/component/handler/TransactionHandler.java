@@ -1,8 +1,9 @@
-package com.zero.pennywise.service.component.handler;
+package com.zero.pennywise.component.handler;
 
 import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
 
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.component.cache.BudgetCache;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.entity.WaringMessageEntity;
@@ -14,7 +15,6 @@ import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
-import com.zero.pennywise.service.component.cache.BudgetCache;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class TransactionHandler {
 
 
   // 거래 등록
-  public String addTransaction(UserEntity user, CategoriesEntity category, TransactionDTO transactionDTO) {
+  public String addTransaction(UserEntity user, CategoryEntity category, TransactionDTO transactionDTO) {
     TransactionEntity transaction = transactionRepository
         .save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
 
@@ -49,7 +49,7 @@ public class TransactionHandler {
 
   // 입력한 데이터 수정
   public String updateTransactionDetails(UserEntity user, TransactionEntity transaction, UpdateTransactionDTO updateTransaction) {
-    CategoriesEntity category = categoryHandler
+    CategoryEntity category = categoryHandler
         .getCateogry(user.getId(), updateTransaction.getCategoryName());
 
     transaction.setCategoryId(category.getCategoryId());
@@ -124,8 +124,8 @@ public class TransactionHandler {
 
   // 캐시에 저장 되어 있는 예산 수정
   public void updateBalanceCacheData(UserEntity user, TransactionEntity transaction, UpdateTransactionDTO updateTransaction) {
-    CategoriesEntity beforeCategory = categoryHandler
-        .getCateogryById(user.getId(), transaction.getCategoryId());
+    CategoryEntity beforeCategory = categoryHandler
+        .getCateogryByUserIdAndId(user.getId(), transaction.getCategoryId());
 
     BalancesDTO balance = budgetCache.getBalances(user.getId(), beforeCategory.getCategoryName());
 
@@ -159,7 +159,7 @@ public class TransactionHandler {
 
   // 다른 카테고리로 수정하는 경우
   private void updateBalanceForNewCategory(UserEntity user, UpdateTransactionDTO updateTransaction) {
-    CategoriesEntity newCategory = categoryHandler
+    CategoryEntity newCategory = categoryHandler
         .getCateogry(user.getId(), updateTransaction.getCategoryName());
 
     BalancesDTO balance = budgetCache.getBalances(user.getId(), newCategory.getCategoryName());
@@ -185,8 +185,8 @@ public class TransactionHandler {
     if (!transaction.getType().isExpenses()) {
       return;
     }
-    CategoriesEntity beforeCategory = categoryHandler
-        .getCateogryById(userId, transaction.getCategoryId());
+    CategoryEntity beforeCategory = categoryHandler
+        .getCateogryByUserIdAndId(userId, transaction.getCategoryId());
 
     BalancesDTO balance = budgetCache.getBalances(userId, beforeCategory.getCategoryName());
     balance.setBalance(balance.getBalance() + transaction.getAmount());
@@ -194,16 +194,4 @@ public class TransactionHandler {
     budgetCache.updateBalance(userId, balance.getBalance(), balance.getCategoryName());
   }
 
-  // 고정 지출 / 수입 재등록
-  public void updateFixedTransactionDetail(List<TransactionEntity> transactions) {
-    transactions.forEach(transaction -> transactionRepository.save(
-        TransactionEntity.builder()
-            .user(transaction.getUser())
-            .categoryId(transaction.getCategoryId())
-            .type(transaction.getType())
-            .amount(transaction.getAmount())
-            .description(transaction.getDescription())
-            .dateTime(LocalDateTime.now())
-            .build()));
-  }
 }

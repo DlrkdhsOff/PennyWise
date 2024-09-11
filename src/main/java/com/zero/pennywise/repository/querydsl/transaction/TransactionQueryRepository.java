@@ -19,4 +19,6 @@ public interface TransactionQueryRepository {
   Long getTracsactionAvgLastThreeMonth(Long userId, Long categoryId, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
   Long getExpenses(Long userId, Long categoryId, String thisMonths);
+
+  Long getCurrentAmount(UserEntity user, Long categoryId, String description);
 }

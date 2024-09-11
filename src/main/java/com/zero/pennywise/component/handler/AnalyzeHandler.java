@@ -1,6 +1,6 @@
-package com.zero.pennywise.service.component.handler;
+package com.zero.pennywise.component.handler;
 
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
@@ -28,7 +28,7 @@ public class AnalyzeHandler {
 
   // 이번달 전체 지출 금액 및 카테고리별 지출 금액
   public AnalyzeDTO getThisMonthBalance(Long userId) {
-    List<CategoriesEntity> categories = categoryHandler.getAllCategoryList(userId);
+    List<CategoryEntity> categories = categoryHandler.getAllCategoryList(userId);
 
     String thisMonth = LocalDate.now().toString();
 
@@ -36,7 +36,7 @@ public class AnalyzeHandler {
         .getExpenses(userId, null, thisMonth);
 
     List<CategoryBalanceDTO> list = new ArrayList<>();
-    for (CategoriesEntity c : categories) {
+    for (CategoryEntity c : categories) {
       list.add(new CategoryBalanceDTO(
           c.getCategoryName(),
           transactionQueryRepository.getExpenses(userId, c.getCategoryId(), thisMonth)
@@ -48,7 +48,7 @@ public class AnalyzeHandler {
 
   // 지난 3달 지출 총액 평균 및 카테고리별 지출 총액 평균
   public AnalyzeDTO getLastThreeMonthBalance(Long userId) {
-    List<CategoriesEntity> categories = categoryHandler.getAllCategoryList(userId);
+    List<CategoryEntity> categories = categoryHandler.getAllCategoryList(userId);
 
     LocalDateTime startDateTime = getStartDate();
     LocalDateTime endDateTime = getLastMonth();
@@ -57,7 +57,7 @@ public class AnalyzeHandler {
         .getTracsactionAvgLastThreeMonth(userId, null, startDateTime, endDateTime);
 
     List<CategoryBalanceDTO> list = new ArrayList<>();
-    for (CategoriesEntity c : categories) {
+    for (CategoryEntity c : categories) {
       list.add(new CategoryBalanceDTO(
           c.getCategoryName(),
           transactionQueryRepository

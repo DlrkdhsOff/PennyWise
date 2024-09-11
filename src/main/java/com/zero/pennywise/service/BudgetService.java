@@ -1,25 +1,21 @@
 package com.zero.pennywise.service;
 
 import static com.zero.pennywise.utils.PageUtils.getPagedBalanceData;
-import static com.zero.pennywise.utils.PageUtils.page;
 
+import com.zero.pennywise.component.cache.BudgetCache;
+import com.zero.pennywise.component.handler.BudgetHandler;
+import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.BudgetEntity;
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
-import com.zero.pennywise.repository.CategoriesRepository;
-import com.zero.pennywise.service.component.cache.BudgetCache;
-import com.zero.pennywise.service.component.handler.BudgetHandler;
-import com.zero.pennywise.service.component.handler.CategoryHandler;
-import com.zero.pennywise.service.component.handler.UserHandler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +33,7 @@ public class BudgetService {
   public String setBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category =categoryHandler
+    CategoryEntity category =categoryHandler
         .getCateogry(user.getId(), budgetDTO.getCategoryName());
 
     budgetHandler.validateBudget(user.getId(), category.getCategoryId());
@@ -50,10 +46,9 @@ public class BudgetService {
   // 카테고리별 예산 목록 조회
   public BudgetPage getBudget(Long userId, Pageable page) {
     UserEntity user = userHandler.getUserById(userId);
-    Pageable pageable = page(page);
 
     List<BalancesDTO> balances = budgetCache.getBalancesFromCache(userId);
-    return BudgetPage.of(getPagedBalanceData(balances, pageable));
+    return BudgetPage.of(getPagedBalanceData(balances, page));
   }
 
   // 카테고리별 예산 수정
@@ -61,7 +56,7 @@ public class BudgetService {
   public String updateBudget(Long userId, BudgetDTO budgetDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category = categoryHandler
+    CategoryEntity category = categoryHandler
         .getCateogry(user.getId(), budgetDTO.getCategoryName());
 
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
@@ -78,7 +73,7 @@ public class BudgetService {
   public String deleteBudget(Long userId, String categoryName) {
     UserEntity user = userHandler.getUserById(userId);
 
-    CategoriesEntity category = categoryHandler.getCateogry(user.getId(), categoryName);
+    CategoryEntity category = categoryHandler.getCateogry(user.getId(), categoryName);
 
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
     budgetRepository.deleteByBudgetId(budget.getBudgetId());

@@ -1,7 +1,7 @@
-package com.zero.pennywise.service.component.handler;
+package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
-import com.zero.pennywise.entity.CategoriesEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.repository.BudgetRepository;
@@ -23,7 +23,7 @@ public class BudgetHandler {
   }
 
   // 예산 새로 등록
-  public BudgetEntity save(UserEntity user, CategoriesEntity category, Long amount) {
+  public BudgetEntity save(UserEntity user, CategoryEntity category, Long amount) {
     return budgetRepository.save(
         BudgetEntity.builder()
             .user(user)

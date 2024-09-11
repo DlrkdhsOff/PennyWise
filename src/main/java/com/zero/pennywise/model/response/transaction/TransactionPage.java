@@ -2,9 +2,11 @@ package com.zero.pennywise.model.response.transaction;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class TransactionPage {
   private int pageNumber;

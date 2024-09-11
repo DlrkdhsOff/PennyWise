@@ -1,9 +1,11 @@
 package com.zero.pennywise.model.request.account;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class UpdateDTO {
 
   @NotBlank(message = "비밀번호를 입력해주세요.")
