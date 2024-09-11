@@ -6,14 +6,12 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QCategoryEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
-import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -78,23 +76,6 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')", t.dateTime).as("dateTime"));
   }
 
-
-  @Override
-  public List<TransactionEntity> findByLastMonthTransaction(String lastMonthsDate) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-
-    return jpaQueryFactory
-        .selectFrom(t)
-        .where(
-            t.dateTime.stringValue().startsWith(lastMonthsDate)
-                .and(
-                    t.type.eq(TransactionStatus.FIXED_INCOME)
-                        .or(t.type.eq(TransactionStatus.FIXED_EXPENSES))
-                )
-        )
-        .fetch();
-  }
-
   @Override
   public Long getExpenses(Long userId, Long categoryId, String thisMonths) {
 
@@ -129,40 +110,31 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         )
         .fetchOne();
 
-    updateSavingTransaction(user.getId(), categoryId, description);
 
     return currentAmount == null ? 0L : currentAmount;
   }
 
-  public void updateSavingTransaction(Long userId, Long categoryId, String description) {
+  @Override
+  public void endSavings(Long userId, Long categoryId, String description) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
-    Long transactionId = jpaQueryFactory
-        .select(t.transactionId)
-        .from(t)
+
+    jpaQueryFactory
+        .update(t)
+        .set(t.type, TransactionStatus.END)
         .where(
             t.user.id.eq(userId),
             t.categoryId.eq(categoryId),
             t.description.eq(description)
         )
-        .orderBy(t.dateTime.desc())
-        .limit(1)
-        .fetchOne();
-
-    if (transactionId != null) {
-      jpaQueryFactory
-          .update(t)
-          .set(t.type, TransactionStatus.END)
-          .where(t.transactionId.eq(transactionId))
-          .execute();
-    }
+        .execute();
   }
 
   @Override
-  public Long getTracsactionAvgLastThreeMonth(Long userId, Long categoryId, LocalDateTime startDateTime,
+  public Long getExpensesAvgLastThreeMonth(Long userId, Long categoryId, LocalDateTime startDateTime,
       LocalDateTime endDateTime) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
 
-    Long expensesData = jpaQueryFactory
+    Long totalExpenses = jpaQueryFactory
         .select((t.amount.sum()))
         .from(t)
         .where(
@@ -173,6 +145,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
             categoryId != null ? t.categoryId.eq(categoryId) : null
         )
         .fetchOne();
-    return (expensesData != null) ? expensesData / 3 : 0L;
+    return (totalExpenses != null) ? totalExpenses / 3 : 0L;
   }
+
 }

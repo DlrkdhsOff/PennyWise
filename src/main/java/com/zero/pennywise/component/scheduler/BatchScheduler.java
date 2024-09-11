@@ -30,6 +30,6 @@ public class BatchScheduler {
         .toJobParameters();
 
     jobLauncher.run(transactionJob, jobParameters);
-    logger.info("{} : 고정 지출 수입 등록", LocalDate.now());
+    logger.info("{} : transactionJob", LocalDate.now());
   }
 }

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,32 +27,31 @@ public class SavingHandler {
   private final TransactionRepository transactionRepository;
 
   public SavingsEntity save(UserEntity user, SavingsDTO savingsDTO) {
-    createCateogry(user);
+    CategoryEntity category = getCategory(user);
 
-    return savingsRepository.save(SavingsEntity.builder()
-        .user(user)
-        .name(savingsDTO.getName())
-        .amount(savingsDTO.getAmount())
-        .startDate(savingsDTO.getStartDate())
-        .endDate(savingsDTO.getStartDate().plusMonths(savingsDTO.getMonthsToSave()))
-        .description(savingsDTO.getDescription())
-        .build());
+    try {
+      return savingsRepository.save(SavingsEntity.builder()
+          .user(user)
+          .category(category)
+          .name(savingsDTO.getName())
+          .amount(savingsDTO.getAmount())
+          .startDate(savingsDTO.getStartDate())
+          .endDate(savingsDTO.getStartDate().plusMonths(savingsDTO.getMonthsToSave()))
+          .description(savingsDTO.getDescription())
+          .build());
+    } catch (Exception e) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 저축명 입니다.");
+    }
   }
+
 
 
   public CategoryEntity getCategory(UserEntity user) {
     return categoryRepository.findByUserIdAndCategoryName(user.getId(), "저축")
-        .orElseGet(() -> null);
-  }
-
-  public void createCateogry(UserEntity user) {
-    if (categoryRepository.existsByUserIdAndCategoryName(user.getId(), "저축")) {
-      return;
-    }
-    categoryRepository.save(CategoryEntity.builder()
-        .user(user)
-        .categoryName("저축")
-        .build());
+        .orElseGet(() -> categoryRepository.save(CategoryEntity.builder()
+            .user(user)
+            .categoryName("저축")
+            .build()));
   }
 
   public SavingsEntity getSavings(UserEntity user, String name) {
@@ -59,24 +59,19 @@ public class SavingHandler {
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 저축 정보 입니다."));
   }
 
-  public void payment(UserEntity user, SavingsEntity savings) {
-    CategoryEntity category = getCategory(user);
 
-    transactionRepository.save(TransactionEntity.builder()
-        .user(user)
-        .amount(savings.getAmount())
-        .type(TransactionStatus.FIXED_EXPENSES)
-        .categoryId(category.getCategoryId())
-        .dateTime(LocalDateTime.now())
-        .description(savings.getName() + savings.getDescription())
-        .build());
-  }
-
+  @Transactional
   public void endDeposit(UserEntity user, SavingsEntity savings) {
 
     CategoryEntity category = getCategory(user);
     String description = savings.getName() + savings.getDescription();
 
+    // 삭제 후 같은 이름으로 저축을 생성했을 경우 이전 기록이 조회 되기 때문에
+    // 해당 저축 정보의 type를 END로 변경
+    transactionQueryRepository
+        .endSavings(user.getId(), category.getCategoryId(), description);
+
+    // 저축 종료시 모은 금액 거래 목록에 수입으로 저장
     Long currentAmount = transactionQueryRepository
         .getCurrentAmount(user, category.getCategoryId(), description);
 
@@ -88,5 +83,7 @@ public class SavingHandler {
         .description(description)
         .dateTime(LocalDateTime.now())
         .build());
+
+    savingsRepository.deleteById(savings.getId());
   }
 }

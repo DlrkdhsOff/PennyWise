@@ -1,20 +1,22 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.component.handler.AnalyzeHandler;
 import com.zero.pennywise.component.handler.SavingHandler;
 import com.zero.pennywise.component.handler.UserHandler;
-import com.zero.pennywise.component.scheduler.TransactionScheduler;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.model.response.savings.SavingsPage;
-import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.querydsl.savings.SavingsQueryRepository;
+import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,18 +24,24 @@ public class SavingsService {
 
   private final UserHandler userHandler;
   private final SavingHandler savingHandler;
-  private final TransactionScheduler transactionScheduler;
   private final SavingsQueryRepository savingsQueryRepository;
-  private final SavingsRepository savingsRepository;
+  private final TransactionQueryRepository transactionQueryRepository;
+  private final AnalyzeHandler analyzeHandler;
 
 
   // 저축 정보 등록
   public String setSavings(Long userId, SavingsDTO savingsDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
+    if (LocalDate.now().isAfter(savingsDTO.getStartDate())) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "지난 날짜는 입력 할 수 없습니다.");
+    }
+
+    if (savingsDTO.getMonthsToSave() < 3) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "최소 3개월 부터 등록 할 수 있습니다.");
+    }
+
     SavingsEntity savings = savingHandler.save(user, savingsDTO);
-    transactionScheduler.schedulePayment(user, savings);
-    transactionScheduler.scheduleEnd(user, savings);
 
     return "성공적으로 저축 정보를 등록하였습니다. ";
   }
@@ -49,14 +57,13 @@ public class SavingsService {
   }
 
   // 저축 정보 삭제
-  @Transactional
   public String deleteSavings(Long userId, DeleteSavingsDTO deleteSavingsDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
     SavingsEntity savings = savingHandler.getSavings(user, deleteSavingsDTO.getName());
     savingHandler.endDeposit(user, savings);
-    savingsRepository.deleteById(savings.getId());
 
     return "저축 정보를 삭제 하였습니다.";
   }
+
 }
