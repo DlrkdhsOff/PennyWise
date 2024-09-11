@@ -64,4 +64,14 @@ public class SavingsController {
 
     return ResponseEntity.ok().body(savingsService.deleteSavings(userId, deleteSavingsDTO));
   }
+
+//  @GetMapping("/recommend")
+//  public ResponseEntity<?> recommend(HttpServletRequest request) {
+//    Long userId = (Long) request.getSession().getAttribute("userId");
+//    if (userId == null) {
+//      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
+//    }
+//
+//    return ResponseEntity.ok().body(savingsService.recommend(userId));
+//  }
 }

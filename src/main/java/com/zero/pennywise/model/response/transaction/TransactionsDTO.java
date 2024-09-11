@@ -23,7 +23,7 @@ public class TransactionsDTO {
     for (TransactionsDTO transaction : list.getContent()) {
       switch (transaction.getType()) {
         case "EXPENSES" -> transaction.setType("지출");
-        case "FIXED_EXPENSES" -> transaction.setType("고정 지출");
+        case "FIXED_EXPENSES", "END" -> transaction.setType("고정 지출");
         case "INCOME" -> transaction.setType("수입");
         case "FIXED_INCOME" -> transaction.setType("고정 수입");
       };

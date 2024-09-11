@@ -54,14 +54,14 @@ public class AnalyzeHandler {
     LocalDateTime endDateTime = getLastMonth();
 
     Long totalEexpenses = transactionQueryRepository
-        .getTracsactionAvgLastThreeMonth(userId, null, startDateTime, endDateTime);
+        .getExpensesAvgLastThreeMonth(userId, null, startDateTime, endDateTime);
 
     List<CategoryBalanceDTO> list = new ArrayList<>();
     for (CategoryEntity c : categories) {
       list.add(new CategoryBalanceDTO(
           c.getCategoryName(),
           transactionQueryRepository
-              .getTracsactionAvgLastThreeMonth(userId, c.getCategoryId(), startDateTime, endDateTime)
+              .getExpensesAvgLastThreeMonth(userId, c.getCategoryId(), startDateTime, endDateTime)
       ));
     }
 

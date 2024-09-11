@@ -20,6 +20,8 @@ repositories {
 dependencies {
     // Spring Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -42,6 +44,13 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Spring Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+//    // Quartz
+//    implementation 'org.quartz-scheduler:quartz:2.3.2'
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

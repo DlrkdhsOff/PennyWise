@@ -1,6 +1,5 @@
-package com.zero.pennywise.config;
+package com.zero.pennywise.exception;
 
-import com.zero.pennywise.exception.GlobalException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

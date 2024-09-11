@@ -15,11 +15,4 @@ public class SchedulerConfig {
     scheduler.setPoolSize(5);
     return scheduler;
   }
-
-  @Bean
-  public ThreadPoolTaskScheduler singleThreadScheduler() {
-    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-    scheduler.setPoolSize(1);
-    return scheduler;
-  }
 }

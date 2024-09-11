@@ -1,5 +1,6 @@
 package com.zero.pennywise.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,12 +25,17 @@ public class SavingsEntity extends DateEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  Long Id;
+  private Long Id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
+  private CategoryEntity category;
+
+  @Column(unique = true)
   private String name;
 
   private Long amount;
