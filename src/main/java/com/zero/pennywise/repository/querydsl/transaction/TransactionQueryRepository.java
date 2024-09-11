@@ -20,4 +20,5 @@ public interface TransactionQueryRepository {
 
   void endSavings(Long userId, Long categoryId, String description);
 
+  Long getFixedIncomeAvgLastThreeMonth(Long userId, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

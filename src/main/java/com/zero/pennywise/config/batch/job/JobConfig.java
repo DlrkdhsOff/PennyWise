@@ -20,7 +20,7 @@ public class JobConfig {
   private final Step savingStartStep;
   private final Step depositStep;
   private final Step endSavingStep;
-  private final Step deleteSavingDataStep;
+  private final Step deleteSavingStep;
 
 
   @Bean
@@ -30,7 +30,7 @@ public class JobConfig {
         .next(savingStartStep)
         .next(depositStep)
         .next(endSavingStep)
-        .next(deleteSavingDataStep)
+        .next(deleteSavingStep)
         .build();
   }
 

@@ -2,7 +2,6 @@ package com.zero.pennywise.config.batch.step;
 
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.repository.SavingsRepository;
-import com.zero.pennywise.repository.TransactionRepository;
 import java.time.LocalDate;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class DeleteSavingDataStep {
+public class DeleteSavingStepConfig {
 
   private final JobRepository jobRepository;
   private final PlatformTransactionManager platformTransactionManager;
@@ -28,19 +27,19 @@ public class DeleteSavingDataStep {
 
   // savings 테이블에서 해당 저축 정보 삭제
   @Bean
-  public Step deleteSavingDataStep() {
-    return new StepBuilder("deleteSavingDataStep", jobRepository)
+  public Step deleteSavingStep() {
+    return new StepBuilder("deleteSavingStep", jobRepository)
         .<SavingsEntity, Long>chunk(10, platformTransactionManager)
-        .reader(deleteSavingDataReader())
-        .processor(deleteSavingDataProcessor())
-        .writer(deleteSavingDataWriter())
+        .reader(deleteSavingReader())
+        .processor(deleteSavingProcessor())
+        .writer(deleteSavingWriter())
         .build();
   }
 
   @Bean
-  public RepositoryItemReader<SavingsEntity> deleteSavingDataReader() {
+  public RepositoryItemReader<SavingsEntity> deleteSavingReader() {
     return new RepositoryItemReaderBuilder<SavingsEntity>()
-        .name("deleteSavingDataReader")
+        .name("deleteSavingReader")
         .repository(savingsRepository)
         .methodName("findByEndDate")
         .arguments(LocalDate.now())
@@ -50,12 +49,12 @@ public class DeleteSavingDataStep {
   }
 
   @Bean
-  public ItemProcessor<SavingsEntity, Long> deleteSavingDataProcessor() {
+  public ItemProcessor<SavingsEntity, Long> deleteSavingProcessor() {
     return SavingsEntity::getId;
   }
 
   @Bean
-  public ItemWriter<Long> deleteSavingDataWriter() {
+  public ItemWriter<Long> deleteSavingWriter() {
     return id -> id.forEach(savingsRepository::deleteById);
   }
 

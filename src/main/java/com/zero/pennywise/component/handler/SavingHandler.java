@@ -26,13 +26,11 @@ public class SavingHandler {
   private final TransactionQueryRepository transactionQueryRepository;
   private final TransactionRepository transactionRepository;
 
-  public SavingsEntity save(UserEntity user, SavingsDTO savingsDTO) {
-    CategoryEntity category = getCategory(user);
-
+  public void save(UserEntity user, SavingsDTO savingsDTO) {
     try {
-      return savingsRepository.save(SavingsEntity.builder()
+      savingsRepository.save(SavingsEntity.builder()
           .user(user)
-          .category(category)
+          .category(getCategory(user))
           .name(savingsDTO.getName())
           .amount(savingsDTO.getAmount())
           .startDate(savingsDTO.getStartDate())
