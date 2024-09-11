@@ -148,21 +148,5 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return (totalExpenses != null) ? totalExpenses / 3 : 0L;
   }
 
-  @Override
-  public Long getFixedIncomeAvgLastThreeMonth(Long userId, LocalDateTime startDateTime,
-      LocalDateTime endDateTime) {
-    QTransactionEntity t = QTransactionEntity.transactionEntity;
-
-    Long totalIncome = jpaQueryFactory
-        .select((t.amount.sum()))
-        .from(t)
-        .where(
-            t.user.id.eq(userId),
-            t.type.eq(TransactionStatus.FIXED_EXPENSES),
-            t.dateTime.between(startDateTime, endDateTime)
-        )
-        .fetchOne();
-    return (totalIncome != null) ? totalIncome / 3 : 0L;
-  }
 
 }
