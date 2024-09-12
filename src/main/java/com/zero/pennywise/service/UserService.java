@@ -7,15 +7,11 @@ import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.model.request.account.UserDetailsDTO;
-import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -47,11 +43,10 @@ public class UserService implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String email) throws GlobalException {
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-    UserEntity user = userHandler.getUserByEmail(email);
-
-    logger.info("user = {}", user.toString());
+    UserEntity user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않은 아이디입니다."));
 
       return new UserDetailsDTO(user);
 

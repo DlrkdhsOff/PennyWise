@@ -1,7 +1,5 @@
 package com.zero.pennywise.model.request.category;
 
-import static io.lettuce.core.pubsub.PubSubOutput.Type.message;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

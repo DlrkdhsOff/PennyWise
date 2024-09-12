@@ -1,7 +1,6 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.account.LoginDTO;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.service.UserService;

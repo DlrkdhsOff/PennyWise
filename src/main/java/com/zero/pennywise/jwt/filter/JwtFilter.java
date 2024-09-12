@@ -29,19 +29,15 @@ public class JwtFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-
-
     String authorization = request.getHeader("Authorization");
 
     if (authorization == null || !authorization.startsWith("Bearer ")) {
-
       logger.info("token is null");
       filterChain.doFilter(request, response);
       return;
     }
 
     String token = authorization.split(" ")[1];
-
     if (jwtUtil.isExpired(token)) {
 
       logger.info("token isExpired");
@@ -50,19 +46,14 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     Long userId = jwtUtil.getUserId(token);
-
     UserEntity user = userRepository.findById(userId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
 
-
     UserDetailsDTO userDetails = new UserDetailsDTO(user);
-
-
-    Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null,
-        userDetails.getAuthorities());
+    Authentication authToken = new UsernamePasswordAuthenticationToken(
+        userDetails, null, userDetails.getAuthorities());
 
     SecurityContextHolder.getContext().setAuthentication(authToken);
-
     filterChain.doFilter(request, response);
   }
 

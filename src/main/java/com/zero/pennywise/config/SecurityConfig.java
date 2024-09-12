@@ -1,5 +1,6 @@
 package com.zero.pennywise.config;
 
+import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.jwt.filter.JwtFilter;
 import com.zero.pennywise.jwt.filter.LoginFilter;
 import com.zero.pennywise.jwt.util.JwtUtil;
@@ -25,6 +26,7 @@ public class SecurityConfig {
   private final AuthenticationConfiguration authenticationConfiguration;
   private final UserRepository userRepository;
   private final JwtUtil jwtUtil;
+  private final UserHandler userHandler;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -56,8 +58,8 @@ public class SecurityConfig {
         .addFilterBefore(new JwtFilter(userRepository, jwtUtil), LoginFilter.class);
 
     http
-        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), userRepository, jwtUtil),
-            UsernamePasswordAuthenticationFilter.class);
+        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),
+            userRepository, userHandler,jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
 
     http

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
   private final SecretKey secretKey;
+  public static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 60 * 1000L;
 
   public JwtUtil(@Value("${spring.jwt.secret}")String secret) {
 
@@ -33,15 +34,12 @@ public class JwtUtil {
         .getExpiration().before(new Date());
   }
 
-  public String createJwt(Long userId, String role, Long expiredMs) {
-
-    System.out.println(new Date(System.currentTimeMillis()));
-    System.out.println(new Date(System.currentTimeMillis() + expiredMs));
+  public String createJwt(Long userId, String role) {
     return Jwts.builder()
         .claim("userId", userId)
         .claim("role", role)
         .notBefore(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + expiredMs))
+        .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
         .signWith(secretKey)
         .compact();
   }

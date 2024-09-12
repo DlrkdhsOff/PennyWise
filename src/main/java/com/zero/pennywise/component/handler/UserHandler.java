@@ -1,5 +1,6 @@
 package com.zero.pennywise.component.handler;
 
+import com.zero.pennywise.component.cache.BudgetCache;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -29,6 +30,7 @@ public class UserHandler {
   private final CategoryRepository categoryRepository;
   private final WaringMessageRepository waringMessageRepository;
   private final CategoryHandler categoryHandler;
+  private final BudgetCache budgetCache;
 
 
 
@@ -82,10 +84,10 @@ public class UserHandler {
 
 
   // 카테고리별 남은 금액
-  public List<BalancesDTO> getUserCategoryBalances(UserEntity user) {
+  public void getUserCategoryBalances(UserEntity user) {
     List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
     if (userBudget == null) {
-      return null;
+      return;
     }
 
     List<BalancesDTO> result = new ArrayList<>();
@@ -93,7 +95,8 @@ public class UserHandler {
     for (BudgetEntity budget : userBudget) {
       result.add(getCategoryBalances(user.getId(), budget));
     }
-    return result;
+
+    budgetCache.putBalanceInCache(user.getId(), result);
   }
 
   // 카테고리 남은 금액
