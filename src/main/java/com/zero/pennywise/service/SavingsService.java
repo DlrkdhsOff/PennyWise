@@ -29,14 +29,6 @@ public class SavingsService {
   public String setSavings(Long userId, SavingsDTO savingsDTO) {
     UserEntity user = userHandler.getUserById(userId);
 
-    if (LocalDate.now().isAfter(savingsDTO.getStartDate())) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "지난 날짜는 입력 할 수 없습니다.");
-    }
-
-    if (savingsDTO.getMonthsToSave() < 3) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "최소 3개월 부터 등록 할 수 있습니다.");
-    }
-
     savingHandler.save(user, savingsDTO);
 
     return "성공적으로 저축 정보를 등록하였습니다. ";
