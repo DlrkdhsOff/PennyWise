@@ -1,6 +1,9 @@
 package com.zero.pennywise.config;
 
-import com.zero.pennywise.LoginFilter;
+import com.zero.pennywise.jwt.filter.JwtFilter;
+import com.zero.pennywise.jwt.filter.LoginFilter;
+import com.zero.pennywise.jwt.util.JwtUtil;
+import com.zero.pennywise.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +23,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final AuthenticationConfiguration authenticationConfiguration;
+  private final UserRepository userRepository;
+  private final JwtUtil jwtUtil;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -48,7 +53,10 @@ public class SecurityConfig {
             .anyRequest().authenticated());
 
     http
-        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)),
+        .addFilterBefore(new JwtFilter(userRepository, jwtUtil), LoginFilter.class);
+
+    http
+        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), userRepository, jwtUtil),
             UsernamePasswordAuthenticationFilter.class);
 
 

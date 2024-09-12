@@ -40,6 +40,10 @@ public class UserDetailsDTO implements UserDetails {
     return userEntity.getEmail();
   }
 
+  public Long getUserId() {
+    return userEntity.getId();
+  }
+
   @Override
   public boolean isAccountNonExpired() {
 
