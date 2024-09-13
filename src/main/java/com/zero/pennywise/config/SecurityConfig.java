@@ -34,11 +34,6 @@ public class SecurityConfig {
     return configuration.getAuthenticationManager();
   }
 
-  @Bean
-  public BCryptPasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

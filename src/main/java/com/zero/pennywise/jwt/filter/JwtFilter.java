@@ -29,15 +29,15 @@ public class JwtFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String authorization = request.getHeader("Authorization");
 
-    if (authorization == null || !authorization.startsWith("Bearer ")) {
+    String token = jwtUtil.getToken(request.getHeader("Authorization"));
+
+    if (token == null) {
       logger.info("token is null");
       filterChain.doFilter(request, response);
       return;
     }
 
-    String token = authorization.split(" ")[1];
     if (jwtUtil.isExpired(token)) {
 
       logger.info("token isExpired");
