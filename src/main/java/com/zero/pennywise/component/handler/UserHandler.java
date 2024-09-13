@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,11 @@ public class UserHandler {
   public UserEntity getUserById(Long userId) {
     return userRepository.findById(userId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  }
+
+  public UserEntity findByEmail(String email) {
+    return userRepository.findByEmail(email)
+        .orElse(null);
   }
 
   // 전화 번호 유효성 확인

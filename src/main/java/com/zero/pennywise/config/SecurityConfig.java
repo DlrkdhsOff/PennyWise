@@ -36,7 +36,8 @@ public class SecurityConfig {
 
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http,
+      BCryptPasswordEncoder passwordEncoder) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable);
     http
@@ -53,8 +54,8 @@ public class SecurityConfig {
         .addFilterBefore(new JwtFilter(userRepository, jwtUtil), LoginFilter.class);
 
     http
-        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),
-            userRepository, userHandler,jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)
+            ,passwordEncoder, userHandler,jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
 
     http

@@ -2,24 +2,21 @@ package com.zero.pennywise.jwt.filter;
 
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.jwt.util.JwtUtil;
 import com.zero.pennywise.model.request.account.UserDetailsDTO;
-import com.zero.pennywise.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
@@ -27,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
-  private final UserRepository userRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
   private final UserHandler userHandler;
   private final JwtUtil jwtUtil;
   public final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
@@ -56,10 +53,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
 
     logger.info("userDetails : {}", userDetails.getUserId());
-
-    UserEntity user = userRepository.findByEmail(userDetails.getUsername())
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 회원입니다."));
-
+    UserEntity user = userHandler.getUserByEmail(userDetails.getUsername());
 
     String token = jwtUtil.createJwt(user.getId(), user.getRole());
     userHandler.getUserCategoryBalances(user);
@@ -79,18 +73,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
 
-    String errorMessage = null;
+    String errorMessage = "로그인에 실패하였습니다.";
 
-    Optional<UserEntity> optionalUser = userRepository.findByEmail(request.getParameter("email"));
+    UserEntity user = userHandler.findByEmail(request.getParameter("email"));
 
-    if (optionalUser.isEmpty()) {
+    if (user == null) {
       errorMessage = "존재하지 않은 아이디 입니다.";
     } else {
-      errorMessage = "비밀 번호를 다시 입력해주세요";
+      String enPassword = passwordEncoder.encode(request.getParameter("password"));
+      if (!enPassword.equals(user.getPassword())) {
+        errorMessage = "비밀번호를 다시 입력해주세요.";
+      }
 
     }
 
-    // 응답 본문에 메시지를 작성
     response.getWriter().write(errorMessage);
   }
 }
