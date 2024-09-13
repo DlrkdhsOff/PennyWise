@@ -2,12 +2,11 @@ package com.zero.pennywise.controller;
 
 import static com.zero.pennywise.utils.PageUtils.page;
 
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.request.category.CategoryDTO;
 import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.service.BudgetService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.zero.pennywise.utils.UserAuthorizationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -31,14 +30,9 @@ public class BudgetController {
 
   // 카테고리별 예산 설정
   @PostMapping("/budgets")
-  public ResponseEntity<String> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
-      HttpServletRequest request) {
+  public ResponseEntity<String> setBudget(@RequestBody @Valid BudgetDTO BudgetDTO) {
 
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-    }
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.setBudget(userId, BudgetDTO));
@@ -46,14 +40,9 @@ public class BudgetController {
 
   // 카테고리별 예산 수정
   @PatchMapping("/budgets")
-  public ResponseEntity<String> updateBudget(@RequestBody @Valid BudgetDTO BudgetDTO,
-      HttpServletRequest request) {
+  public ResponseEntity<String> updateBudget(@RequestBody @Valid BudgetDTO BudgetDTO) {
 
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-    }
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.updateBudget(userId, BudgetDTO));
@@ -61,15 +50,9 @@ public class BudgetController {
 
   // 예산 목록
   @GetMapping("/budgets")
-  public ResponseEntity<BudgetPage> getbudget(
-      @PageableDefault(page = 0, size = 10) Pageable page,
-      HttpServletRequest request) {
+  public ResponseEntity<BudgetPage> getbudget(@PageableDefault(page = 0, size = 10) Pageable page) {
 
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-    }
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.getBudget(userId, page(page)));
@@ -77,13 +60,8 @@ public class BudgetController {
 
   // 예산 삭제
   @DeleteMapping("/budgets")
-  public ResponseEntity<String> deleteBudget(@RequestBody @Valid CategoryDTO categoryDTO,
-      HttpServletRequest request) {
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-    }
+  public ResponseEntity<String> deleteBudget(@RequestBody @Valid CategoryDTO categoryDTO) {
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(budgetService.deleteBudget(userId, categoryDTO.getCategoryName()));

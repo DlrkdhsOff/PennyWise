@@ -1,10 +1,8 @@
 package com.zero.pennywise.controller;
 
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.service.NotificationService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.zero.pennywise.utils.UserAuthorizationUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +17,9 @@ public class NotificationController {
   private final NotificationService notificationService;
 
   @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter subscribe(HttpServletRequest request) {
+  public SseEmitter subscribe() {
 
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
-    }
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     // 새로운 SseEmitter 생성
     return notificationService.createEmitter(userId);

@@ -26,7 +26,7 @@ public class UserEntity extends DateEntity{
   @Column(length = 50, unique = true)
   private String email;
 
-  @Column(nullable = false, length = 50)
+  @Column(nullable = false)
   private String password;
 
   @Column(nullable = false, length = 50)
@@ -34,4 +34,6 @@ public class UserEntity extends DateEntity{
 
   @Column(nullable = false, unique = true)
   private String phone;
+
+  private String role;
 }

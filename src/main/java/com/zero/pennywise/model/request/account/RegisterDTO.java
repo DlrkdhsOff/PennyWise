@@ -28,6 +28,7 @@ public class RegisterDTO {
         .password(registerDTO.getPassword())
         .username(registerDTO.getUsername())
         .phone(registerDTO.getPhone())
+        .role("ROLE_USER")
         .build();
   }
 

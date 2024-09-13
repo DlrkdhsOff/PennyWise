@@ -1,28 +1,27 @@
 package com.zero.pennywise.service;
 
-import com.zero.pennywise.component.cache.BudgetCache;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.account.LoginDTO;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
-import com.zero.pennywise.model.request.budget.BalancesDTO;
+import com.zero.pennywise.model.request.account.UserDetailsDTO;
 import com.zero.pennywise.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
-  private final BudgetCache budgetCache;
   private final UserHandler userHandler;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   // 회원 가입
   public String register(RegisterDTO registerDTO) {
@@ -30,25 +29,20 @@ public class UserService {
     userHandler.validatePhoneNumber(registerDTO.getPhone());
     registerDTO.setPhone(userHandler.formatPhoneNumber(registerDTO.getPhone()));
 
-    try {
-      userRepository.save(RegisterDTO.of(registerDTO));
-    } catch (Exception e) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 가입된 전화번호 입니다.");
-    }
+    registerDTO.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+    userRepository.save(RegisterDTO.of(registerDTO));
 
     return "회원가입 성공";
   }
 
-  // 로그인
-  public String login(LoginDTO loginDTO, HttpServletRequest request) {
-    UserEntity user = userHandler.getUserByEmail(loginDTO.getEmail());
-    userHandler.validatePassword(user, loginDTO.getPassword());
+  @Override
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-    List<BalancesDTO> balances = userHandler.getUserCategoryBalances(user);
-    budgetCache.putBalanceInCache(user.getId(), balances);
+    UserEntity user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("존재하지 않은 아이디입니다."));
 
-    request.getSession().setAttribute("userId", user.getId());
-    return "로그인 성공";
+      return new UserDetailsDTO(user);
+
   }
 
   // 회원 정보 수정

@@ -1,7 +1,6 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.account.LoginDTO;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.service.UserService;
@@ -31,13 +30,13 @@ public class UserController {
         .body(userService.register(registerDTO));
   }
 
-  // 로그인
-  @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
-      HttpServletRequest request) {
-    return ResponseEntity.ok()
-        .body(userService.login(loginDTO, request));
-  }
+//  // 로그인
+//  @PostMapping("/login")
+//  public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
+//      HttpServletRequest request) {
+//    return ResponseEntity.ok()
+//        .body(userService.login(loginDTO, request));
+//  }
 
   // 회원 정보 수정
   @PatchMapping("/account")

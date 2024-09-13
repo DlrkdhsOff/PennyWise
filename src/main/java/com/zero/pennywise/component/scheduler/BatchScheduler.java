@@ -1,8 +1,6 @@
 package com.zero.pennywise.component.scheduler;
 
-import com.zero.pennywise.service.NotificationService;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;

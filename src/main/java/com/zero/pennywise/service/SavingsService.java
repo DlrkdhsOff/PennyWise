@@ -5,15 +5,12 @@ import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.model.response.savings.SavingsPage;
 import com.zero.pennywise.repository.querydsl.savings.SavingsQueryRepository;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,7 +1,6 @@
 package com.zero.pennywise.config.batch.step;
 
 import com.zero.pennywise.entity.TransactionEntity;
-import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
