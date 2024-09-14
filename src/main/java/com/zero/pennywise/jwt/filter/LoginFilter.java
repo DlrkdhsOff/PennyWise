@@ -5,6 +5,7 @@ import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.jwt.util.JwtUtil;
 import com.zero.pennywise.model.request.account.UserDetailsDTO;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -52,17 +53,26 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     UserDetailsDTO userDetails = (UserDetailsDTO) authentication.getPrincipal();
 
-    logger.info("userDetails : {}", userDetails.getUserId());
     UserEntity user = userHandler.getUserByEmail(userDetails.getUsername());
 
-    String token = jwtUtil.createJwt(user.getId(), user.getRole());
+    String access = jwtUtil.createJwt("access", user.getId(), user.getRole());
+    String refresh = jwtUtil.createJwt("refresh", user.getId(), user.getRole());
     userHandler.getUserCategoryBalances(user);
 
-    response.addHeader("Authorization", token);
+    response.addHeader("access", access);
+    response.addCookie(createCookie(refresh));
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
     response.getWriter().write(user.getUsername() + "님 안녕하세요");
+  }
+
+  private Cookie createCookie(String value) {
+    Cookie cookie = new Cookie("refresh", value);
+    cookie.setMaxAge(24 * 60 * 60);
+    cookie.setHttpOnly(true);
+
+    return cookie;
   }
 
   @Override

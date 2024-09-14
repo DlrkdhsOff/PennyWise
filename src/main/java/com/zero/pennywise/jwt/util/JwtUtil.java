@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
   private final SecretKey secretKey;
-  public static final String TOKEN_PREFIX = "Bearer ";
-  public static final long ACCESS_TOKEN_EXPIRE_TIME = 60 * 60 * 1000L;
+  public static final long ACCESS_TOKEN_EXPIRE_TIME = 10 * 60 * 1000L;  // 10분
+  public static final long REFRESH_TOKEN_EXPIRE_TIME = 24 * 60 * 60 * 1000L;  // 24시간
 
   public JwtUtil(@Value("${spring.jwt.secret.key}")String secret) {
 
@@ -28,29 +28,40 @@ public class JwtUtil {
         .get("userId", Long.class);
   }
 
-  public Boolean isExpired(String token) {
+  public String getRole(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
         .parseSignedClaims(token)
         .getPayload()
-        .getExpiration().before(new Date());
+        .get("role", String.class);
   }
 
-  public String getToken(String authorization) {
-    if (authorization != null && authorization.startsWith(TOKEN_PREFIX)) {
-      return authorization.substring(TOKEN_PREFIX.length());
-    }
-    return null;
+  public String getType(String token) {
+    return Jwts.parser().verifyWith(secretKey).build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .get("type", String.class);
   }
 
-  public String createJwt(Long userId, String role) {
-    String jwtToken = Jwts.builder()
+  public void isExpired(String token) {
+    Jwts.parser().verifyWith(secretKey).build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .getExpiration();
+  }
+
+
+  public String createJwt(String type, Long userId, String role) {
+    long expirationTime = "access".equals(type)
+        ? 30 * 1000L
+        : REFRESH_TOKEN_EXPIRE_TIME;
+
+    return Jwts.builder()
+        .claim("type", type)
         .claim("userId", userId)
         .claim("role", role)
         .notBefore(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
+        .expiration(new Date(System.currentTimeMillis() + expirationTime))
         .signWith(secretKey)
         .compact();
-
-    return TOKEN_PREFIX + jwtToken;
   }
 }
