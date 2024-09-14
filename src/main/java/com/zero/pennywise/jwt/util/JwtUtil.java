@@ -52,7 +52,7 @@ public class JwtUtil {
 
   public String createJwt(String type, Long userId, String role) {
     long expirationTime = "access".equals(type)
-        ? 30 * 1000L
+        ? ACCESS_TOKEN_EXPIRE_TIME
         : REFRESH_TOKEN_EXPIRE_TIME;
 
     return Jwts.builder()
