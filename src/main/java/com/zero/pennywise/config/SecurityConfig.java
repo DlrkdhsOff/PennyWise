@@ -51,11 +51,11 @@ public class SecurityConfig {
             .anyRequest().authenticated());
 
     http
-        .addFilterBefore(new JwtFilter(userRepository, jwtUtil), LoginFilter.class);
+        .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
 
     http
         .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)
-            ,passwordEncoder, userHandler,jwtUtil), UsernamePasswordAuthenticationFilter.class);
+            ,passwordEncoder, userHandler, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
 
     http
