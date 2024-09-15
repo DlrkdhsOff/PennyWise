@@ -71,6 +71,14 @@ public class AnalyzeHandler {
   }
 
 
+  public Long getTotalIncome(Long userId) {
+    LocalDateTime startDateTime = getStartDate();
+    LocalDateTime endDateTime = getLastMonth();
+
+    return transactionQueryRepository.getIncomeAvgLastThreeMonth(userId, startDateTime, endDateTime);
+  }
+
+
   private LocalDateTime getStartDate() {
     return LocalDateTime.now()
         .minusMonths(4)

@@ -1,13 +1,14 @@
 package com.zero.pennywise.component.handler;
 
-import com.zero.pennywise.component.cache.BudgetCache;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.entity.redis.BalanceEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
+import com.zero.pennywise.repository.RedisRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
@@ -16,7 +17,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -31,8 +31,8 @@ public class UserHandler {
   private final CategoryRepository categoryRepository;
   private final WaringMessageRepository waringMessageRepository;
   private final CategoryHandler categoryHandler;
-  private final BudgetCache budgetCache;
-
+  private final RedisHandler redisHandler;
+  private final RedisRepository redisRepository;
 
 
   public void validateEmail(String email) {
@@ -66,13 +66,6 @@ public class UserHandler {
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다."));
   }
 
-  // 비밀번호 유효값 검증
-  public void validatePassword(UserEntity user, String password) {
-    if (!user.getPassword().equals(password)) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
-    }
-  }
-
   // 전화번호 formatting
   public String formatPhoneNumber(String phoneNumber) {
     return phoneNumber.substring(0, 3) + "-" +
@@ -102,7 +95,7 @@ public class UserHandler {
       result.add(getCategoryBalances(user.getId(), budget));
     }
 
-    budgetCache.putBalanceInCache(user.getId(), result);
+    redisRepository.save(new BalanceEntity(user.getId().toString(), result));
   }
 
   // 카테고리 남은 금액

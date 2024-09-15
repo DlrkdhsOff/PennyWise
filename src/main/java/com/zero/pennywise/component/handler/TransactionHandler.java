@@ -1,24 +1,18 @@
 package com.zero.pennywise.component.handler;
 
-import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
+import static com.zero.pennywise.status.TransactionStatus.getEnumType;
 
-import com.zero.pennywise.component.cache.BudgetCache;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.response.transaction.TransactionsDTO;
-import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.repository.TransactionRepository;
-import com.zero.pennywise.repository.WaringMessageRepository;
-import java.time.LocalDateTime;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -27,12 +21,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class TransactionHandler {
 
-  private static final String EXPENSE = "지출";
-
-  private final BudgetCache budgetCache;
+  private final RedisHandler redisHandler;
   private final TransactionRepository transactionRepository;
-  private final RedisTemplate<String, Object> redisTemplate;
-  private final WaringMessageRepository waringMessageRepository;
   private final CategoryHandler categoryHandler;
 
 
@@ -41,34 +31,38 @@ public class TransactionHandler {
     TransactionEntity transaction = transactionRepository
         .save(TransactionDTO.of(user, category.getCategoryId(), transactionDTO));
 
-    addBalance(user, transaction, category.getCategoryName());
+    if (transaction.getType().isExpenses()) {
+      redisHandler.updateBalance(user, transaction.getAmount(), category.getCategoryName());
+    }
 
     return "성공적으로 거래를 등록하였습니다.";
   }
 
 
-  // 입력한 데이터 수정
-  public String updateTransactionDetails(UserEntity user, TransactionEntity transaction, UpdateTransactionDTO updateTransaction) {
-    CategoryEntity category = categoryHandler
-        .getCateogry(user.getId(), updateTransaction.getCategoryName());
-
-    transaction.setCategoryId(category.getCategoryId());
-    transaction.setType(castToTransactionStatus(updateTransaction.getType(), updateTransaction.getIsFixed()));
-    transaction.setAmount(updateTransaction.getAmount());
-    transaction.setDescription(updateTransaction.getDescription());
-
-    transactionRepository.save(transaction);
-    return "거래 정보를 수정하였습니다.";
-  }
-
-
-  // 거래 목록 유효값 검증
+  // 거래 목록 조회 유효값 검증
   public void validateTransactions(List<TransactionsDTO> transactions, String categoryName) {
     if (transactions == null || transactions.isEmpty()) {
       String message =
           StringUtils.hasText(categoryName) ? "존재하지 않은 카테고리 입니다." : "거래 내역에 존재하지 않습니다.";
       throw new GlobalException(HttpStatus.BAD_REQUEST, message);
     }
+  }
+
+
+  // 입력한 데이터 수정
+  @Transactional
+  public void updateTransactionDetails(UserEntity user, TransactionEntity transaction,
+      UpdateTransactionDTO updateTransaction) {
+
+    CategoryEntity category = categoryHandler.getCateogry(user.getId(),
+        updateTransaction.getCategoryName());
+
+    transaction.setCategoryId(category.getCategoryId());
+    transaction.setType(getEnumType(updateTransaction.getType()));
+    transaction.setAmount(updateTransaction.getAmount());
+    transaction.setDescription(updateTransaction.getDescription());
+
+    transactionRepository.save(transaction);
   }
 
 
@@ -79,119 +73,27 @@ public class TransactionHandler {
   }
 
 
-  // 잔액 업데이트 필요시 처리
-  public void addBalance(UserEntity user, TransactionEntity transaction, String categoryName) {
-    BalancesDTO balance = budgetCache.getBalances(user.getId(), categoryName);
+  // Redis balance data 수정
+  @Transactional
+  public void updateRedisBalance(UserEntity user, TransactionEntity transaction,
+      UpdateTransactionDTO updateTransaction) {
 
-    if (balance == null) {
-      return;
+    restoration(user, transaction);
+
+    // 수정한 금액으로 남은 예산 수정
+    if (getEnumType(updateTransaction.getType()).isExpenses()) {
+      redisHandler.updateBalance(user, updateTransaction.getAmount(), updateTransaction.getCategoryName());
     }
-
-    if (transaction.getType().isExpenses()) {
-      long totalBalance = calculateBalance(user, balance, transaction.getAmount(),
-          categoryName);
-      balance.setBalance(totalBalance);
-    }
-
-    budgetCache.updateBalance(user.getId(), balance.getBalance(), categoryName);
   }
 
-
-  // 남은 예산 금액 계산
-  private long calculateBalance(UserEntity user, BalancesDTO balance, Long amount, String categoryName) {
-    long totalBalance = balance.getBalance() - amount;
-
-    if (totalBalance < 0) {
-      sendMessage(user, categoryName + " 예산을 초과 했습니다.");
-      totalBalance = 0L;
-    }
-
-    return totalBalance;
-  }
-
-  // 경고 메시지 전송
-  public void sendMessage(UserEntity user, String message) {
-    WaringMessageEntity warningMessage = WaringMessageEntity.builder()
-        .user(user)
-        .message(message)
-        .recivedDateTime(LocalDateTime.now())
-        .build();
-
-    waringMessageRepository.save(warningMessage);
-    redisTemplate.convertAndSend("notifications", new WaringMessageDTO(user.getId(), message));
-  }
-
-
-  // 캐시에 저장 되어 있는 예산 수정
-  public void updateBalanceCacheData(UserEntity user, TransactionEntity transaction, UpdateTransactionDTO updateTransaction) {
-    CategoryEntity beforeCategory = categoryHandler
+  // 남은 예산 금액 원상 복구
+  public void restoration(UserEntity user, TransactionEntity transaction) {
+    CategoryEntity category = categoryHandler
         .getCateogryByUserIdAndId(user.getId(), transaction.getCategoryId());
 
-    BalancesDTO balance = budgetCache.getBalances(user.getId(), beforeCategory.getCategoryName());
-
-    // 캐시 데이터 원상 복구
     if (transaction.getType().isExpenses()) {
-      balance.setBalance(balance.getBalance() + transaction.getAmount());
+      redisHandler.updateBalance(user, transaction.getAmount() * -1, category.getCategoryName());
     }
-
-    boolean isSameCategory = beforeCategory
-        .getCategoryName().equals(updateTransaction.getCategoryName());
-
-    if (isSameCategory) {
-      updateBalanceForSameCategory(user, balance, updateTransaction);
-    } else {
-      updateBalanceForNewCategory(user, updateTransaction);
-    }
-  }
-
-
-  // 같은 카테고리를 수정할 경우
-  private void updateBalanceForSameCategory(UserEntity user, BalancesDTO balance, UpdateTransactionDTO updateTransaction) {
-    if (isExpense(updateTransaction.getType())) {
-
-      long totalBalance = calculateBalance(user, balance,
-          updateTransaction.getAmount(), balance.getCategoryName());
-
-      balance.setBalance(totalBalance);
-    }
-    budgetCache.updateBalance(user.getId(), balance.getBalance(), balance.getCategoryName());
-  }
-
-  // 다른 카테고리로 수정하는 경우
-  private void updateBalanceForNewCategory(UserEntity user, UpdateTransactionDTO updateTransaction) {
-    CategoryEntity newCategory = categoryHandler
-        .getCateogry(user.getId(), updateTransaction.getCategoryName());
-
-    BalancesDTO balance = budgetCache.getBalances(user.getId(), newCategory.getCategoryName());
-
-    if (isExpense(updateTransaction.getType())) {
-      long totalBalance = calculateBalance(user, balance,
-          updateTransaction.getAmount(),
-          newCategory.getCategoryName());
-
-      balance.setBalance(totalBalance);
-    }
-
-    budgetCache.updateBalance(user.getId(), balance.getBalance(), balance.getCategoryName());
-  }
-
-  // 타입 확인
-  private boolean isExpense(String type) {
-    return EXPENSE.equals(type);
-  }
-
-  // 거래 삭제시 남은 금액 변경
-  public void deleteBalanceCacheData(Long userId, TransactionEntity transaction) {
-    if (!transaction.getType().isExpenses()) {
-      return;
-    }
-    CategoryEntity beforeCategory = categoryHandler
-        .getCateogryByUserIdAndId(userId, transaction.getCategoryId());
-
-    BalancesDTO balance = budgetCache.getBalances(userId, beforeCategory.getCategoryName());
-    balance.setBalance(balance.getBalance() + transaction.getAmount());
-
-    budgetCache.updateBalance(userId, balance.getBalance(), balance.getCategoryName());
   }
 
 }

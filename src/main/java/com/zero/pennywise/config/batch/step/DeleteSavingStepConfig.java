@@ -55,7 +55,7 @@ public class DeleteSavingStepConfig {
 
   @Bean
   public ItemWriter<Long> deleteSavingWriter() {
-    return id -> id.forEach(savingsRepository::deleteById);
+    return savingsRepository::deleteAllById;
   }
 
 }

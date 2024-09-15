@@ -7,10 +7,12 @@ public enum TransactionStatus {
 
   FIXED_EXPENSES ,FIXED_INCOME, EXPENSES ,INCOME, END;
 
-  public static TransactionStatus castToTransactionStatus(String type, String isFixed) {
+  public static TransactionStatus getEnumType(String type) {
     return switch (type) {
-      case "지출" -> isFixed.equals("Y") ? FIXED_EXPENSES : EXPENSES;
-      case "수입" -> isFixed.equals("Y") ? FIXED_INCOME : INCOME;
+      case "지출" -> EXPENSES;
+      case "수입" -> INCOME;
+      case "고정 지출" -> FIXED_EXPENSES;
+      case "고정 수입" -> FIXED_INCOME;
       default -> throw new GlobalException(HttpStatus.BAD_REQUEST, "수입/지출 타입을 정확하게 입력해주세요");
     };
   }
@@ -22,11 +24,5 @@ public enum TransactionStatus {
     };
   }
 
-  public boolean isExpensesStr(String type) {
-    return switch (type) {
-      case "지출" -> true;
-      case "수입" -> false;
-      default -> throw new GlobalException(HttpStatus.BAD_REQUEST, "수입/지출 타입을 정확하게 입력해주세요");
-    };
-  }
+
 }
