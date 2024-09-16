@@ -2,9 +2,9 @@ package com.zero.pennywise.service;
 
 import static com.zero.pennywise.utils.PageUtils.getPagedBalanceData;
 
-import com.zero.pennywise.component.handler.RedisHandler;
 import com.zero.pennywise.component.handler.BudgetHandler;
 import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.RedisHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
@@ -47,7 +47,7 @@ public class BudgetService {
   public BudgetPage getBudget(Long userId, Pageable page) {
     UserEntity user = userHandler.getUserById(userId);
 
-    List<BalancesDTO> balances = redisHandler.getBalance(userId);
+    List<BalancesDTO> balances = redisHandler.getBalance(user.getId());
     return BudgetPage.of(getPagedBalanceData(balances, page));
   }
 
@@ -60,12 +60,11 @@ public class BudgetService {
         .getCateogry(user.getId(), budgetDTO.getCategoryName());
 
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
-    Long beforeAmount = budget.getAmount();
+    redisHandler.updateBudget(user.getId(), budget.getAmount(), budgetDTO.getAmount(), budgetDTO.getCategoryName());
 
     budget.setAmount(budgetDTO.getAmount());
     budgetRepository.save(budget);
 
-    redisHandler.updateBudget(user.getId(), beforeAmount, budget.getAmount(), budgetDTO.getCategoryName());
     return "성공적으로 예산을 수정하였습니다.";
   }
 
