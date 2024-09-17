@@ -22,7 +22,10 @@ public class PageUtils {
     int currentPage = pageable.getPageNumber();
     int start = currentPage * pageSize;
 
-    // 데이터 범위 확인 및 페이징 처리
+    if (balances == null) {
+      balances = Collections.emptyList();
+    }
+
     if (balances.size() < start) {
       balances = Collections.emptyList();
     } else {

@@ -56,9 +56,9 @@ public class TransactionService {
     TransactionEntity transaction = transactionHandler
         .getTransaction(updateTransaction.getTransactionId());
 
-    transactionHandler.updateBalanceCacheData(user, transaction, updateTransaction);
-
-    return transactionHandler.updateTransactionDetails(user, transaction, updateTransaction);
+    transactionHandler.updateRedisBalance(user, transaction, updateTransaction);
+    transactionHandler.updateTransactionDetails(user, transaction, updateTransaction);
+    return "거래 정보를 수정하였습니다.";
   }
 
 
@@ -68,9 +68,8 @@ public class TransactionService {
     UserEntity user = userHandler.getUserById(userId);
     TransactionEntity transaction = transactionHandler.getTransaction(transactionId);
 
-    transactionHandler.deleteBalanceCacheData(userId, transaction);
-    transactionRepository.deleteByUserIdAndTransactionId(user.getId(),
-        transaction.getTransactionId());
+    transactionHandler.restoration(user, transaction);
+    transactionRepository.deleteByUserIdAndTransactionId(user.getId(), transaction.getTransactionId());
 
     return "거래를 성공적으로 삭제하였습니다.";
   }

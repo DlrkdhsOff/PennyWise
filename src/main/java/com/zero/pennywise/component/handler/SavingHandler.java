@@ -12,6 +12,7 @@ import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -83,5 +84,9 @@ public class SavingHandler {
         .build());
 
     savingsRepository.deleteById(savings.getId());
+  }
+
+  public List<SavingsEntity> getAllSavings(Long userId) {
+    return savingsRepository.findAllByUserId(userId);
   }
 }

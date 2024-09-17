@@ -2,9 +2,9 @@ package com.zero.pennywise.service;
 
 import static com.zero.pennywise.utils.PageUtils.getPagedBalanceData;
 
-import com.zero.pennywise.component.cache.BudgetCache;
 import com.zero.pennywise.component.handler.BudgetHandler;
 import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.RedisHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BudgetService {
 
   private final UserHandler userHandler;
-  private final BudgetCache budgetCache;
+  private final RedisHandler redisHandler;
   private final BudgetHandler budgetHandler;
   private final CategoryHandler categoryHandler;
   private final BudgetRepository budgetRepository;
@@ -39,7 +39,7 @@ public class BudgetService {
     budgetHandler.validateBudget(user.getId(), category.getCategoryId());
     BudgetEntity budget = budgetHandler.save(user, category, budgetDTO.getAmount());
 
-    budgetCache.addNewBudget(user.getId(), budget, category.getCategoryName());
+    redisHandler.addNewBudget(user.getId(), budget, category.getCategoryName());
     return "성공적으로 예산을 등록하였습니다.";
   }
 
@@ -47,7 +47,7 @@ public class BudgetService {
   public BudgetPage getBudget(Long userId, Pageable page) {
     UserEntity user = userHandler.getUserById(userId);
 
-    List<BalancesDTO> balances = budgetCache.getBalancesFromCache(userId);
+    List<BalancesDTO> balances = redisHandler.getBalance(user.getId());
     return BudgetPage.of(getPagedBalanceData(balances, page));
   }
 
@@ -60,11 +60,11 @@ public class BudgetService {
         .getCateogry(user.getId(), budgetDTO.getCategoryName());
 
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
+    redisHandler.updateBudget(user.getId(), budget.getAmount(), budgetDTO.getAmount(), budgetDTO.getCategoryName());
 
     budget.setAmount(budgetDTO.getAmount());
     budgetRepository.save(budget);
 
-    budgetCache.updateBudget(user.getId(), budget.getAmount(), budgetDTO.getCategoryName());
     return "성공적으로 예산을 수정하였습니다.";
   }
 
@@ -78,7 +78,7 @@ public class BudgetService {
     BudgetEntity budget = budgetHandler.getBudget(user.getId(), category.getCategoryId());
     budgetRepository.deleteByBudgetId(budget.getBudgetId());
 
-    budgetCache.deleteBalance(userId, category.getCategoryName());
+    redisHandler.deleteBalance(userId, category.getCategoryName());
     return "성공적으로 예산을 삭제 하였습니다.";
   }
 }

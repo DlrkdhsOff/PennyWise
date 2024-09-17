@@ -1,5 +1,6 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.component.handler.AnalyzeHandler;
 import com.zero.pennywise.component.handler.SavingHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.CategoryEntity;
@@ -20,6 +21,7 @@ public class SavingsService {
   private final UserHandler userHandler;
   private final SavingHandler savingHandler;
   private final SavingsQueryRepository savingsQueryRepository;
+  private final AnalyzeHandler analyzeHandler;
 
 
   // 저축 정보 등록
@@ -50,5 +52,22 @@ public class SavingsService {
 
     return "저축 정보를 삭제 하였습니다.";
   }
+
+//  public Object recommend(Long userId) {
+//    UserEntity user = userHandler.getUserById(userId);
+//
+//    Long totalIncome = analyzeHandler.getTotalIncome(userId);
+//    AnalyzeDTO analyzeDTO = analyzeHandler.getLastThreeMonthBalance(userId);
+//
+//
+//    List<SavingsEntity> savingsList = savingHandler.getAllSavings(userId);
+//    if (savingsList == null) {
+//      if (totalIncome * 0.2 < analyzeDTO.getTotalExpenses()) {
+//
+//      }
+//    } else {
+//
+//    }
+//  }
 
 }

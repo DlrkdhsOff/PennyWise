@@ -96,6 +96,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return (totalExpense != null) ? totalExpense : 0L;
   }
 
+
   @Override
   public Long getCurrentAmount(UserEntity user, Long categoryId, String description) {
     QTransactionEntity t = QTransactionEntity.transactionEntity;
@@ -148,5 +149,22 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
     return (totalExpenses != null) ? totalExpenses / 3 : 0L;
   }
 
+
+  @Override
+  public Long getIncomeAvgLastThreeMonth(Long userId, LocalDateTime startDateTime,
+      LocalDateTime endDateTime) {
+    QTransactionEntity t = QTransactionEntity.transactionEntity;
+
+    Long totalIncome = jpaQueryFactory
+        .select((t.amount.sum()))
+        .from(t)
+        .where(
+            t.user.id.eq(userId),
+            t.type.eq(TransactionStatus.INCOME),
+            t.dateTime.between(startDateTime, endDateTime)
+        )
+        .fetchOne();
+    return (totalIncome != null) ? totalIncome / 3 : 0L;
+  }
 
 }

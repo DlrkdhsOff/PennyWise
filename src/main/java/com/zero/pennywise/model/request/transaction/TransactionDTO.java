@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.request.transaction;
 
-import static com.zero.pennywise.status.TransactionStatus.castToTransactionStatus;
+import static com.zero.pennywise.status.TransactionStatus.getEnumType;
 
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -32,7 +32,7 @@ public class TransactionDTO {
     return TransactionEntity.builder()
         .user(user)
         .categoryId(categoryId)
-        .type(castToTransactionStatus(transactionDTO.getType(), transactionDTO.getIsFixed()))
+        .type(getEnumType(transactionDTO.getType()))
         .amount(transactionDTO.getAmount())
         .description(transactionDTO.getDescription())
         .dateTime(LocalDateTime.now())
