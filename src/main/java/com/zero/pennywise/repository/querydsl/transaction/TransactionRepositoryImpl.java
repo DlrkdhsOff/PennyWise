@@ -7,8 +7,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QCategoryEntity;
 import com.zero.pennywise.entity.QTransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.enums.TransactionStatus;
 import com.zero.pennywise.model.response.transaction.TransactionsDTO;
-import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -160,7 +160,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .from(t)
         .where(
             t.user.id.eq(userId),
-            t.type.eq(TransactionStatus.INCOME),
+            t.type.eq(TransactionStatus.FIXED_INCOME),
             t.dateTime.between(startDateTime, endDateTime)
         )
         .fetchOne();

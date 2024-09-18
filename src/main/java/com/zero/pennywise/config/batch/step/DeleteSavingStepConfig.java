@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
@@ -29,9 +28,8 @@ public class DeleteSavingStepConfig {
   @Bean
   public Step deleteSavingStep() {
     return new StepBuilder("deleteSavingStep", jobRepository)
-        .<SavingsEntity, Long>chunk(10, platformTransactionManager)
+        .<SavingsEntity, SavingsEntity>chunk(10, platformTransactionManager)
         .reader(deleteSavingReader())
-        .processor(deleteSavingProcessor())
         .writer(deleteSavingWriter())
         .build();
   }
@@ -49,13 +47,7 @@ public class DeleteSavingStepConfig {
   }
 
   @Bean
-  public ItemProcessor<SavingsEntity, Long> deleteSavingProcessor() {
-    return SavingsEntity::getId;
+  public ItemWriter<SavingsEntity> deleteSavingWriter() {
+    return savingsEntities -> savingsRepository.deleteAllInBatch();
   }
-
-  @Bean
-  public ItemWriter<Long> deleteSavingWriter() {
-    return savingsRepository::deleteAllById;
-  }
-
 }

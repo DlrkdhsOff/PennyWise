@@ -1,6 +1,7 @@
 package com.zero.pennywise.entity.redis;
 
 import com.zero.pennywise.model.request.budget.BalancesDTO;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class BalanceEntity {
   @Id
   private String userId;
 
-  private List<BalancesDTO> balances;
+  private List<BalancesDTO> balances = new ArrayList<>();
 
 }
+

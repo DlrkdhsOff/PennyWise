@@ -57,7 +57,7 @@ public class NotificationService implements MessageListener {
       logger.info("waringMessage.toString(): {}", waringMessage.toString());
       sendNotification(waringMessage.getUserId(), waringMessage.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.info("Exception {}", e.getMessage());
     }
   }
 

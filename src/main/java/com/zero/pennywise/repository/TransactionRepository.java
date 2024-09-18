@@ -1,8 +1,8 @@
 package com.zero.pennywise.repository;
 
 import com.zero.pennywise.entity.TransactionEntity;
+import com.zero.pennywise.enums.TransactionStatus;
 import com.zero.pennywise.model.response.transaction.EndSavindDTO;
-import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;

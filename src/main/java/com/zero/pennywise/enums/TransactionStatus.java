@@ -1,4 +1,4 @@
-package com.zero.pennywise.status;
+package com.zero.pennywise.enums;
 
 import com.zero.pennywise.exception.GlobalException;
 import org.springframework.http.HttpStatus;
@@ -23,6 +23,4 @@ public enum TransactionStatus {
       case INCOME, FIXED_INCOME, END -> false;
     };
   }
-
-
 }

@@ -11,7 +11,6 @@ import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,9 +37,6 @@ public class RedisHandler {
     BalanceEntity balanceEntity = redisRepository.findByUserId(userId.toString());
 
     List<BalancesDTO> list = balanceEntity.getBalances();
-    if (list == null) {
-      list = new ArrayList<>();
-    }
 
     Long totalExpenses = transactionQueryRepository
         .getExpenses(userId, budget.getCategory().getCategoryId(), LocalDate.now().toString());
@@ -85,7 +81,7 @@ public class RedisHandler {
     BalanceEntity balanceEntity = redisRepository.findByUserId(user.getId().toString());
 
     for (BalancesDTO balance : balanceEntity.getBalances()) {
-      if (balance.getCategoryName().equals(categoryName)) {
+      if (balance.getCategoryName().contains(categoryName)) {
         balance.setBalance(calculateBalance(user, balance.getBalance(), amount, categoryName));
       }
     }

@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.request.transaction;
 
-import static com.zero.pennywise.status.TransactionStatus.getEnumType;
+import static com.zero.pennywise.enums.TransactionStatus.getEnumType;
 
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -24,9 +24,6 @@ public class TransactionDTO {
   private Long amount;
 
   private String description;
-
-  @NotBlank(message = "고정적인 지출/수입일 경우 \"Y\"를 입력해주세요.")
-  private String isFixed;
 
   public static TransactionEntity of(UserEntity user, Long categoryId, TransactionDTO transactionDTO) {
     return TransactionEntity.builder()

@@ -6,10 +6,13 @@ import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.enums.RecommendMessage;
 import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
+import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
 import com.zero.pennywise.model.response.savings.SavingsPage;
 import com.zero.pennywise.repository.querydsl.savings.SavingsQueryRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,21 +56,26 @@ public class SavingsService {
     return "저축 정보를 삭제 하였습니다.";
   }
 
-//  public Object recommend(Long userId) {
-//    UserEntity user = userHandler.getUserById(userId);
-//
-//    Long totalIncome = analyzeHandler.getTotalIncome(userId);
-//    AnalyzeDTO analyzeDTO = analyzeHandler.getLastThreeMonthBalance(userId);
-//
-//
-//    List<SavingsEntity> savingsList = savingHandler.getAllSavings(userId);
-//    if (savingsList == null) {
-//      if (totalIncome * 0.2 < analyzeDTO.getTotalExpenses()) {
-//
-//      }
-//    } else {
-//
-//    }
-//  }
+  public String recommend(Long userId) {
+    UserEntity user = userHandler.getUserById(userId);
+
+    Long totalIncome = analyzeHandler.getTotalIncome(userId);
+    AnalyzeDTO analyzeDTO = analyzeHandler.getLastThreeMonthBalance(userId);
+
+    Long totalExpenses = analyzeDTO.getTotalExpenses();
+    List<SavingsEntity> savingsList = savingHandler.getAllSavings(userId);
+
+    Long savingAccount = null;
+    if (savingsList != null) {
+      savingAccount = savingsList.stream().mapToLong(SavingsEntity::getAmount).sum();
+    }
+
+    String maxExpenseCategory = analyzeDTO.getCategoryBalances().get(0).getCategoryName();
+
+
+
+    return RecommendMessage.getMessage(totalIncome, totalExpenses, savingAccount, maxExpenseCategory);
+  }
+
 
 }
