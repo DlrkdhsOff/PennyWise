@@ -2,7 +2,6 @@ package com.zero.pennywise.repository;
 
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.model.response.transaction.EndSavindDTO;
-import com.zero.pennywise.status.TransactionStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -46,7 +45,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
       + "WHERE s.endDate = :endDate AND t.type = :type "
       + "GROUP BY t.user, t.categoryId")
   Page<EndSavindDTO> findAmountSumByType(
-      @Param("type") TransactionStatus type,
+//      @Param("type") TransactionStatus type,
       @Param("endDate") LocalDate endDate,
       Pageable pageable);
 

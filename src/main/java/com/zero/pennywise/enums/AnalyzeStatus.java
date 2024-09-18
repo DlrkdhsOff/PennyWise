@@ -1,4 +1,4 @@
-package com.zero.pennywise.status;
+package com.zero.pennywise.enums;
 
 public enum AnalyzeStatus {
 

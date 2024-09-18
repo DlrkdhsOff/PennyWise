@@ -10,7 +10,7 @@ import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
-import com.zero.pennywise.status.TransactionStatus;
+import com.zero.pennywise.enums.TransactionStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

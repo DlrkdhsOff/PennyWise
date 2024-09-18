@@ -4,7 +4,7 @@ import com.zero.pennywise.component.handler.AnalyzeHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
-import com.zero.pennywise.status.AnalyzeStatus;
+import com.zero.pennywise.enums.AnalyzeStatus;
 import java.text.NumberFormat;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;

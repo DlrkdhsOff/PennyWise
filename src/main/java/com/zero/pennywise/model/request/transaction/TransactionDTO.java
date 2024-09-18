@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.request.transaction;
 
-import static com.zero.pennywise.status.TransactionStatus.getEnumType;
+import static com.zero.pennywise.enums.TransactionStatus.getEnumType;
 
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
