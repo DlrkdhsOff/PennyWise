@@ -5,7 +5,7 @@ import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
 
 public enum AnalyzeMessage {
   LAST_THREE_MONTH_AVG("지난 3달간 평균 지출 총액 : %,d원\n"),
-  THIS_MONTH_TOTAL("\n현재 평균 지출 총액 : %,d원\n"),
+  THIS_MONTH_TOTAL("현재 평균 지출 총액 : %,d원\n"),
   CATEGORY_EXPENSE("카테고리 %s : %,d원\n"),
 
   EXPENSES_TOO_HIGH("지난 3달간 평균 지출 금액보다 %,d원 더 사용 했습니다.\n"),
@@ -27,13 +27,14 @@ public enum AnalyzeMessage {
     // 지난 3달 평균 지출
     sb.append(LAST_THREE_MONTH_AVG.generateMessage(lastTotalAmount));
     for (CategoryBalanceDTO dto : lastThreeMonth.getCategoryBalances()) {
-      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses()));
+      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses())).append("\n");
+
     }
 
     // 이번달 지출
     sb.append(THIS_MONTH_TOTAL.generateMessage(thisMonthAmount));
     for (CategoryBalanceDTO dto : thisMonth.getCategoryBalances()) {
-      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses()));
+      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses())).append("\n");
     }
 
     return sb.toString();
