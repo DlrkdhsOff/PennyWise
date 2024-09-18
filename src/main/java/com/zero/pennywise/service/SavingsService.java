@@ -70,7 +70,11 @@ public class SavingsService {
       savingAccount = savingsList.stream().mapToLong(SavingsEntity::getAmount).sum();
     }
 
-    return RecommendMessage.evaluate(totalIncome, totalExpenses, savingAccount);
+    String maxExpenseCategory = analyzeDTO.getCategoryBalances().get(0).getCategoryName();
+
+
+
+    return RecommendMessage.getMessage(totalIncome, totalExpenses, savingAccount, maxExpenseCategory);
   }
 
 

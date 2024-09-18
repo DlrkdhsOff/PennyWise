@@ -140,8 +140,7 @@ public class TransactionRepositoryImpl implements TransactionQueryRepository {
         .from(t)
         .where(
             t.user.id.eq(userId),
-            t.type.eq(TransactionStatus.EXPENSES)
-                .or(t.type.eq(TransactionStatus.FIXED_EXPENSES)),
+            t.type.eq(TransactionStatus.EXPENSES),
             t.dateTime.between(startDateTime, endDateTime),
             categoryId != null ? t.categoryId.eq(categoryId) : null
         )
