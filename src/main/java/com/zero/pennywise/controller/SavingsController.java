@@ -6,7 +6,6 @@ import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.service.SavingsService;
 import com.zero.pennywise.utils.UserAuthorizationUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
