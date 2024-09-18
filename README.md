@@ -5,8 +5,9 @@
 ## 사용 기술
 - **Java**
 - **Spring Boot**
-- **JPA**
+- **Spring Security**
 - **Spring Batch**
+- **JPA**
 - **MySQL**
 - **QueryDsl**
 - **Redis**
