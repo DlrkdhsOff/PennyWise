@@ -25,9 +25,6 @@ public class TransactionDTO {
 
   private String description;
 
-  @NotBlank(message = "고정적인 지출/수입일 경우 \"Y\"를 입력해주세요.")
-  private String isFixed;
-
   public static TransactionEntity of(UserEntity user, Long categoryId, TransactionDTO transactionDTO) {
     return TransactionEntity.builder()
         .user(user)

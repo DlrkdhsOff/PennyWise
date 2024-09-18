@@ -39,7 +39,7 @@ public class DeleteSavingStepConfig {
     return new RepositoryItemReaderBuilder<SavingsEntity>()
         .name("deleteSavingReader")
         .repository(savingsRepository)
-        .methodName("findByEndDateBefore")
+        .methodName("findByEndDate")
         .arguments(LocalDate.now())
         .pageSize(10)
         .sorts(Map.of("id", Sort.Direction.ASC))

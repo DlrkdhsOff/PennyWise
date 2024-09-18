@@ -81,7 +81,7 @@ public class RedisHandler {
     BalanceEntity balanceEntity = redisRepository.findByUserId(user.getId().toString());
 
     for (BalancesDTO balance : balanceEntity.getBalances()) {
-      if (balance.getCategoryName().equals(categoryName)) {
+      if (balance.getCategoryName().contains(categoryName)) {
         balance.setBalance(calculateBalance(user, balance.getBalance(), amount, categoryName));
       }
     }

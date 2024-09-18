@@ -3,10 +3,8 @@ package com.zero.pennywise.service;
 import com.zero.pennywise.component.handler.AnalyzeHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.enums.AnalyzeStatus;
+import com.zero.pennywise.enums.AnalyzeMessage;
 import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
-import java.text.NumberFormat;
-import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,7 @@ public class AnalyzeService {
 
 
 
-  public Object analyze(Long userId) {
+  public String analyze(Long userId) {
     UserEntity user = userHandler.getUserById(userId);
 
     // 지난 3달 지출 금액
@@ -28,16 +26,14 @@ public class AnalyzeService {
     // 이번달 지출 금액
     AnalyzeDTO thisMonth = analyzeHandler.getThisMonthBalance(userId);
 
-    // 이번달 지출금액이 지난 3달간 평균 지출 금액보다 150% 이상일 경우
-    if (lastThreeMonth.getTotalExpenses() * 2.5 < thisMonth.getTotalExpenses()) {
-      Long lastTotalAmount = lastThreeMonth.getTotalExpenses();
-      Long thisMonthAmount = thisMonth.getTotalExpenses();
+    Long lastTotalAmount = lastThreeMonth.getTotalExpenses();
+    Long thisMonthAmount = thisMonth.getTotalExpenses();
 
-      NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
-      String balance = numberFormat.format(thisMonthAmount - lastTotalAmount);
-      analyzeHandler.sendMessage(user, AnalyzeStatus.BAD.getMessage(balance));
-    }
-    return null;
+    analyzeHandler.isExpensesToHigh(user, lastTotalAmount, thisMonthAmount, thisMonth);
+
+    return AnalyzeMessage.getMessage(lastTotalAmount, thisMonthAmount, lastThreeMonth, thisMonth);
   }
+
+
 }
 
