@@ -27,14 +27,14 @@ public enum AnalyzeMessage {
     // 지난 3달 평균 지출
     sb.append(LAST_THREE_MONTH_AVG.generateMessage(lastTotalAmount));
     for (CategoryBalanceDTO dto : lastThreeMonth.getCategoryBalances()) {
-      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses())).append("\n");
+      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses()));
 
     }
-
+    sb.append("\n");
     // 이번달 지출
     sb.append(THIS_MONTH_TOTAL.generateMessage(thisMonthAmount));
     for (CategoryBalanceDTO dto : thisMonth.getCategoryBalances()) {
-      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses())).append("\n");
+      sb.append(CATEGORY_EXPENSE.generateMessage(dto.getCategoryName(), dto.getTotalExpenses()));
     }
 
     return sb.toString();

@@ -1,7 +1,6 @@
 package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
-import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.entity.redis.BalanceEntity;
@@ -44,7 +43,7 @@ public class RedisHandler {
 
     Long amount = budget.getAmount();
 
-    Long balance = Math.max(amount - totalExpenses, 0L);
+    Long balance = amount - totalExpenses;
 
     list.add(new BalancesDTO(categoryName, amount, balance));
     balanceEntity.setBalances(list);
@@ -108,7 +107,6 @@ public class RedisHandler {
 
     if (totalBalance < 0) {
       sendMessage(user, categoryName + " 예산을 초과 했습니다.");
-      totalBalance = 0L;
     }
 
     return totalBalance;

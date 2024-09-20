@@ -74,14 +74,16 @@ public class SavingHandler {
     Long currentAmount = transactionQueryRepository
         .getCurrentAmount(user, category.getCategoryId(), description);
 
-    transactionRepository.save(TransactionEntity.builder()
-        .user(user)
-        .categoryId(category.getCategoryId())
-        .type(TransactionStatus.INCOME)
-        .amount(currentAmount)
-        .description(description)
-        .dateTime(LocalDateTime.now())
-        .build());
+    if (currentAmount > 0) {
+      transactionRepository.save(TransactionEntity.builder()
+          .user(user)
+          .categoryId(category.getCategoryId())
+          .type(TransactionStatus.INCOME)
+          .amount(currentAmount)
+          .description(description)
+          .dateTime(LocalDateTime.now())
+          .build());
+    }
 
     savingsRepository.deleteById(savings.getId());
   }
