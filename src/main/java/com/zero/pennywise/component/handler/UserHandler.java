@@ -1,9 +1,11 @@
 package com.zero.pennywise.component.handler;
 
+import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
+import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
@@ -20,6 +22,7 @@ public class UserHandler {
   private final BudgetRepository budgetRepository;
   private final CategoryRepository categoryRepository;
   private final WaringMessageRepository waringMessageRepository;
+  private final SavingsRepository savingsRepository;
 
   public void validateEmail(String email) {
     if (userRepository.existsByEmail(email)) {
@@ -65,40 +68,7 @@ public class UserHandler {
     transactionRepository.deleteAllByUserId(userId);
     categoryRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
+    savingsRepository.deleteAllByUserId(userId);
+
   }
-
-
-//  // 카테고리별 남은 금액
-//  public void getUserCategoryBalances(UserEntity user) {
-//    List<BudgetEntity> userBudget = budgetRepository.findAllByUserId(user.getId());
-//    if (userBudget == null) {
-//      return;
-//    }
-//
-//    List<BalancesDTO> result = new ArrayList<>();
-//
-//    for (BudgetEntity budget : userBudget) {
-//      result.add(getCategoryBalances(user.getId(), budget));
-//    }
-//
-//    redisRepository.save(new BalanceEntity(user.getId().toString(), result));
-//  }
-//
-//  // 카테고리 남은 금액
-//  public BalancesDTO getCategoryBalances(Long userId, BudgetEntity budget) {
-//    CategoryEntity category = categoryHandler
-//        .getCateogryByUserIdAndId(userId, budget.getCategory().getCategoryId());
-//
-//    String thisMonths = LocalDate.now().toString();
-//
-//    Long totalExpenses = transactionQueryRepository
-//        .getExpenses(userId, category.getCategoryId(), thisMonths);
-//
-//    String categoryName = category.getCategoryName();
-//    Long amount = budget.getAmount();
-//
-//    totalExpenses = (amount - totalExpenses < 0) ? 0 : (amount - totalExpenses);
-//
-//    return new BalancesDTO(categoryName, amount, totalExpenses);
-//  }
 }

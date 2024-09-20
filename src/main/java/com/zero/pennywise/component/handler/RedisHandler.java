@@ -1,6 +1,7 @@
 package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.entity.redis.BalanceEntity;
@@ -47,6 +48,18 @@ public class RedisHandler {
 
     list.add(new BalancesDTO(categoryName, amount, balance));
     balanceEntity.setBalances(list);
+    redisRepository.save(balanceEntity);
+  }
+
+  public void updateCategoryName(Long userId, String beforeCategoryName, String afterCategoryName) {
+    BalanceEntity balanceEntity = redisRepository.findByUserId(userId.toString());
+
+    for (BalancesDTO dto : balanceEntity.getBalances()) {
+      if (dto.getCategoryName().contains(beforeCategoryName)) {
+        dto.setCategoryName(afterCategoryName);
+      }
+    }
+
     redisRepository.save(balanceEntity);
   }
 

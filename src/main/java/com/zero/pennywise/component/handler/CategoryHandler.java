@@ -1,7 +1,9 @@
 package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.CategoryEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
+import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.repository.CategoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class CategoryHandler {
 
   private final CategoryRepository categoryRepository;
+  private final RedisHandler redisHandler;
 
 
   public void existsCategory(Long userId, String categoryName) {
@@ -33,5 +36,14 @@ public class CategoryHandler {
 
   public List<CategoryEntity> getAllCategoryList(Long userId) {
     return categoryRepository.findAllByUserId(userId);
+  }
+
+  public void updateCategory(UserEntity user, CategoryEntity category, UpdateCategoryDTO updateCategory) {
+
+    existsCategory(user.getId(), updateCategory.getNewCategoryName());
+
+    redisHandler.updateCategoryName(user.getId(), category.getCategoryName(), updateCategory.getNewCategoryName());
+    category.setCategoryName(updateCategory.getNewCategoryName());
+    categoryRepository.save(category);
   }
 }

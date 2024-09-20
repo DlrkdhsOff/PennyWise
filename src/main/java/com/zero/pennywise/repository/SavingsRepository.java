@@ -19,4 +19,6 @@ public interface SavingsRepository extends JpaRepository<SavingsEntity, Long> {
   boolean existsByUserIdAndName(Long userId, String name);
 
   List<SavingsEntity> findAllByUserId(Long userId);
+
+  void deleteAllByUserId(Long userId);
 }

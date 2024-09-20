@@ -3,6 +3,7 @@ package com.zero.pennywise.service;
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.RedisHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -59,9 +60,7 @@ public class CategoryService {
 
     return categoryRepository.findByUserIdAndCategoryName(user.getId(), updateCategory.getCategoryName())
         .map(category -> {
-          categoryHandler.existsCategory(user.getId(), updateCategory.getNewCategoryName());
-          category.setCategoryName(updateCategory.getNewCategoryName());
-          categoryRepository.save(category);
+          categoryHandler.updateCategory(user, category, updateCategory);
 
           return "성공적으로 카테고리를 수정하였습니다.";
         })
