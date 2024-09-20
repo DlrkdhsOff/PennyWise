@@ -1,11 +1,9 @@
 package com.zero.pennywise.controller;
 
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.service.UserService;
 import com.zero.pennywise.utils.UserAuthorizationUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

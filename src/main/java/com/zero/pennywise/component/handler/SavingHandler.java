@@ -1,5 +1,7 @@
 package com.zero.pennywise.component.handler;
 
+import static com.zero.pennywise.enums.TransactionStatus.getEnumType;
+
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.TransactionEntity;
@@ -11,6 +13,7 @@ import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +32,7 @@ public class SavingHandler {
 
   public void save(UserEntity user, SavingsDTO savingsDTO) {
     try {
-      savingsRepository.save(SavingsEntity.builder()
+      SavingsEntity savings = savingsRepository.save(SavingsEntity.builder()
           .user(user)
           .category(getCategory(user))
           .name(savingsDTO.getName())
@@ -38,6 +41,17 @@ public class SavingHandler {
           .endDate(savingsDTO.getStartDate().plusMonths(savingsDTO.getMonthsToSave()))
           .description(savingsDTO.getDescription())
           .build());
+
+      if (savingsDTO.getStartDate().equals(LocalDate.now())) {
+        transactionRepository.save(TransactionEntity.builder()
+            .user(user)
+            .categoryId(savings.getCategory().getCategoryId())
+            .type(TransactionStatus.FIXED_EXPENSES)
+            .amount(savings.getAmount())
+            .description(savings.getName() + savings.getDescription())
+            .dateTime(LocalDateTime.now())
+            .build());
+      }
     } catch (Exception e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 저축명 입니다.");
     }

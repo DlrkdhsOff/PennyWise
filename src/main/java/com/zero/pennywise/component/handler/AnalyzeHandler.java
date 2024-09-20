@@ -8,6 +8,7 @@ import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.entity.WaringMessageEntity;
 import com.zero.pennywise.model.request.transaction.CategoryBalanceDTO;
 import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
+import com.zero.pennywise.model.response.waring.MessageDTO;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
@@ -121,7 +122,7 @@ public class AnalyzeHandler {
         .build();
 
     waringMessageRepository.save(warningMessage);
-    redisTemplate.convertAndSend("notifications", new WaringMessageDTO(user.getId(), message));
+    redisTemplate.convertAndSend("notifications", new MessageDTO(user.getId(), message));
   }
 
 

@@ -1,6 +1,7 @@
 package com.zero.pennywise.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zero.pennywise.model.response.waring.MessageDTO;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import java.io.IOException;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class NotificationService implements MessageListener {
   @Override
   public void onMessage(Message message, byte[] pattern) {
     try {
-      WaringMessageDTO waringMessage = mapper.readValue(message.getBody(), WaringMessageDTO.class);
+      MessageDTO waringMessage = mapper.readValue(message.getBody(), MessageDTO.class);
 
       logger.info("waringMessage.toString(): {}", waringMessage.toString());
       sendNotification(waringMessage.getUserId(), waringMessage.getMessage());
