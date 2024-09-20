@@ -1,6 +1,5 @@
 package com.zero.pennywise.model.response.waring;
 
-import com.zero.pennywise.model.response.category.CategoriesPage;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

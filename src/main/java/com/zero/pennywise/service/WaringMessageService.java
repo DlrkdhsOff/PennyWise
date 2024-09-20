@@ -1,7 +1,6 @@
 package com.zero.pennywise.service;
 
 import com.zero.pennywise.entity.WaringMessageEntity;
-import com.zero.pennywise.model.response.transaction.TransactionPage;
 import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import com.zero.pennywise.model.response.waring.WaringMessagePage;
 import com.zero.pennywise.repository.WaringMessageRepository;

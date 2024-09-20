@@ -7,7 +7,6 @@ import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.model.request.account.UserDetailsDTO;
 import com.zero.pennywise.repository.UserRepository;
-import java.sql.SQLIntegrityConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;

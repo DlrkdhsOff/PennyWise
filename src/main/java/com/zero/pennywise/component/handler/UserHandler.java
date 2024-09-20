@@ -1,6 +1,5 @@
 package com.zero.pennywise.component.handler;
 
-import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.repository.BudgetRepository;

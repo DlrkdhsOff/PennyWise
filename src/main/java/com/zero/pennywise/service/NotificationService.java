@@ -2,7 +2,6 @@ package com.zero.pennywise.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zero.pennywise.model.response.waring.MessageDTO;
-import com.zero.pennywise.model.response.waring.WaringMessageDTO;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

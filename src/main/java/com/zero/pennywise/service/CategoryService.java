@@ -3,7 +3,6 @@ package com.zero.pennywise.service;
 import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.component.handler.CategoryHandler;
-import com.zero.pennywise.component.handler.RedisHandler;
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;

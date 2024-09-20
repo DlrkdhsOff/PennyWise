@@ -1,7 +1,5 @@
 package com.zero.pennywise.component.handler;
 
-import static com.zero.pennywise.enums.TransactionStatus.getEnumType;
-
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.TransactionEntity;
