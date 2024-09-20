@@ -2,11 +2,14 @@ package com.zero.pennywise.service;
 
 import com.zero.pennywise.component.handler.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.model.request.account.UserDetailsDTO;
 import com.zero.pennywise.repository.UserRepository;
+import java.sql.SQLIntegrityConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,7 +33,12 @@ public class UserService implements UserDetailsService {
     registerDTO.setPhone(userHandler.formatPhoneNumber(registerDTO.getPhone()));
 
     registerDTO.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-    userRepository.save(RegisterDTO.of(registerDTO));
+
+    try {
+      userRepository.save(RegisterDTO.of(registerDTO));
+    } catch (Exception e) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 가입된 전화번호 입니다.");
+    }
 
     return "회원가입 성공";
   }
@@ -55,7 +63,11 @@ public class UserService implements UserDetailsService {
     user.setUsername(updateDTO.getUsername());
     user.setPhone(userHandler.formatPhoneNumber(updateDTO.getPhone()));
 
-    userRepository.save(user);
+    try {
+      userRepository.save(user);
+    } catch (Exception e) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 가입된 전화번호 입니다.");
+    }
     return "회원 정보가 성공적으로 수정되었습니다.";
   }
 

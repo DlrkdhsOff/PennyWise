@@ -1,10 +1,9 @@
 package com.zero.pennywise.controller;
 
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.account.RegisterDTO;
 import com.zero.pennywise.model.request.account.UpdateDTO;
 import com.zero.pennywise.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.zero.pennywise.utils.UserAuthorizationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,23 +29,10 @@ public class UserController {
         .body(userService.register(registerDTO));
   }
 
-//  // 로그인
-//  @PostMapping("/login")
-//  public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO,
-//      HttpServletRequest request) {
-//    return ResponseEntity.ok()
-//        .body(userService.login(loginDTO, request));
-//  }
-
   // 회원 정보 수정
   @PatchMapping("/account")
-  public ResponseEntity<String> updateAccount(@RequestBody @Valid UpdateDTO updateDTO,
-      HttpServletRequest request) {
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-    }
+  public ResponseEntity<String> updateAccount(@RequestBody @Valid UpdateDTO updateDTO) {
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     return ResponseEntity.ok()
         .body(userService.update(userId, updateDTO));
@@ -54,12 +40,8 @@ public class UserController {
 
   // 회원 탈퇴
   @DeleteMapping("/account")
-  public ResponseEntity<String> delete(HttpServletRequest request) {
-    Long userId = (Long) request.getSession().getAttribute("userId");
-
-    if (userId == null) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "로그인을 해주세요");
-    }
+  public ResponseEntity<String> delete() {
+    Long userId = UserAuthorizationUtil.getLoginUserId();
 
     return ResponseEntity.ok()
         .body(userService.delete(userId));

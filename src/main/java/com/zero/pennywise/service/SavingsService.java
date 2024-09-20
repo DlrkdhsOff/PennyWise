@@ -72,8 +72,6 @@ public class SavingsService {
 
     String maxExpenseCategory = analyzeDTO.getCategoryBalances().get(0).getCategoryName();
 
-
-
     return RecommendMessage.getMessage(totalIncome, totalExpenses, savingAccount, maxExpenseCategory);
   }
 

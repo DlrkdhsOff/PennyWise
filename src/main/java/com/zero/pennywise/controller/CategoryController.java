@@ -48,7 +48,7 @@ public class CategoryController {
         .body(categoryService.createCategory(userId, categoryDTO.getCategoryName()));
   }
 
-  // 카테고리 생성
+  // 카테고리 수정
   @PatchMapping("/categories")
   public ResponseEntity<String> updateCategory(@RequestBody @Valid UpdateCategoryDTO updateCategory) {
 

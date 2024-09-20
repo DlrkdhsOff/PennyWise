@@ -84,7 +84,7 @@ public class UserBalanceStepConfig {
         .getExpenses(userId, category.getCategoryId(), LocalDate.now().toString());
 
     Long amount = budget.getAmount();
-    totalExpenses = Math.max(0, amount - totalExpenses);
+    totalExpenses = amount - totalExpenses;
 
     return new BalancesDTO(category.getCategoryName(), amount, totalExpenses);
   }
