@@ -44,7 +44,7 @@ public class TransactionController {
   @GetMapping("/transaction")
   public ResponseEntity<TransactionPage> getTransactionList(
       @RequestParam(name = "categoryName", required = false) String categoryName,
-      @PageableDefault(page = 0, size = 10) Pageable page)
+      @PageableDefault(page = 1, size = 11) Pageable page)
   {
     Long userId = UserAuthorizationUtil.getLoginUserId();
 

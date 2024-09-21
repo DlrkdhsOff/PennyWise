@@ -30,7 +30,7 @@ public class CategoryController {
 
   // 카테고리 목록 출력
   @GetMapping("/categories")
-  public ResponseEntity<CategoriesPage> category( @PageableDefault(page = 0, size = 10) Pageable page) {
+  public ResponseEntity<CategoriesPage> category( @PageableDefault(page = 1, size = 11) Pageable page) {
 
     Long userId = UserAuthorizationUtil.getLoginUserId();
 

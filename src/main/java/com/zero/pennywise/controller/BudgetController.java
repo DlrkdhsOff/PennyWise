@@ -50,7 +50,7 @@ public class BudgetController {
 
   // 예산 목록
   @GetMapping("/budgets")
-  public ResponseEntity<BudgetPage> getbudget(@PageableDefault(page = 0, size = 10) Pageable page) {
+  public ResponseEntity<BudgetPage> getbudget(@PageableDefault(page = 1, size = 11) Pageable page) {
 
     Long userId = UserAuthorizationUtil.getLoginUserId();
 

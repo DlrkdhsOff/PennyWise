@@ -35,7 +35,7 @@ public class SavingsController {
   }
 
   @GetMapping("/savings")
-  public ResponseEntity<?> savings(@PageableDefault(page = 0, size = 10) Pageable page) {
+  public ResponseEntity<?> savings(@PageableDefault(page = 1, size = 11) Pageable page) {
 
     Long userId = UserAuthorizationUtil.getLoginUserId();
 

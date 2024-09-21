@@ -22,7 +22,7 @@ public class WaringMessageController {
 
   // 거래 목록 출력 (전체 / 카테고리별)
   @GetMapping("/waring-message")
-  public ResponseEntity<WaringMessagePage> getWaringMessageList(@PageableDefault(page = 0, size = 10) Pageable page)
+  public ResponseEntity<WaringMessagePage> getWaringMessageList(@PageableDefault(page = 1, size = 11) Pageable page)
   {
     Long userId = UserAuthorizationUtil.getLoginUserId();
 
