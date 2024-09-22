@@ -22,6 +22,7 @@ public class BudgetHandler {
     }
   }
 
+
   // 예산 새로 등록
   public BudgetEntity save(UserEntity user, CategoryEntity category, Long amount) {
     return budgetRepository.save(
