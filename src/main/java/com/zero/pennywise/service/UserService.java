@@ -39,6 +39,7 @@ public class UserService implements UserDetailsService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 가입된 전화번호 입니다.");
     }
 
+
     return "회원가입 성공";
   }
 
