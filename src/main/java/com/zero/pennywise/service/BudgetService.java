@@ -11,7 +11,6 @@ import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.budget.BalancesDTO;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
-import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.repository.BudgetRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

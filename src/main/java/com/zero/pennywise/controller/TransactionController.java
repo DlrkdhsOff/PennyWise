@@ -4,7 +4,6 @@ import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
-import com.zero.pennywise.model.response.transaction.TransactionPage;
 import com.zero.pennywise.service.TransactionService;
 import com.zero.pennywise.utils.UserAuthorizationUtil;
 import jakarta.validation.Valid;

@@ -1,6 +1,6 @@
 package com.zero.pennywise.model.request.category;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 public class UpdateCategoryDTO {
 
-  @NotBlank(message = "변경 전 카테고리명을 입력해주세요")
-  private String categoryName;
+  @NotEmpty(message = "변경 전 카테고리명을 입력해주세요")
+  private String beforecategoryName;
 
-  @NotBlank(message = "변경할 카테고리 명을 입력해주세요")
-  private String newCategoryName;
+  @NotEmpty(message = "변경할 카테고리 명을 입력해주세요")
+  private String afterCategoryName;
 
 }

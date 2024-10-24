@@ -4,7 +4,6 @@ import static com.zero.pennywise.utils.PageUtils.page;
 
 import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.request.category.CategoryDTO;
-import com.zero.pennywise.model.response.budget.BudgetPage;
 import com.zero.pennywise.service.BudgetService;
 import com.zero.pennywise.utils.UserAuthorizationUtil;
 import jakarta.validation.Valid;

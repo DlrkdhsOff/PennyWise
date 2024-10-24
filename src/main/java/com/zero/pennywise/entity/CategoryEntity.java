@@ -18,7 +18,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter
-@Setter
 public class CategoryEntity {
 
   @Id

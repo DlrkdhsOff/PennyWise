@@ -8,7 +8,6 @@ import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
-import com.zero.pennywise.model.response.transaction.TransactionPage;
 import com.zero.pennywise.model.response.transaction.TransactionsDTO;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;

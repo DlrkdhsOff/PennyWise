@@ -10,7 +10,6 @@ import com.zero.pennywise.enums.RecommendMessage;
 import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
 import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
-import com.zero.pennywise.model.response.savings.SavingsPage;
 import com.zero.pennywise.repository.querydsl.savings.SavingsQueryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
