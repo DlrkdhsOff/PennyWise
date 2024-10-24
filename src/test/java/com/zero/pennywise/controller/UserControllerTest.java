@@ -15,7 +15,7 @@
 //import com.zero.pennywise.model.request.account.UpdateDTO;
 //import com.zero.pennywise.entity.UserEntity;
 //import com.zero.pennywise.repository.UserRepository;
-//import com.zero.pennywise.service.UserService;
+//import com.zero.pennywise.service.impl.UserService;
 //import jakarta.transaction.Transactional;
 //import java.util.Optional;
 //import org.junit.jupiter.api.Test;

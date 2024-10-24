@@ -2,22 +2,27 @@ package com.zero.pennywise.model.response;
 
 import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.model.type.SuccessResultCode;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 
+@Getter
 public class ResultResponse {
 
-  private HttpStatus status;
-  private String message;
-  private Object data;
+  private final Integer code;
+  private final HttpStatus status;
+  private final String message;
+  private final Object data;
 
-  private ResultResponse(SuccessResultCode successResultCode, Object data) {
+  public ResultResponse(SuccessResultCode successResultCode, Object data) {
+    this.code = successResultCode.getStatus().value();
     this.status = successResultCode.getStatus();
     this.message = successResultCode.getMessage();
     this.data = data;
   }
 
-  private ResultResponse(FailedResultCode failedResultCode,  Object data) {
+  public ResultResponse(FailedResultCode failedResultCode,  Object data) {
+    this.code = failedResultCode.getStatus().value();
     this.status = failedResultCode.getStatus();
     this.message = failedResultCode.getMessage();
     this.data = data;

@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.request.account;
+package com.zero.pennywise.model.request.user;
 
 import com.zero.pennywise.entity.UserEntity;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class UserDetailsDTO implements UserDetails {
       @Override
       public String getAuthority() {
 
-        return userEntity.getRole();
+        return userEntity.getRole().toString();
       }
     });
 
@@ -38,10 +38,6 @@ public class UserDetailsDTO implements UserDetails {
   public String getUsername() {
 
     return userEntity.getEmail();
-  }
-
-  public Long getUserId() {
-    return userEntity.getId();
   }
 
   @Override
@@ -68,3 +64,4 @@ public class UserDetailsDTO implements UserDetails {
     return true;
   }
 }
+

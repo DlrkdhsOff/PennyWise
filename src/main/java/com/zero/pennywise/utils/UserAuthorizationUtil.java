@@ -1,7 +1,7 @@
 package com.zero.pennywise.utils;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.account.UserDetailsDTO;
+import com.zero.pennywise.model.request.user.UserDetailsDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
