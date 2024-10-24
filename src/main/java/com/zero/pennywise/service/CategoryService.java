@@ -1,82 +1,16 @@
 package com.zero.pennywise.service;
 
-import static com.zero.pennywise.utils.PageUtils.page;
-
-import com.zero.pennywise.component.handler.CategoryHandler;
-import com.zero.pennywise.component.handler.UserHandler;
-import com.zero.pennywise.entity.CategoryEntity;
-import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
-import com.zero.pennywise.model.response.category.CategoriesPage;
-import com.zero.pennywise.repository.CategoryRepository;
-import com.zero.pennywise.repository.querydsl.category.CategoryQueryRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.zero.pennywise.model.response.ResultResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
-@Service
-@RequiredArgsConstructor
-public class CategoryService {
+public interface CategoryService {
 
-  private final CategoryRepository categoryRepository;
-  private final CategoryQueryRepository categoryQueryRepository;
-  private final UserHandler userHandler;
-  private final CategoryHandler categoryHandler;
+  ResultResponse getCategoryList(int page, HttpServletRequest request);
 
-  // 카테고리 목록
-  public CategoriesPage getCategoryList(Long userId, Pageable page) {
-    UserEntity user = userHandler.getUserById(userId);
+  ResultResponse createCategory(String categoryName, HttpServletRequest request);
 
-    Pageable pageable = page(page);
+  ResultResponse updateCategory(UpdateCategoryDTO updateCategoryDTO, HttpServletRequest request);
 
-    Page<String> categories = categoryQueryRepository.getAllCategory(user.getId(), pageable);
-    return CategoriesPage.of(categories);
-  }
-
-
-  // 카테고리 생성
-  public String createCategory(Long userId, String categoryName) {
-    UserEntity user = userHandler.getUserById(userId);
-
-    categoryHandler.existsCategory(user.getId(), categoryName);
-
-    categoryRepository.save(CategoryEntity.builder()
-        .user(user)
-        .categoryName(categoryName)
-        .build());
-
-    return "카테고리를 생성하였습니다.";
-  }
-
-  // 카테고리 수정
-  @Transactional
-  public String updateCategory(Long userId, UpdateCategoryDTO updateCategory) {
-    UserEntity user = userHandler.getUserById(userId);
-
-    return categoryRepository.findByUserIdAndCategoryName(user.getId(), updateCategory.getCategoryName())
-        .map(category -> {
-          categoryHandler.updateCategory(user, category, updateCategory);
-
-          return "성공적으로 카테고리를 수정하였습니다.";
-        })
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));
-  }
-
-
-  // 카테고리 삭제
-  @Transactional
-  public String deleteCategory(Long userId, String categoryName) {
-    UserEntity user = userHandler.getUserById(userId);
-
-    return categoryRepository.findByUserIdAndCategoryName(user.getId(), categoryName)
-        .map(category -> {
-          categoryRepository.deleteByUserIdAndCategoryName(user.getId(), categoryName);
-          return "성공적으로 카테고리를 삭제하였습니다.";
-        })
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));
-  }
+  ResultResponse deleteCategory(String categoryName, HttpServletRequest request);
 }
