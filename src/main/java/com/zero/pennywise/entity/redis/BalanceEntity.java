@@ -1,6 +1,6 @@
 package com.zero.pennywise.entity.redis;
 
-import com.zero.pennywise.model.request.budget.BalancesDTO;
+import com.zero.pennywise.model.response.balances.Balances;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -16,9 +16,9 @@ import org.springframework.data.redis.core.RedisHash;
 public class BalanceEntity {
 
   @Id
-  private String userId;
+  private Long userId;
 
-  private List<BalancesDTO> balances = new ArrayList<>();
+  private List<Balances> balances = new ArrayList<>();
 
 }
 

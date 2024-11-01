@@ -20,6 +20,12 @@ public enum SuccessResultCode {
   SUCCESS_CREATE_CATEGORY(HttpStatus.CREATED, "카테고리 등록 성공!"),
   SUCCESS_UPDATE_CATEGORY(HttpStatus.OK, "카테고리 수정 성공!"),
   SUCCESS_DELETE_CATEGORY(HttpStatus.OK, "카테고리 삭제 성공!"),
+
+  // Budget
+  SUCCESS_GET_BUDGET_LIST(HttpStatus.CREATED, "예산 목록 조회 성공!"),
+  SUCCESS_CREATE_BUDGET(HttpStatus.CREATED, "예산 등록 성공!"),
+  SUCCESS_UPDATE_BUDGET(HttpStatus.CREATED, "예산 수정 성공!"),
+  SUCCESS_DELETE_BUDGET(HttpStatus.CREATED, "예산 삭제 성공!"),
   ;
 
   private final HttpStatus status;

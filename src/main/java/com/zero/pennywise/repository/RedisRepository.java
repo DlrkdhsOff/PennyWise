@@ -1,10 +1,11 @@
 package com.zero.pennywise.repository;
 
 import com.zero.pennywise.entity.redis.BalanceEntity;
+import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 public interface RedisRepository extends CrudRepository<BalanceEntity, Long> {
 
-  BalanceEntity findByUserId(String userId);
+  Optional<BalanceEntity> findByUserId(Long userId);
 
 }

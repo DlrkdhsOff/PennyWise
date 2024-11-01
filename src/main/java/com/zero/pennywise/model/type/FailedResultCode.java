@@ -17,6 +17,13 @@ public enum FailedResultCode {
   // Category
   CATEGORY_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 등록한 카테고리 입니다."),
   CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."),
+
+  // Budget
+  BUDGET_ALREADY_USED(HttpStatus.BAD_REQUEST, "이미 등록한 예산입니다."),
+  BUDGET_NOT_FOUND(HttpStatus.BAD_REQUEST, "예산을 찾을 수 없습니다."),
+
+  // Transaction
+  INVALID_TRANSACTION_TYPE(HttpStatus.BAD_REQUEST, "거래 타입을 정확하게 입력해주세요.")
   ;
 
   private final HttpStatus status;

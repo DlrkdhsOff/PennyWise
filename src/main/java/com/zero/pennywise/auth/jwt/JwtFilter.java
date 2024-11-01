@@ -25,14 +25,14 @@ public class JwtFilter extends OncePerRequestFilter {
       HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
+    log.info("request uri >>> {}", request.getRequestURI());
+
     // 인증이 필요없는 경로 토큰 검증 제외
     if (isExcludedPath(request.getRequestURI())) {
-
+      log.info("Is Exclude Path !!");
       filterChain.doFilter(request, response);
       return;
     }
-
-    log.info("request uri >>> {}", request.getRequestURI());
 
     // Header에서 Access-Token 추출
     String tokenHeader = request.getHeader(TokenType.ACCESS.getValue());
@@ -81,6 +81,10 @@ public class JwtFilter extends OncePerRequestFilter {
   private boolean isExcludedPath(String requestURI) {
     return requestURI.equals("/")
         || requestURI.equals("/api/v1/users/login")
-        || requestURI.equals("/api/v1/users/signup");
+        || requestURI.equals("/api/v1/users/signup")
+        || requestURI.equals("/v3/api-docs")
+        || requestURI.equals("/swagger-ui")
+        || requestURI.equals("/swagger-ui.html")
+        || requestURI.equals("/swagger-resources");
   }
 }

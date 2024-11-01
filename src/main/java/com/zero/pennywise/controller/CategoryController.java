@@ -1,15 +1,11 @@
 package com.zero.pennywise.controller;
 
-import com.zero.pennywise.model.request.category.CategoryDTO;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.service.CategoryService;
-import com.zero.pennywise.service.impl.CategoryServiceImpl;
-import com.zero.pennywise.utils.UserAuthorizationUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

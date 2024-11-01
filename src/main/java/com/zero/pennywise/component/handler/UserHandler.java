@@ -6,7 +6,6 @@ import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.SavingsRepository;
-import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ public class UserHandler {
 
   private final BCryptPasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
-  private final TransactionRepository transactionRepository;
   private final BudgetRepository budgetRepository;
   private final CategoryRepository categoryRepository;
   private final WaringMessageRepository waringMessageRepository;
@@ -71,7 +69,6 @@ public class UserHandler {
   // 회원 탈퇴시 나머지 데이터 삭제
   public void deleteAllUserData(Long userId) {
     budgetRepository.deleteAllByUserId(userId);
-    transactionRepository.deleteAllByUserId(userId);
     categoryRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
     savingsRepository.deleteAllByUserId(userId);

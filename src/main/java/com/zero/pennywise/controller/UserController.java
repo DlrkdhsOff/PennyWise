@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
   private final UserService userService;
@@ -33,6 +33,7 @@ public class UserController {
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
+  // 로그인
   @PostMapping("/login")
   public ResponseEntity<ResultResponse> login(
       @RequestBody @Valid LoginDTO loginDTO,
@@ -42,6 +43,7 @@ public class UserController {
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
+  // 회원정보 조회
   @GetMapping
   public ResponseEntity<ResultResponse> getUserInfo(HttpServletRequest request) {
 

@@ -1,4 +1,4 @@
-package com.zero.pennywise.model.request.budget;
+package com.zero.pennywise.model.response.balances;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BalancesDTO {
+public class Balances {
 
   private String categoryName;
   private Long amount;
