@@ -1,5 +1,6 @@
 package com.zero.pennywise.exception;
 
+import com.zero.pennywise.model.response.ResultResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,7 +23,8 @@ public class GlobalExceptionHandler {
 
 
   @ExceptionHandler(GlobalException.class)
-  public ResponseEntity<String> globalException(GlobalException ex) {
-    return ResponseEntity.status(ex.getStatus()).body(ex.getMessage());
+  public ResponseEntity<ResultResponse> handleGlobalException(GlobalException ex) {
+    ResultResponse resultResponse = ex.getResultResponse();
+    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 }

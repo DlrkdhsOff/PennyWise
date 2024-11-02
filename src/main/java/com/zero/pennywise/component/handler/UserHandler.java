@@ -2,72 +2,79 @@ package com.zero.pennywise.component.handler;
 
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
+import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.SavingsRepository;
-import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class UserHandler {
 
+  private final BCryptPasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
-  private final TransactionRepository transactionRepository;
   private final BudgetRepository budgetRepository;
   private final CategoryRepository categoryRepository;
   private final WaringMessageRepository waringMessageRepository;
   private final SavingsRepository savingsRepository;
 
+  // 이메일 검증
   public void validateEmail(String email) {
     if (userRepository.existsByEmail(email)) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디 입니다.");
+      throw new GlobalException(FailedResultCode.EMAIL_ALREADY_USED);
     }
   }
 
-  public UserEntity getUserById(Long userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."));
+  // 비밀번호 암호화
+  public String encodePassword(String password) {
+    return passwordEncoder.encode(password);
   }
 
+  // 이메일과 일치하는 User 객체 반환
   public UserEntity findByEmail(String email) {
     return userRepository.findByEmail(email)
-        .orElse(null);
+        .orElseThrow(() -> new GlobalException(FailedResultCode.USER_NOT_FOUND));
   }
 
-  // 전화 번호 유효성 확인
-  public void validatePhoneNumber(String phone) {
-    if (!phone.matches("^[0-9]+$")) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "전화번호에 유효하지 않은 문자가 포함되어 있습니다.");
-    } else if (phone.length() > 11) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST, "유효하지 않은 전화번호 입니다.");
+  // 비밀번호 검증
+  public void validatePassword(String password) {
+    if (!passwordEncoder.matches(password, encodePassword(password))) {
+      throw new GlobalException(FailedResultCode.PASSWORD_MISMATCH);
     }
   }
 
-  // 아이디와 일치하는 UserEntity 객체 반환
-  public UserEntity getUserByEmail(String email) {
-    return userRepository.findByEmail(email)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않은 아이디 입니다."));
+  // userId와 일치하는 User 객체 반환
+  public UserEntity findByUserId(long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(FailedResultCode.USER_NOT_FOUND));
   }
 
-  // 전화번호 formatting
-  public String formatPhoneNumber(String phoneNumber) {
-    return phoneNumber.substring(0, 3) + "-" +
-        phoneNumber.substring(3, 7) + "-" +
-        phoneNumber.substring(7);
+  // 닉네임 검증
+  public void validateNickname(String nickname) {
+    if (userRepository.existsByNickname(nickname)) {
+      throw new GlobalException(FailedResultCode.NICKNAME_ALREADY_USED);
+    }
+  }
+
+  // 회원 정보 저장
+  public void saveUser(UserEntity user) {
+    userRepository.save(user);
   }
 
   // 회원 탈퇴시 나머지 데이터 삭제
-  public void deleteOtherData(Long userId) {
+  public void deleteAllUserData(Long userId) {
     budgetRepository.deleteAllByUserId(userId);
-    transactionRepository.deleteAllByUserId(userId);
     categoryRepository.deleteAllByUserId(userId);
     waringMessageRepository.deleteAllByUserId(userId);
     savingsRepository.deleteAllByUserId(userId);
+    userRepository.deleteById(userId);
 
   }
+
+
 }

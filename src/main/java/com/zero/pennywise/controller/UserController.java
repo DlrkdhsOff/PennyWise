@@ -1,49 +1,72 @@
 package com.zero.pennywise.controller;
 
-import com.zero.pennywise.model.request.account.RegisterDTO;
-import com.zero.pennywise.model.request.account.UpdateDTO;
+import com.zero.pennywise.model.request.user.LoginDTO;
+import com.zero.pennywise.model.request.user.RegisterDTO;
+import com.zero.pennywise.model.request.user.UpdateDTO;
+import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.service.UserService;
-import com.zero.pennywise.utils.UserAuthorizationUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
   private final UserService userService;
 
   // 회원가입
-  @PostMapping("/register")
-  public ResponseEntity<String> register(@RequestBody @Valid RegisterDTO registerDTO) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(userService.register(registerDTO));
+  @PostMapping("/signup")
+  public ResponseEntity<ResultResponse> register(@RequestBody @Valid RegisterDTO registerDTO) {
+
+    ResultResponse resultResponse = userService.signup(registerDTO);
+    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
+  }
+
+  // 로그인
+  @PostMapping("/login")
+  public ResponseEntity<ResultResponse> login(
+      @RequestBody @Valid LoginDTO loginDTO,
+      HttpServletResponse response) {
+
+    ResultResponse resultResponse = userService.login(loginDTO, response);
+    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
+  }
+
+  // 회원정보 조회
+  @GetMapping
+  public ResponseEntity<ResultResponse> getUserInfo(HttpServletRequest request) {
+
+    ResultResponse resultResponse = userService.getUserInfo(request);
+    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
   // 회원 정보 수정
-  @PatchMapping("/account")
-  public ResponseEntity<String> updateAccount(@RequestBody @Valid UpdateDTO updateDTO) {
-    Long userId = UserAuthorizationUtil.getLoginUserId();
+  @PutMapping
+  public ResponseEntity<ResultResponse> updateUserInfo(
+      @RequestBody @Valid UpdateDTO updateDTO,
+      HttpServletRequest request) {
 
-    return ResponseEntity.ok()
-        .body(userService.update(userId, updateDTO));
+    ResultResponse resultResponse = userService.updateUserInfo(updateDTO, request);
+    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
   // 회원 탈퇴
-  @DeleteMapping("/account")
-  public ResponseEntity<String> delete() {
-    Long userId = UserAuthorizationUtil.getLoginUserId();
+  @DeleteMapping
+  public ResponseEntity<ResultResponse> deleteUser(HttpServletRequest request) {
 
-    return ResponseEntity.ok()
-        .body(userService.delete(userId));
+    ResultResponse resultResponse = userService.deleteUser(request);
+    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
+
 }

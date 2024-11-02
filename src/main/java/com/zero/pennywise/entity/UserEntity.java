@@ -1,10 +1,14 @@
 package com.zero.pennywise.entity;
 
+import com.zero.pennywise.model.type.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +20,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter
-@Setter
 public class UserEntity extends DateEntity{
 
   @Id
@@ -30,10 +33,8 @@ public class UserEntity extends DateEntity{
   private String password;
 
   @Column(nullable = false, length = 50)
-  private String username;
+  private String nickname;
 
-  @Column(nullable = false, unique = true)
-  private String phone;
-
-  private String role;
+  @Enumerated(EnumType.STRING)
+  private UserRole role;
 }
