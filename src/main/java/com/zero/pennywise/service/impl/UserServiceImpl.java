@@ -15,6 +15,8 @@ import com.zero.pennywise.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+  private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
   private final UserHandler userHandler;
   private final JwtUtil jwtUtil;
 
@@ -33,7 +36,7 @@ public class UserServiceImpl implements UserService {
     userHandler.validateEmail(registerDTO.getEmail());
 
     UserEntity user = UserEntity.builder()
-        .nickname(registerDTO.getEmail())
+        .email(registerDTO.getEmail())
         .password(userHandler.encodePassword(registerDTO.getPassword()))
         .nickname(registerDTO.getNickname())
         .role(UserRole.USER)
@@ -54,7 +57,7 @@ public class UserServiceImpl implements UserService {
     String access = jwtUtil.createJwt("access", user.getId(), UserRole.USER);
     String refresh = jwtUtil.createJwt("refresh", user.getId(), UserRole.USER);
 
-    response.addHeader(TokenType.ACCESS.getValue(), access);
+    response.addHeader(TokenType.ACCESS.getValue(), "Bearer " + access);
     response.addCookie(jwtUtil.setCookie(refresh));
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_LOGIN);
@@ -63,6 +66,7 @@ public class UserServiceImpl implements UserService {
   // 회원 정보 조회
   @Override
   public ResultResponse getUserInfo(HttpServletRequest request) {
+    log.info("-----------------");
     Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
     UserEntity user = userHandler.findByUserId(userId);
 

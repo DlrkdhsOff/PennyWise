@@ -36,15 +36,21 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable);
     http
-        .authorizeHttpRequests(auth ->
-            auth.requestMatchers(
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/swagger-resources/**"
+            ).permitAll()
+            .requestMatchers(
                 "/",
-                "api/v1/user/register",
-                "login").permitAll()
+                "/api/v1/users/signup",
+                "/api/v1/users/login"
+            ).permitAll()
             .anyRequest().authenticated());
     http
-        .addFilterBefore(new JwtFilter(jwtUtil),
-            UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
     http
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

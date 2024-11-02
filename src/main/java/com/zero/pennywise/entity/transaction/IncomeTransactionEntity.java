@@ -1,6 +1,6 @@
-package com.zero.pennywise.entity;
+package com.zero.pennywise.entity.transaction;
 
-import com.zero.pennywise.enums.TransactionStatus;
+import com.zero.pennywise.enums.TransactionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,40 +9,32 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity(name = "transactions")
+@Entity(name = "income_transactions")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
-public class TransactionEntity {
+public class IncomeTransactionEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long transactionId;
+  private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private UserEntity user;
-
-  @Column(nullable = false)
-  private Long categoryId;
+  @ManyToOne (fetch = FetchType.LAZY)
+  private TransactionEntity transaction;
 
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private TransactionStatus type;
+  private TransactionType type;
 
-  @Column(nullable = false)
-  private Long amount;
+  private long amount;
 
   private String description;
 

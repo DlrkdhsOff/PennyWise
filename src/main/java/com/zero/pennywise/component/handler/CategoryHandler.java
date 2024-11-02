@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class CategoryHandler {
 
   private final CategoryRepository categoryRepository;
-  private final RedisHandler redisHandler;
+//  private final RedisHandler redisHandler;
 
   // 모든 카테고리 조회
   public PageResponse<String> getAllCategoryList(UserEntity user, int page) {
@@ -50,20 +50,20 @@ public class CategoryHandler {
   }
 
 
-  public CategoryEntity getCateogryByUserIdAndId(Long userId, Long categoryId) {
-    return categoryRepository.findByUserIdAndCategoryId(userId, categoryId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));
-  }
-
-
-  public void updateCategory(UserEntity user, CategoryEntity category, UpdateCategoryDTO updateCategory) {
-
-    existsCategory(user.getId(), updateCategory.getNewCategoryName());
-
-    redisHandler.updateCategoryName(user.getId(), category.getCategoryName(), updateCategory.getNewCategoryName());
-    category.setCategoryName(updateCategory.getNewCategoryName());
-    categoryRepository.save(category);
-  }
+//  public CategoryEntity getCateogryByUserIdAndId(Long userId, Long categoryId) {
+//    return categoryRepository.findByUserIdAndCategoryId(userId, categoryId)
+//        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."));
+//  }
+//
+//
+//  public void updateCategory(UserEntity user, CategoryEntity category, UpdateCategoryDTO updateCategory) {
+//
+//    existsCategory(user.getId(), updateCategory.getNewCategoryName());
+//
+//    redisHandler.updateCategoryName(user.getId(), category.getCategoryName(), updateCategory.getNewCategoryName());
+//    category.setCategoryName(updateCategory.getNewCategoryName());
+//    categoryRepository.save(category);
+//  }
 
 
   // 카테고리 저장
