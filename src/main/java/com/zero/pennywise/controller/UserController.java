@@ -68,4 +68,5 @@ public class UserController {
     ResultResponse resultResponse = userService.deleteUser(request);
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
+
 }
