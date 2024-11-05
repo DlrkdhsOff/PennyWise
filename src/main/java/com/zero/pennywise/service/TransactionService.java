@@ -1,11 +1,18 @@
 package com.zero.pennywise.service;
 
+import com.zero.pennywise.model.request.transaction.TransactionDTO;
+import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
+import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface TransactionService {
 
-  ResultResponse getAllTransactionList(int page, HttpServletRequest request);
+  ResultResponse getTransactionInfo(TransactionInfoDTO transactionInfoDTO, int page, HttpServletRequest request);
 
-  ResultResponse getTransactionList(String categoryName, int page, HttpServletRequest request);
+  ResultResponse setTransaction(TransactionDTO transactionDTO, HttpServletRequest request);
+
+  ResultResponse updateTransaction(UpdateTransactionDTO updateTransactionDTO, HttpServletRequest request);
+
+  ResultResponse deleteTransaction(Long trasactionId, HttpServletRequest request);
 }

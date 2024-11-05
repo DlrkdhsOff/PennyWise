@@ -3,9 +3,11 @@ package com.zero.pennywise.component.handler;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.type.FailedResultCode;
+import com.zero.pennywise.repository.BalanceRepository;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.SavingsRepository;
+import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ public class UserHandler {
   private final UserRepository userRepository;
   private final BudgetRepository budgetRepository;
   private final CategoryRepository categoryRepository;
+  private final TransactionRepository transactionRepository;
+  private final BalanceRepository balanceRepository;
   private final WaringMessageRepository waringMessageRepository;
   private final SavingsRepository savingsRepository;
 
@@ -67,12 +71,14 @@ public class UserHandler {
   }
 
   // 회원 탈퇴시 나머지 데이터 삭제
-  public void deleteAllUserData(Long userId) {
-    budgetRepository.deleteAllByUserId(userId);
-    categoryRepository.deleteAllByUserId(userId);
-    waringMessageRepository.deleteAllByUserId(userId);
-    savingsRepository.deleteAllByUserId(userId);
-    userRepository.deleteById(userId);
+  public void deleteAllUserData(UserEntity user) {
+    budgetRepository.deleteAllByUser(user);
+    balanceRepository.deleteAllByUser(user);
+    transactionRepository.deleteAllByUser(user);
+    categoryRepository.deleteAllByUser(user);
+    waringMessageRepository.deleteAllByUser(user);
+    savingsRepository.deleteAllByUser(user);
+    userRepository.delete(user);
 
   }
 

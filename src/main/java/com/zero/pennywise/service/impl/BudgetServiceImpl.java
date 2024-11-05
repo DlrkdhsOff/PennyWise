@@ -1,104 +1,95 @@
-//package com.zero.pennywise.service.impl;
-//
-//import com.zero.pennywise.auth.jwt.JwtUtil;
-//import com.zero.pennywise.component.handler.BudgetHandler;
-//import com.zero.pennywise.component.handler.CategoryHandler;
-//import com.zero.pennywise.component.handler.RedisHandler;
-//import com.zero.pennywise.component.handler.UserHandler;
-//import com.zero.pennywise.entity.BudgetEntity;
-//import com.zero.pennywise.entity.CategoryEntity;
-//import com.zero.pennywise.entity.UserEntity;
-//import com.zero.pennywise.model.request.budget.BudgetDTO;
-//import com.zero.pennywise.model.response.ResultResponse;
-//import com.zero.pennywise.model.response.balances.Balances;
-//import com.zero.pennywise.model.response.page.PageResponse;
-//import com.zero.pennywise.model.type.SuccessResultCode;
-//import com.zero.pennywise.model.type.TokenType;
-//import com.zero.pennywise.repository.BudgetRepository;
-//import com.zero.pennywise.service.BudgetService;
-//import jakarta.servlet.http.HttpServletRequest;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class BudgetServiceImpl implements BudgetService {
-//
-//  private final JwtUtil jwtUtil;
-//  private final UserHandler userHandler;
-////  private final RedisHandler redisHandler;
-//  private final BudgetHandler budgetHandler;
-//  private final CategoryHandler categoryHandler;
-//
-//  // 예산 목록
-//  @Override
-//  public ResultResponse getBudget(int page, HttpServletRequest request) {
-//    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-//    UserEntity user = userHandler.findByUserId(userId);
-//
-//    PageResponse<Balances> response = redisHandler.getBalance(user, page);
-//    return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
-//  }
-//
-//  // 카테고리별 예산 설정
-//  @Override
-//  public ResultResponse createBudget(BudgetDTO budgetDTO, HttpServletRequest request) {
-//
-//    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-//    UserEntity user = userHandler.findByUserId(userId);
-//
-//    CategoryEntity category = categoryHandler.findCategory(user, budgetDTO.getCategoryName());
-//
-//    budgetHandler.validateBudget(user, category);
-//    BudgetEntity budget = BudgetEntity.builder()
-//        .user(user)
-//        .category(category)
-//        .amount(budgetDTO.getAmount())
-//        .build();
-//
-//    budgetHandler.saveBudget(budget);
-//
-//    redisHandler.addNewBudget(user.getId(), budget, category.getCategoryName());
-//    return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_BUDGET);
-//  }
-//
-//  // 카테고리별 예산 수정
-//  @Transactional
-//  public ResultResponse updateBudget(BudgetDTO budgetDTO, HttpServletRequest request) {
-//    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-//    UserEntity user = userHandler.findByUserId(userId);
-//
-//    CategoryEntity category = categoryHandler.findCategory(user, budgetDTO.getCategoryName());
-//
-//    BudgetEntity budget = budgetHandler.findBudget(user, category);
-//    redisHandler.updateBudget(user.getId(), budget.getAmount(), budgetDTO.getAmount(), budgetDTO.getCategoryName());
-//
-//    BudgetEntity newBudget = BudgetEntity.builder()
-//        .budgetId(budget.getBudgetId())
-//        .user(budget.getUser())
-//        .category(category)
-//        .amount(budgetDTO.getAmount())
-//        .build();
-//
-//    budgetHandler.saveBudget(newBudget);
-//
-//    return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_BUDGET);
-//  }
-//
-//  // 예산 삭제
-//  @Override
-//  @Transactional
-//  public ResultResponse deleteBudget(String categoryName, HttpServletRequest request) {
-//    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-//    UserEntity user = userHandler.findByUserId(userId);
-//
-//    CategoryEntity category = categoryHandler.findCategory(user, categoryName);
-//    BudgetEntity budget = budgetHandler.findBudget(user, category);
-//
-//    budgetHandler.deleteBudget(budget);
-//
-//    redisHandler.deleteBalance(userId, category.getCategoryName());
-//    return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_BUDGET);
-//  }
-//}
+package com.zero.pennywise.service.impl;
+
+import com.zero.pennywise.auth.jwt.JwtUtil;
+import com.zero.pennywise.component.handler.BudgetHandler;
+import com.zero.pennywise.component.handler.CategoryHandler;
+import com.zero.pennywise.component.handler.UserHandler;
+import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoryEntity;
+import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
+import com.zero.pennywise.model.request.budget.UpdateBudgetDTO;
+import com.zero.pennywise.model.response.ResultResponse;
+import com.zero.pennywise.model.response.budget.Budgets;
+import com.zero.pennywise.model.response.page.PageResponse;
+import com.zero.pennywise.model.type.SuccessResultCode;
+import com.zero.pennywise.model.type.TokenType;
+import com.zero.pennywise.service.BudgetService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class BudgetServiceImpl implements BudgetService {
+
+  private final JwtUtil jwtUtil;
+  private final UserHandler userHandler;
+  private final BudgetHandler budgetHandler;
+  private final CategoryHandler categoryHandler;
+
+  // 요청 헤더에서 사용자 정보를 추출하여 반환
+  private UserEntity fetchUser(HttpServletRequest request) {
+    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
+    return userHandler.findByUserId(userId);
+  }
+
+  // 사용자와 카테고리 이름으로 카테고리 엔티티 조회
+  private CategoryEntity fetchCategory(UserEntity user, String categoryName) {
+    return categoryHandler.findCategory(user, categoryName);
+  }
+
+  // 예산 목록 조회
+  @Override
+  public ResultResponse getBudget(String categoryName, int page, HttpServletRequest request) {
+    UserEntity user = fetchUser(request);
+    PageResponse<Budgets> response = budgetHandler.getBudgetInfo(user, categoryName, page);
+    return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
+  }
+
+  // 새로운 예산 등록
+  @Override
+  public ResultResponse createBudget(BudgetDTO budgetDTO, HttpServletRequest request) {
+    UserEntity user = fetchUser(request);
+    CategoryEntity category = fetchCategory(user, budgetDTO.getCategoryName());
+
+    // 예산 중복 검증
+    budgetHandler.validateBudget(user, category);
+
+    // 예산 엔티티 생성 및 저장
+    BudgetEntity budget = BudgetDTO.of(user, category, budgetDTO);
+    budgetHandler.saveBudget(budget);
+
+    return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_BUDGET);
+  }
+
+  // 기존 예산 수정
+  @Transactional
+  public ResultResponse updateBudget(UpdateBudgetDTO updateBudgetDTO, HttpServletRequest request) {
+    UserEntity user = fetchUser(request);
+    CategoryEntity category = fetchCategory(user, updateBudgetDTO.getCategoryName());
+
+    // 예산 중복 검증
+    budgetHandler.validateBudget(user, category);
+
+    // 수정된 예산 정보 저장
+    BudgetEntity newBudget = UpdateBudgetDTO.of(user, category, updateBudgetDTO);
+    budgetHandler.saveBudget(newBudget);
+
+    return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_BUDGET);
+  }
+
+  // 예산 삭제
+  @Override
+  @Transactional
+  public ResultResponse deleteBudget(Long budgetId, HttpServletRequest request) {
+    UserEntity user = fetchUser(request);
+
+    // 예산 존재 여부 검증 및 삭제
+    BudgetEntity budget = budgetHandler.findBudgetById(budgetId, user);
+    budgetHandler.deleteBudget(budget);
+
+    return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_BUDGET);
+  }
+}

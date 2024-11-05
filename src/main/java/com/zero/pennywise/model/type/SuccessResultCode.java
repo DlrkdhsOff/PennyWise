@@ -26,6 +26,12 @@ public enum SuccessResultCode {
   SUCCESS_CREATE_BUDGET(HttpStatus.CREATED, "예산 등록 성공!"),
   SUCCESS_UPDATE_BUDGET(HttpStatus.CREATED, "예산 수정 성공!"),
   SUCCESS_DELETE_BUDGET(HttpStatus.CREATED, "예산 삭제 성공!"),
+
+  // Transaction
+  SUCCESS_CREATE_TRANSACTION(HttpStatus.CREATED, "거래 등록 성공!"),
+  SUCCESS_GET_TRANSACTION_INFO(HttpStatus.OK, "거래 목록 조회 성공!"),
+  SUCCESS_UPDATE_TRANSACTION(HttpStatus.CREATED, "거래 수정 성공!"),
+  SUCCESS_DELETE_TRANSACTION(HttpStatus.CREATED, "거래 삭제 성공!"),
   ;
 
   private final HttpStatus status;

@@ -8,23 +8,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity(name = "savings")
+@Entity(name = "Balance")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
-public class SavingsEntity extends DateEntity{
-
+public class BalanceEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long Id;
+  private Long balance;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
@@ -34,14 +31,33 @@ public class SavingsEntity extends DateEntity{
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 
-  @Column(unique = true)
-  private String name;
+  @Column(nullable = false)
+  private Long totalIncomeAmount;
 
-  private Long amount;
+  @Column(nullable = false)
+  private Long totalExpensesAmount;
 
-  private String description;
+  @Column(nullable = false)
+  private String recordMonth;
 
-  private LocalDate startDate;
 
-  private LocalDate endDate;
+  // 수입 금액 추가
+  public void addIncomeAmount(Long amount) {
+    this.totalIncomeAmount += amount;
+  }
+
+  // 지출 금액 추가
+  public void addExpensesAmount(Long amount) {
+    this.totalExpensesAmount += amount;
+  }
+
+  // 수입 금액 차감
+  public void subtractIncomeAmount(Long amount) {
+    this.totalIncomeAmount -= amount;
+  }
+
+  // 지출 금액 차감
+  public void subtractExpensesAmount(Long amount) {
+    this.totalExpensesAmount -= amount;
+  }
 }
