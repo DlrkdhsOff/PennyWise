@@ -11,14 +11,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity(name = "category")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
-public class CategoryEntity {
+public class CategoryEntity extends DateEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

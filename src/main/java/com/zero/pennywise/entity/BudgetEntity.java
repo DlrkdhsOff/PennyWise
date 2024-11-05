@@ -19,18 +19,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter
-@Setter
 public class BudgetEntity extends DateEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long budgetId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 

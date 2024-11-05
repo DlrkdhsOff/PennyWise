@@ -1,6 +1,6 @@
 //package com.zero.pennywise.config.batch.step;
 //
-//import com.zero.pennywise.entity.transaction.TransactionEntity;
+//import com.zero.pennywise.entity.TransactionEntity;
 //import com.zero.pennywise.enums.TransactionStatus;
 //import com.zero.pennywise.repository.TransactionRepository;
 //import java.time.LocalDate;

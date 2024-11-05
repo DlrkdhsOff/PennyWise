@@ -1,28 +1,13 @@
-//package com.zero.pennywise.repository.querydsl.transaction;
-//
-//import com.zero.pennywise.entity.UserEntity;
-//import com.zero.pennywise.model.response.transaction.Transactions;
-//import com.zero.pennywise.model.response.transaction.TransactionsDTO;
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.stereotype.Repository;
-//
-//@Repository
-//public interface TransactionQueryRepository {
-//
-//  List<Transactions> findAllTransaction(UserEntity user);
-//
-//  Page<TransactionsDTO> getAllTransaction(UserEntity user, String categoryName, Pageable page);
-//
-//  Long getExpensesAvgLastThreeMonth(Long userId, Long categoryId, LocalDateTime startDateTime, LocalDateTime endDateTime);
-//
-//  Long getExpenses(Long userId, Long categoryId, String thisMonths);
-//
-//  Long getCurrentAmount(UserEntity user, Long categoryId, String description);
-//
-//  void endSavings(Long userId, Long categoryId, String description);
-//
-//  Long getIncomeAvgLastThreeMonth(Long userId, LocalDateTime startDateTime, LocalDateTime endDateTime);
-//}
+package com.zero.pennywise.repository.querydsl.transaction;
+
+import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
+import com.zero.pennywise.model.response.page.PageResponse;
+import com.zero.pennywise.model.response.transaction.Transactions;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TransactionQueryRepository {
+
+  PageResponse<Transactions> getTransactionInfo(UserEntity user, TransactionInfoDTO transactionInfoDTO, int page);
+}

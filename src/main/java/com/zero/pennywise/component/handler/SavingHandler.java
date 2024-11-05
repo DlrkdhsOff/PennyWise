@@ -2,7 +2,7 @@
 //
 //import com.zero.pennywise.entity.CategoryEntity;
 //import com.zero.pennywise.entity.SavingsEntity;
-//import com.zero.pennywise.entity.transaction.TransactionEntity;
+//import com.zero.pennywise.entity.TransactionEntity;
 //import com.zero.pennywise.entity.UserEntity;
 //import com.zero.pennywise.enums.TransactionStatus;
 //import com.zero.pennywise.exception.GlobalException;

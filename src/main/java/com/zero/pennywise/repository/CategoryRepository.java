@@ -18,13 +18,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
   Optional<CategoryEntity> findByUserAndCategoryName(UserEntity user, String categoryName);
 
-  Optional<CategoryEntity> findByUserIdAndCategoryId(Long userId, Long cateogryId);
-
-
-  void deleteByUserIdAndCategoryName(Long userId, String categoryName);
-
-  List<CategoryEntity> findAllByUserId(Long userId);
-
-  void deleteAllByUserId(Long userId);
+  void deleteAllByUser(UserEntity user);
 
 }

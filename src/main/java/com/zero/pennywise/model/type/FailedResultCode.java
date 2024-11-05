@@ -23,7 +23,8 @@ public enum FailedResultCode {
   BUDGET_NOT_FOUND(HttpStatus.BAD_REQUEST, "예산을 찾을 수 없습니다."),
 
   // Transaction
-  INVALID_TRANSACTION_TYPE(HttpStatus.BAD_REQUEST, "거래 타입을 정확하게 입력해주세요.")
+  INVALID_TRANSACTION_TYPE(HttpStatus.BAD_REQUEST, "거래 타입을 정확하게 입력해주세요."),
+  TRANSACTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "거래를 찾을 수 없습니다."),
   ;
 
   private final HttpStatus status;

@@ -20,7 +20,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Getter
-@Setter
 public class SavingsEntity extends DateEntity{
 
   @Id

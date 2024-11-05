@@ -24,7 +24,7 @@ public class UserEntity extends DateEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long userId;
 
   @Column(length = 50, unique = true)
   private String email;

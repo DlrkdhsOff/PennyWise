@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService {
     UserEntity user = userHandler.findByEmail(loginDTO.getEmail());
     userHandler.validatePassword(loginDTO.getPassword());
 
-    String access = jwtUtil.createJwt("access", user.getId(), UserRole.USER);
-    String refresh = jwtUtil.createJwt("refresh", user.getId(), UserRole.USER);
+    String access = jwtUtil.createJwt("access", user.getUserId(), UserRole.USER);
+    String refresh = jwtUtil.createJwt("refresh", user.getUserId(), UserRole.USER);
 
     response.addHeader(TokenType.ACCESS.getValue(), "Bearer " + access);
     response.addCookie(jwtUtil.setCookie(refresh));
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
     userHandler.validateNickname(updateDTO.getNickname());
 
     UserEntity updateUser = UserEntity.builder()
-        .id(user.getId())
+        .userId(user.getUserId())
         .email(user.getEmail())
         .password(userHandler.encodePassword(updateDTO.getAfterPassword()))
         .nickname(updateDTO.getNickname())
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
     Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
     UserEntity user = userHandler.findByUserId(userId);
 
-    userHandler.deleteAllUserData(user.getId());
+    userHandler.deleteAllUserData(user);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_USER_INFO);
   }
