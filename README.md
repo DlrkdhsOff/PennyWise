@@ -74,7 +74,8 @@
 
 
 ## ERD
-![image](https://github.com/user-attachments/assets/d5e864cd-f02b-48d6-8731-025e5ad868cf)
+![PennyWise_ERD](https://github.com/user-attachments/assets/0d1924f1-ffeb-4704-a7c1-4373a3ccb87b)
+
 
 
 
