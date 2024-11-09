@@ -24,7 +24,7 @@ public class SavingsEntity extends DateEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long Id;
+  private Long savingId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
@@ -35,7 +35,7 @@ public class SavingsEntity extends DateEntity{
   private CategoryEntity category;
 
   @Column(unique = true)
-  private String name;
+  private String savingName;
 
   private Long amount;
 

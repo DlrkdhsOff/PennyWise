@@ -1,7 +1,10 @@
 package com.zero.pennywise.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zero.pennywise.auth.jwt.JwtUtil;
 import com.zero.pennywise.model.response.waring.MessageDTO;
+import com.zero.pennywise.model.type.TokenType;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +22,19 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class NotificationService implements MessageListener {
 
+  private final JwtUtil jwtUtil;
   private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
   private final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
-  public SseEmitter createEmitter(Long userId) {
+  // 요청 헤더에서 사용자 정보를 추출하여 반환
+  private Long fetchUser(HttpServletRequest request) {
+    return jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
+  }
+
+  public SseEmitter createEmitter(HttpServletRequest request) {
+
+    Long userId = fetchUser(request);
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
     emitters.put(userId, emitter);
 

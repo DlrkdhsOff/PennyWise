@@ -29,6 +29,12 @@ public class UserServiceImpl implements UserService {
   private final UserHandler userHandler;
   private final JwtUtil jwtUtil;
 
+  // 요청 헤더에서 사용자 정보를 추출하여 반환
+  private UserEntity fetchUser(HttpServletRequest request) {
+    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
+    return userHandler.findByUserId(userId);
+  }
+
   // 회원 가입
   @Override
   public ResultResponse signup(RegisterDTO registerDTO) {
@@ -66,9 +72,7 @@ public class UserServiceImpl implements UserService {
   // 회원 정보 조회
   @Override
   public ResultResponse getUserInfo(HttpServletRequest request) {
-    log.info("-----------------");
-    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-    UserEntity user = userHandler.findByUserId(userId);
+    UserEntity user = fetchUser(request);
 
     UserInfo userInfo = new UserInfo(user.getEmail(), user.getNickname());
 
@@ -79,8 +83,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResultResponse updateUserInfo(UpdateDTO updateDTO, HttpServletRequest request) {
 
-    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-    UserEntity user = userHandler.findByUserId(userId);
+    UserEntity user = fetchUser(request);
 
     userHandler.validatePassword(updateDTO.getBeforePassword());
     userHandler.validateNickname(updateDTO.getNickname());
@@ -103,8 +106,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public ResultResponse deleteUser(HttpServletRequest request) {
-    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-    UserEntity user = userHandler.findByUserId(userId);
+    UserEntity user = fetchUser(request);
 
     userHandler.deleteAllUserData(user);
 

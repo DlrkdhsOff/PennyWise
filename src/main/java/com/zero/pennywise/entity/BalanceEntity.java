@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class BalanceEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long balance;
+  private Long balanceId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
