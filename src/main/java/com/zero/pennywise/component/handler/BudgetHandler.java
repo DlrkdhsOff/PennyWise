@@ -4,18 +4,12 @@ import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.response.balances.Balances;
 import com.zero.pennywise.model.response.budget.Budgets;
 import com.zero.pennywise.model.response.page.PageResponse;
-import com.zero.pennywise.model.response.transaction.Transactions;
 import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component

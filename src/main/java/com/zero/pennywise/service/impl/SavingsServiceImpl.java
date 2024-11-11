@@ -1,81 +1,45 @@
 package com.zero.pennywise.service.impl;
 
 
+import com.zero.pennywise.auth.jwt.JwtUtil;
+import com.zero.pennywise.component.handler.SavingHandler;
 import com.zero.pennywise.component.handler.UserHandler;
-import com.zero.pennywise.entity.CategoryEntity;
-import com.zero.pennywise.entity.SavingsEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.enums.RecommendMessage;
-import com.zero.pennywise.model.request.savings.DeleteSavingsDTO;
-import com.zero.pennywise.model.request.savings.SavingsDTO;
 import com.zero.pennywise.model.response.ResultResponse;
-import com.zero.pennywise.model.response.analyze.AnalyzeDTO;
-import com.zero.pennywise.repository.querydsl.savings.SavingsQueryRepository;
+import com.zero.pennywise.model.response.balances.Balances;
+import com.zero.pennywise.model.response.savings.RecommendSavings;
+import com.zero.pennywise.model.type.SuccessResultCode;
+import com.zero.pennywise.model.type.TokenType;
 import com.zero.pennywise.service.SavingsService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SavingsServiceImpl implements SavingsService {
 
+  private final JwtUtil jwtUtil;
   private final UserHandler userHandler;
-  private final SavingsQueryRepository savingsQueryRepository;
+  private final SavingHandler savingHandler;
 
-  @Override
-  public ResultResponse setSavings(SavingsDTO savingsDTO) {
-    return null;
+  // 요청 헤더에서 사용자 정보를 추출하여 반환
+  private UserEntity fetchUser(HttpServletRequest request) {
+    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
+    return userHandler.findByUserId(userId);
   }
 
-//  // 저축 정보 등록
-//  public String setSavings(Long userId, SavingsDTO savingsDTO) {
-//    UserEntity user = userHandler.getUserById(userId);
-//
-//    savingHandler.save(user, savingsDTO);
-//
-//    return "성공적으로 저축 정보를 등록하였습니다. ";
-//  }
-//
-//  // 저축 정보 조회
-//  public SavingsPage getSavings(Long userId, Pageable page) {
-//    UserEntity user = userHandler.getUserById(userId);
-//
-//    CategoryEntity category = savingHandler.getCategory(user);
-//
-//    return SavingsPage.of(savingsQueryRepository
-//        .getAllSavings(user.getId(), page, category.getCategoryId()));
-//  }
-//
-//  // 저축 정보 삭제
-//  public String deleteSavings(Long userId, DeleteSavingsDTO deleteSavingsDTO) {
-//    UserEntity user = userHandler.getUserById(userId);
-//
-//    SavingsEntity savings = savingHandler.getSavings(user, deleteSavingsDTO.getName());
-//    savingHandler.endDeposit(user, savings);
-//
-//    return "저축 정보를 삭제 하였습니다.";
-//  }
-//
-//  public String recommend(Long userId) {
-//    UserEntity user = userHandler.getUserById(userId);
-//
-//    Long totalIncome = analyzeHandler.getTotalIncome(userId);
-//    AnalyzeDTO analyzeDTO = analyzeHandler.getLastThreeMonthBalance(userId);
-//
-//    Long totalExpenses = analyzeDTO.getTotalExpenses();
-//    List<SavingsEntity> savingsList = savingHandler.getAllSavings(userId);
-//
-//    Long savingAccount = null;
-//    if (savingsList != null) {
-//      savingAccount = savingsList.stream().mapToLong(SavingsEntity::getAmount).sum();
-//    }
-//
-//    String maxExpenseCategory = analyzeDTO.getCategoryBalances().get(0).getCategoryName();
-//
-//    return RecommendMessage.getMessage(totalIncome, totalExpenses, savingAccount, maxExpenseCategory);
-//  }
+  @Override
+  public ResultResponse recommend(HttpServletRequest request) {
+    UserEntity user = fetchUser(request);
 
+    List<Balances> recentAvgList = savingHandler.getRecentAvg(user);
 
+    RecommendSavings recommend = savingHandler.recommend(recentAvgList);
+
+    return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, recommend);
+  }
 }

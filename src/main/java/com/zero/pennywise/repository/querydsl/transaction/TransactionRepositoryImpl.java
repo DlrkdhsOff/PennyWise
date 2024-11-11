@@ -2,8 +2,8 @@ package com.zero.pennywise.repository.querydsl.transaction;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.zero.pennywise.entity.QTransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.entity.transaction.QTransactionEntity;
 import com.zero.pennywise.enums.TransactionType;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
 import com.zero.pennywise.model.response.page.PageResponse;

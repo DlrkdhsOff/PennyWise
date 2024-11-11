@@ -24,7 +24,11 @@ public enum FailedResultCode {
 
   // Transaction
   INVALID_TRANSACTION_TYPE(HttpStatus.BAD_REQUEST, "거래 타입을 정확하게 입력해주세요."),
-  TRANSACTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "거래를 찾을 수 없습니다."),
+  TRANSACTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "거래 내역이 존재하지 않습니다."),
+
+  // Balance
+  AVERAGE_INCOME_TOO_LOW(HttpStatus.BAD_REQUEST, "평균 수입 금액이 너무 적습니다.");
+
   ;
 
   private final HttpStatus status;
