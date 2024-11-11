@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: dlrkdhsoff
+      MYSQL_DATABASE: pennywise
+    volumes:
+      - /Users/kaon/Devleop/Database/Docker-Mysql/mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306

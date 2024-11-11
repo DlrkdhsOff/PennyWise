@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pennywise
+    username: root
+    password: dlrkdhsoff
+
+  jwt:
+    secret:
+      key: KU1MrpjZAhmPgnD6pfZ6pVFfOFL8yVuQ7/rQDki/iVkzesH8782X9s656q1txnhzkg1I40ovzcpgXCUHD40/qQ==
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
