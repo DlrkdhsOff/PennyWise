@@ -3,14 +3,12 @@ package com.zero.pennywise.component.handler;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.response.page.PageResponse;
 import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.CategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component

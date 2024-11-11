@@ -1,8 +1,8 @@
 package com.zero.pennywise.model.request.transaction;
 
 import com.zero.pennywise.entity.CategoryEntity;
-import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.entity.TransactionEntity;
+import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.enums.TransactionType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,6 +1,5 @@
 package com.zero.pennywise.model.response.balances;
 
-import com.zero.pennywise.entity.CategoryEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

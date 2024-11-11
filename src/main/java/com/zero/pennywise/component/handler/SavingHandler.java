@@ -9,7 +9,6 @@ import com.zero.pennywise.model.type.SavingsMessage;
 import com.zero.pennywise.repository.querydsl.balance.BalanceQueryRepository;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

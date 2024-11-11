@@ -1,16 +1,13 @@
 package com.zero.pennywise.repository.querydsl.balance;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.QBalanceEntity;
-import com.zero.pennywise.entity.QCategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.balances.Balances;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
