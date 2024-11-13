@@ -24,7 +24,6 @@ public class UserHandler {
   private final TransactionRepository transactionRepository;
   private final BalanceRepository balanceRepository;
   private final WaringMessageRepository waringMessageRepository;
-  private final SavingsRepository savingsRepository;
 
   // 이메일 검증
   public void validateEmail(String email) {
@@ -76,7 +75,6 @@ public class UserHandler {
     transactionRepository.deleteAllByUser(user);
     categoryRepository.deleteAllByUser(user);
     waringMessageRepository.deleteAllByUser(user);
-    savingsRepository.deleteAllByUser(user);
     userRepository.delete(user);
 
   }
