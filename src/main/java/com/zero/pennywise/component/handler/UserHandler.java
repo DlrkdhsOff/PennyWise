@@ -6,7 +6,6 @@ import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BalanceRepository;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
-import com.zero.pennywise.repository.SavingsRepository;
 import com.zero.pennywise.repository.TransactionRepository;
 import com.zero.pennywise.repository.UserRepository;
 import com.zero.pennywise.repository.WaringMessageRepository;
@@ -54,7 +53,7 @@ public class UserHandler {
 
   // userId와 일치하는 User 객체 반환
   public UserEntity findByUserId(long userId) {
-    return userRepository.findById(userId)
+    return userRepository.findByUserId(userId)
         .orElseThrow(() -> new GlobalException(FailedResultCode.USER_NOT_FOUND));
   }
 
