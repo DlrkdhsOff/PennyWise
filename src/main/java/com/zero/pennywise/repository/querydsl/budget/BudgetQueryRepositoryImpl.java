@@ -3,6 +3,7 @@ package com.zero.pennywise.repository.querydsl.budget;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.QBalanceEntity;
 import com.zero.pennywise.entity.QBudgetEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -49,17 +50,32 @@ public class BudgetQueryRepositoryImpl implements BudgetQueryRepository {
   }
 
   @Override
-  public Budgets getBudget(BudgetEntity budgetEntity) {
+  public Budgets getBudget(UserEntity user, CategoryEntity category) {
+    QBudgetEntity qBudget = QBudgetEntity.budgetEntity;
+
+    // 예산 정보 조회
+    BudgetEntity budget = jpaQueryFactory
+        .selectFrom(qBudget)
+        .where(
+            qBudget.user.eq(user),
+            qBudget.category.eq(category)
+        )
+        .fetchOne();
+
+    assert budget != null;
+
+    // 총 지출 금액 조회
     Long totalExpenses = getTotalExpenses(
-        budgetEntity.getUser(),
-        budgetEntity.getCategory().getCategoryName()
+        budget.getUser(),
+        budget.getCategory().getCategoryName()
     );
 
-    Long balance = budgetEntity.getAmount() - totalExpenses;
+    // 예산 정보 및 사용가능 금액 전달
+    Long balance = budget.getAmount() - totalExpenses;
     return new Budgets(
-        budgetEntity.getBudgetId(),
-        budgetEntity.getCategory().getCategoryName(),
-        budgetEntity.getAmount(),
+        budget.getBudgetId(),
+        budget.getCategory().getCategoryName(),
+        budget.getAmount(),
         balance
     );
   }

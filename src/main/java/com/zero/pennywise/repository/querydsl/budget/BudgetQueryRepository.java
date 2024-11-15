@@ -1,6 +1,6 @@
 package com.zero.pennywise.repository.querydsl.budget;
 
-import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.response.budget.Budgets;
 import java.util.List;
@@ -11,5 +11,5 @@ public interface BudgetQueryRepository {
 
   List<Budgets> getBudgetList(UserEntity user, String categoryName);
 
-  Budgets getBudget(BudgetEntity budget);
+  Budgets getBudget(UserEntity user, CategoryEntity category);
 }

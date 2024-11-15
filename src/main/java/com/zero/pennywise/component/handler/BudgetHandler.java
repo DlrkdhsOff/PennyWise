@@ -44,9 +44,9 @@ public class BudgetHandler {
   // 예산 등록
   public void saveBudget(BudgetEntity budget) {
     budgetRepository.save(budget);
-    Budgets budgets = budgetQueryRepository.getBudget(budget);
 
-    redisHandler.setOrUpdateBudgetAmount(budget.getUser().getUserId(), budgets);
+    // 캐시 데이터 업데이트
+    redisHandler.setOrUpdateBudgetAmount(budget.getUser().getUserId(), budget);
   }
 
   // 예산 조회
