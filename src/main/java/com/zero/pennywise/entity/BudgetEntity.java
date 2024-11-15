@@ -1,6 +1,5 @@
 package com.zero.pennywise.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +31,5 @@ public class BudgetEntity extends DateEntity{
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 
-  @Column(nullable = true)
   private Long amount;
 }

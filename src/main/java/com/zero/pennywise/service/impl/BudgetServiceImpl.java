@@ -44,7 +44,7 @@ public class BudgetServiceImpl implements BudgetService {
   @Override
   public ResultResponse getBudget(String categoryName, int page, HttpServletRequest request) {
     UserEntity user = fetchUser(request);
-    PageResponse<Budgets> response = budgetHandler.getBudgetInfo(user, categoryName, page);
+    PageResponse<Budgets> response = PageResponse.of(budgetHandler.getBudgetInfo(user, categoryName), page);
     return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
   }
 
@@ -55,7 +55,7 @@ public class BudgetServiceImpl implements BudgetService {
     CategoryEntity category = fetchCategory(user, budgetDTO.getCategoryName());
 
     // 예산 중복 검증
-    budgetHandler.validateBudget(user, category);
+    budgetHandler.validateCreateBudget(user, category);
 
     // 예산 엔티티 생성 및 저장
     BudgetEntity budget = BudgetDTO.of(user, category, budgetDTO);
@@ -71,7 +71,7 @@ public class BudgetServiceImpl implements BudgetService {
     CategoryEntity category = fetchCategory(user, updateBudgetDTO.getCategoryName());
 
     // 예산 중복 검증
-    budgetHandler.validateBudget(user, category);
+    budgetHandler.validateUpdateBudget(user, category);
 
     // 수정된 예산 정보 저장
     BudgetEntity newBudget = UpdateBudgetDTO.of(user, category, updateBudgetDTO);

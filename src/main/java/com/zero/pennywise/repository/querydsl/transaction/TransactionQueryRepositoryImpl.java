@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class TransactionRepositoryImpl implements TransactionQueryRepository {
+public class TransactionQueryRepositoryImpl implements TransactionQueryRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 

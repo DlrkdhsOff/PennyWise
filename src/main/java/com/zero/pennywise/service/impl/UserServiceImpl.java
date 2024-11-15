@@ -15,8 +15,6 @@ import com.zero.pennywise.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-  private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
   private final UserHandler userHandler;
   private final JwtUtil jwtUtil;
 

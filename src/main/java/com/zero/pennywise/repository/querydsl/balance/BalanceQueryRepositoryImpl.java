@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class BalanceRepositoryImpl implements BalanceQueryRepository {
+public class BalanceQueryRepositoryImpl implements BalanceQueryRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 

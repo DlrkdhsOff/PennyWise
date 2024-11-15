@@ -5,11 +5,12 @@ import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.response.budget.Budgets;
-import com.zero.pennywise.model.response.page.PageResponse;
 import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,22 +19,34 @@ public class BudgetHandler {
 
   private final BudgetRepository budgetRepository;
   private final BudgetQueryRepository budgetQueryRepository;
+  private final RedisHandler redisHandler;
 
   // 예산 목록
-  public PageResponse<Budgets> getBudgetInfo(UserEntity user, String categoryName, int page) {
-    return budgetQueryRepository.getBudgetInfo(user, categoryName, page);
+  @Cacheable(value = "Budgets", key = "#user.userId", condition = "#user != null")
+  public List<Budgets> getBudgetInfo(UserEntity user, String categoryName) {
+    return budgetQueryRepository.getBudgetList(user, categoryName);
   }
 
-  // 예산 중복 검증
-  public void validateBudget(UserEntity user, CategoryEntity category) {
+  // 예산 등록시 중복 검증
+  public void validateCreateBudget(UserEntity user, CategoryEntity category) {
     if (budgetRepository.existsByUserAndCategory(user, category)) {
       throw new GlobalException(FailedResultCode.BUDGET_ALREADY_USED);
+    }
+  }
+
+  // 예산 수정시 중복 검증
+  public void validateUpdateBudget(UserEntity user, CategoryEntity category) {
+    if (!budgetRepository.existsByUserAndCategory(user, category)) {
+      throw new GlobalException(FailedResultCode.BUDGET_NOT_FOUND);
     }
   }
 
   // 예산 등록
   public void saveBudget(BudgetEntity budget) {
     budgetRepository.save(budget);
+    Budgets budgets = budgetQueryRepository.getBudget(budget);
+
+    redisHandler.setOrUpdateBudgetAmount(budget.getUser().getUserId(), budgets);
   }
 
   // 예산 조회
