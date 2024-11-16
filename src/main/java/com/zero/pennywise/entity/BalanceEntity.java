@@ -27,7 +27,7 @@ public class BalanceEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 
