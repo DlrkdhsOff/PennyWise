@@ -5,7 +5,9 @@ import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface BalanceRepository extends JpaRepository<BalanceEntity, Long> {
 
   // 지정한 달의 사용자와 카테고리가 일치하는 데이터 반환
