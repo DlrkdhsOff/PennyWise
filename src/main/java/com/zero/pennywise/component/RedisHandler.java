@@ -1,8 +1,9 @@
-package com.zero.pennywise.component.handler;
+package com.zero.pennywise.component;
 
 import com.zero.pennywise.entity.BalanceEntity;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.UserEntity;
+import com.zero.pennywise.model.response.budget.BudgetCache;
 import com.zero.pennywise.model.response.budget.Budgets;
 import com.zero.pennywise.repository.querydsl.budget.BudgetQueryRepository;
 import java.util.ArrayList;
@@ -20,20 +21,19 @@ public class RedisHandler {
   private final CacheManager cacheManager;
   private final BudgetQueryRepository budgetQueryRepository;
 
-  @SuppressWarnings("unchecked")
-  public List<Budgets> getCachedBudgets(Long userId) {
+  public BudgetCache getCachedBudgets(Long userId) {
     Cache cache = cacheManager.getCache("Budgets");
     if (cache != null) {
       Cache.ValueWrapper cachedValue = cache.get(userId);
       if (cachedValue != null) {
-        return (List<Budgets>) cachedValue.get(); // 캐시에서 Budget 리스트 반환
+        return (BudgetCache) cachedValue.get(); // 캐시에서 Budget 리스트 반환
       }
     }
     return null; // 캐시에 데이터가 없으면 null 반환
   }
 
   public void setOrUpdateBudgetAmount(Long userId, BudgetEntity budgetEntity) {
-    List<Budgets> budgetsList = getCachedBudgets(userId);
+    List<Budgets> budgetsList = getCachedBudgets(userId).getBudgets();
 
     Budgets budgets = budgetQueryRepository.getBudget(budgetEntity.getUser(), budgetEntity.getCategory());
     if (budgetsList != null) {
@@ -62,12 +62,12 @@ public class RedisHandler {
   private void updateCache(Long userId, List<Budgets> budgetsList) {
     Cache cache = cacheManager.getCache("Budgets");
     if (cache != null) {
-      cache.put(userId, budgetsList);
+      cache.put(userId, new BudgetCache(budgetsList));
     }
   }
 
   public void updateBalance(UserEntity user, BalanceEntity balance) {
-    List<Budgets> budgetsList = getCachedBudgets(user.getUserId());
+    List<Budgets> budgetsList = getCachedBudgets(user.getUserId()).getBudgets();
 
     if (budgetsList != null) {
       budgetsList = budgetsList.stream()

@@ -1,9 +1,10 @@
-package com.zero.pennywise.component.handler;
+package com.zero.pennywise.component;
 
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
+import com.zero.pennywise.model.response.budget.BudgetCache;
 import com.zero.pennywise.model.response.budget.Budgets;
 import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BudgetRepository;
@@ -23,8 +24,9 @@ public class BudgetHandler {
 
   // 예산 목록
   @Cacheable(value = "Budgets", key = "#user.userId", condition = "#user != null")
-  public List<Budgets> getBudgetInfo(UserEntity user, String categoryName) {
-    return budgetQueryRepository.getBudgetList(user, categoryName);
+  public BudgetCache getBudgetInfo(UserEntity user, String categoryName) {
+    List<Budgets> budgets = budgetQueryRepository.getBudgetList(user, categoryName);
+    return new BudgetCache(budgets);
   }
 
   // 예산 등록시 중복 검증

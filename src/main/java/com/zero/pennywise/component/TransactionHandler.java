@@ -1,4 +1,4 @@
-package com.zero.pennywise.component.handler;
+package com.zero.pennywise.component;
 
 
 import com.zero.pennywise.entity.TransactionEntity;

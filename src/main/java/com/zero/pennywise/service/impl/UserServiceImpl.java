@@ -1,7 +1,7 @@
 package com.zero.pennywise.service.impl;
 
 import com.zero.pennywise.auth.jwt.JwtUtil;
-import com.zero.pennywise.component.handler.UserHandler;
+import com.zero.pennywise.component.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.user.LoginDTO;
 import com.zero.pennywise.model.request.user.RegisterDTO;

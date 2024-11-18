@@ -1,9 +1,9 @@
 package com.zero.pennywise.service.impl;
 
 import com.zero.pennywise.auth.jwt.JwtUtil;
-import com.zero.pennywise.component.handler.BudgetHandler;
-import com.zero.pennywise.component.handler.CategoryHandler;
-import com.zero.pennywise.component.handler.UserHandler;
+import com.zero.pennywise.component.BudgetHandler;
+import com.zero.pennywise.component.CategoryHandler;
+import com.zero.pennywise.component.UserHandler;
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
@@ -44,7 +44,7 @@ public class BudgetServiceImpl implements BudgetService {
   @Override
   public ResultResponse getBudget(String categoryName, int page, HttpServletRequest request) {
     UserEntity user = fetchUser(request);
-    PageResponse<Budgets> response = PageResponse.of(budgetHandler.getBudgetInfo(user, categoryName), page);
+    PageResponse<Budgets> response = PageResponse.of(budgetHandler.getBudgetInfo(user, categoryName).getBudgets(), page);
     return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
   }
 

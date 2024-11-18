@@ -1,6 +1,6 @@
 package com.zero.pennywise.auth.service;
 
-import com.zero.pennywise.component.handler.UserHandler;
+import com.zero.pennywise.component.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.user.UserDetailsDTO;
 import lombok.RequiredArgsConstructor;
