@@ -1,4 +1,4 @@
-# 개인 재무 관리 서비스
+# 개인 쟈산 관리 서비스
 
 이 프로젝트는 사용자가 자신의 수입, 지출, 저축을 효율적으로 관리할 수 있도록 돕는 종합적인 개인 재무 관리 서비스 입니다. 사용자는 이 서비스를 통해 지출을 추적하고, 예산을 설정하며, 지출 패턴을 분석하고, 저축 목표를 달성할 수 있습니다.
 
@@ -68,7 +68,8 @@
 
 
 ## ERD
-![PennyWise_ERD](https://github.com/user-attachments/assets/0d1924f1-ffeb-4704-a7c1-4373a3ccb87b)
+![image](https://github.com/user-attachments/assets/b5dbbc26-6e4c-42b7-9f95-0b2f4cd98393)
+
 
 
 
