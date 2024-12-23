@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-
   private final UserHandler userHandler;
   private final JwtUtil jwtUtil;
 
