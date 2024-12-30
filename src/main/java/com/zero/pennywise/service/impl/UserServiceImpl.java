@@ -4,7 +4,7 @@ import com.zero.pennywise.auth.jwt.JwtUtil;
 import com.zero.pennywise.component.UserHandler;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.user.LoginDTO;
-import com.zero.pennywise.model.request.user.RegisterDTO;
+import com.zero.pennywise.model.request.user.SignUpDTO;
 import com.zero.pennywise.model.request.user.UpdateDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.model.response.user.UserInfo;
@@ -35,16 +35,12 @@ public class UserServiceImpl implements UserService {
 
   // 회원 가입
   @Override
-  public ResultResponse signup(RegisterDTO registerDTO) {
+  public ResultResponse signup(SignUpDTO signUpDTO) {
 
-    userHandler.validateEmail(registerDTO.getEmail());
+    userHandler.validateEmail(signUpDTO.getEmail());
+    userHandler.validateNickname(signUpDTO.getNickname());
 
-    UserEntity user = UserEntity.builder()
-        .email(registerDTO.getEmail())
-        .password(userHandler.encodePassword(registerDTO.getPassword()))
-        .nickname(registerDTO.getNickname())
-        .role(UserRole.USER)
-        .build();
+    UserEntity user = SignUpDTO.of(signUpDTO, userHandler.encodePassword(signUpDTO.getPassword()));
 
     userHandler.saveUser(user);
 
@@ -86,13 +82,8 @@ public class UserServiceImpl implements UserService {
     userHandler.validatePassword(updateDTO.getBeforePassword());
     userHandler.validateNickname(updateDTO.getNickname());
 
-    UserEntity updateUser = UserEntity.builder()
-        .userId(user.getUserId())
-        .email(user.getEmail())
-        .password(userHandler.encodePassword(updateDTO.getAfterPassword()))
-        .nickname(updateDTO.getNickname())
-        .role(user.getRole())
-        .build();
+    UserEntity updateUser = UpdateDTO.of(user, updateDTO,
+        userHandler.encodePassword(updateDTO.getAfterPassword()));
 
     userHandler.saveUser(updateUser);
 
