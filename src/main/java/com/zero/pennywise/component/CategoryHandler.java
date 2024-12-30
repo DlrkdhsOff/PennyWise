@@ -18,13 +18,11 @@ public class CategoryHandler {
   private final CategoryRepository categoryRepository;
 
   // 모든 카테고리 조회
-  public PageResponse<String> getAllCategoryList(UserEntity user, int page) {
-    List<String> categories = categoryRepository.findAllByUser(user)
+  public List<String> getAllCategoryList(UserEntity user) {
+    return categoryRepository.findAllByUser(user)
         .map(categoryList -> categoryList.stream()
             .map(CategoryEntity::getCategoryName).toList())
         .orElse(new ArrayList<>());
-
-    return PageResponse.of(categories, page);
   }
 
   // 카테고리 검증
