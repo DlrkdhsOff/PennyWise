@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WaringMessageDTO {
 
+  private Long userId;
   private String message;
-  private String recivedDateTime;
 }

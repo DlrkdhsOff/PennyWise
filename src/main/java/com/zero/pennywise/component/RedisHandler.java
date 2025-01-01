@@ -29,7 +29,7 @@ public class RedisHandler {
         return (BudgetCache) cachedValue.get(); // 캐시에서 Budget 리스트 반환
       }
     }
-    return null; // 캐시에 데이터가 없으면 null 반환
+    return new BudgetCache(); // 캐시에 데이터가 없으면 null 반환
   }
 
   public void setOrUpdateBudgetAmount(Long userId, BudgetEntity budgetEntity) {
@@ -83,7 +83,8 @@ public class RedisHandler {
             }
             return budget;
           }).toList();
+
+      updateCache(user.getUserId(), budgetsList);
     }
-    updateCache(user.getUserId(), budgetsList);
   }
 }

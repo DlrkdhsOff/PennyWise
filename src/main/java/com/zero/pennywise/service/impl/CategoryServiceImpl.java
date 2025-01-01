@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public ResultResponse getCategoryList(int page, HttpServletRequest request) {
     UserEntity user = fetchUser(request);
-    PageResponse<String> response = categoryHandler.getAllCategoryList(user, page);
+    PageResponse<String> response = PageResponse.of(categoryHandler.getAllCategoryList(user), page);
 
     return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
   }
@@ -54,6 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
         .user(user)
         .categoryName(categoryName)
         .build();
+
     categoryHandler.saveCategory(category);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_CATEGORY);

@@ -1,7 +1,7 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.model.request.user.LoginDTO;
-import com.zero.pennywise.model.request.user.RegisterDTO;
+import com.zero.pennywise.model.request.user.SignUpDTO;
 import com.zero.pennywise.model.request.user.UpdateDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.service.UserService;
@@ -27,9 +27,9 @@ public class UserController {
 
   // 회원가입
   @PostMapping("/signup")
-  public ResponseEntity<ResultResponse> register(@RequestBody @Valid RegisterDTO registerDTO) {
+  public ResponseEntity<ResultResponse> register(@RequestBody @Valid SignUpDTO signUpDTO) {
 
-    ResultResponse resultResponse = userService.signup(registerDTO);
+    ResultResponse resultResponse = userService.signup(signUpDTO);
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
