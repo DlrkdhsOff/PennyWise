@@ -10,7 +10,6 @@ import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
-import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.model.response.page.PageResponse;
 import com.zero.pennywise.model.response.transaction.Transactions;
@@ -64,21 +63,6 @@ public class TransactionServiceImpl implements TransactionService {
     return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_TRANSACTION);
   }
 
-  // 거래 수정 기능
-  @Override
-  public ResultResponse updateTransaction(UpdateTransactionDTO updateTransactionDTO, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-
-    // 기존 거래와 수정할 카테고리 조회 후 잔액 업데이트
-    TransactionEntity transaction = transactionHandler.findByTransactionId(user, updateTransactionDTO.getTransactionId());
-    CategoryEntity category = fetchCategory(user, updateTransactionDTO.getCategoryName());
-
-    TransactionEntity updatedTransaction = UpdateTransactionDTO.of(transaction, category, updateTransactionDTO);
-    balanceHandler.updateBalance(user, transaction, updatedTransaction);
-    transactionHandler.saveTransaction(updatedTransaction);
-
-    return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_TRANSACTION);
-  }
 
   // 거래 삭제 기능
   @Override
