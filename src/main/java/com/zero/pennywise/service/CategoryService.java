@@ -10,5 +10,7 @@ public interface CategoryService {
 
   ResultResponse createCategory(String categoryName, HttpServletRequest request);
 
+  ResultResponse updateCategory(UpdateCategoryDTO updateCategoryDTO, HttpServletRequest request);
+
   ResultResponse deleteCategory(String categoryName, HttpServletRequest request);
 }
