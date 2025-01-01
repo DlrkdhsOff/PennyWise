@@ -1,20 +1,13 @@
 package com.zero.pennywise.service.impl;
 
-import com.zero.pennywise.auth.jwt.JwtUtil;
-import com.zero.pennywise.component.BalanceHandler;
-import com.zero.pennywise.component.CategoryHandler;
-import com.zero.pennywise.component.TransactionHandler;
-import com.zero.pennywise.component.UserHandler;
-import com.zero.pennywise.entity.CategoryEntity;
+import com.zero.pennywise.component.facade.FacadeManager;
 import com.zero.pennywise.entity.TransactionEntity;
-import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.model.response.page.PageResponse;
 import com.zero.pennywise.model.response.transaction.Transactions;
 import com.zero.pennywise.model.type.SuccessResultCode;
-import com.zero.pennywise.model.type.TokenType;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,55 +17,32 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-  private final JwtUtil jwtUtil;
-  private final UserHandler userHandler;
-  private final CategoryHandler categoryHandler;
-  private final TransactionHandler transactionHandler;
-  private final BalanceHandler balanceHandler;
+  private final FacadeManager facadeManager;
 
-  // 요청 헤더에서 사용자 정보를 추출하여 반환
-  private UserEntity fetchUser(HttpServletRequest request) {
-    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-    return userHandler.findByUserId(userId);
-  }
 
-  // 사용자와 카테고리 이름으로 카테고리 엔티티 조회
-  private CategoryEntity fetchCategory(UserEntity user, String categoryName) {
-    return categoryHandler.findCategory(user, categoryName);
-  }
 
   // 거래 목록 조회 기능
   @Override
   public ResultResponse getTransactionInfo(TransactionInfoDTO transactionInfoDTO, int page, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    PageResponse<Transactions> response = transactionHandler.getTransactionInfo(user, transactionInfoDTO, page);
+    PageResponse<Transactions> response = facadeManager.getTransactionList(request, transactionInfoDTO, page);
+
     return new ResultResponse(SuccessResultCode.SUCCESS_GET_TRANSACTION_INFO, response);
   }
 
   // 거래 등록 기능
   @Override
   public ResultResponse setTransaction(TransactionDTO transactionDTO, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    CategoryEntity category = fetchCategory(user, transactionDTO.getCategoryName());
+    TransactionEntity transaction = facadeManager.createTransaction(request, transactionDTO);
 
-    // 거래 생성 후 잔액 업데이트
-    TransactionEntity transaction = TransactionDTO.of(user, category, transactionDTO);
-    balanceHandler.addBalance(user, transaction);
-    transactionHandler.saveTransaction(transaction);
-
+    facadeManager.saveTransaction(transaction);
     return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_TRANSACTION);
   }
 
 
   // 거래 삭제 기능
   @Override
-  public ResultResponse deleteTransaction(Long transactionId, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-
-    // 거래 삭제 후 잔액 조정
-    TransactionEntity transaction = transactionHandler.findByTransactionId(user, transactionId);
-    balanceHandler.deleteBalance(user, transaction);
-    transactionHandler.deleteTransaction(transaction);
+  public ResultResponse deleteTransaction(Long transactionId) {
+    facadeManager.deleteTransaction(transactionId);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_TRANSACTION);
   }
