@@ -44,16 +44,6 @@ public class CategoryController {
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
-  // 카테고리 수정
-  @PutMapping
-  public ResponseEntity<ResultResponse> updateCategory(
-      @RequestBody @Valid UpdateCategoryDTO updateCategoryDTO,
-      HttpServletRequest request) {
-
-    ResultResponse resultResponse = categoryService.updateCategory(updateCategoryDTO, request);
-    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
-  }
-
 
   // 카테고리 삭제
   @DeleteMapping

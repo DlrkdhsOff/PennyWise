@@ -60,21 +60,6 @@ public class CategoryServiceImpl implements CategoryService {
     return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_CATEGORY);
   }
 
-  // 카테고리 수정
-  @Override
-  @Transactional
-  public ResultResponse updateCategory(UpdateCategoryDTO updateCategory, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    CategoryEntity category = fetchCategory(user, updateCategory.getBeforecategoryName());
-
-    categoryHandler.validateCategory(user, updateCategory.getAfterCategoryName());
-    CategoryEntity newCategory = UpdateCategoryDTO.of(category, updateCategory);
-
-    categoryHandler.saveCategory(newCategory);
-
-    return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_CATEGORY);
-  }
-
 
   // 카테고리 삭제
   @Override
