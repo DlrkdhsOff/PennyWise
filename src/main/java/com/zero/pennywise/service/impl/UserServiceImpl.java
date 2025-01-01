@@ -1,7 +1,7 @@
 package com.zero.pennywise.service.impl;
 
 import com.zero.pennywise.auth.jwt.JwtUtil;
-import com.zero.pennywise.component.UserHandler;
+import com.zero.pennywise.component.facade.FacadeManager;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.user.LoginDTO;
 import com.zero.pennywise.model.request.user.SignUpDTO;
@@ -23,25 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-  private final UserHandler userHandler;
+  private final FacadeManager facadeManager;
   private final JwtUtil jwtUtil;
-
-  // 요청 헤더에서 사용자 정보를 추출하여 반환
-  private UserEntity fetchUser(HttpServletRequest request) {
-    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-    return userHandler.findByUserId(userId);
-  }
 
   // 회원 가입
   @Override
   public ResultResponse signup(SignUpDTO signUpDTO) {
 
-    userHandler.validateEmail(signUpDTO.getEmail());
-    userHandler.validateNickname(signUpDTO.getNickname());
+    UserEntity user = facadeManager.createUser(signUpDTO);
 
-    UserEntity user = SignUpDTO.of(signUpDTO, userHandler.encodePassword(signUpDTO.getPassword()));
-
-    userHandler.saveUser(user);
+    facadeManager.saveUser(user);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_SIGNUP);
   }
@@ -50,8 +41,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResultResponse login(LoginDTO loginDTO, HttpServletResponse response) {
 
-    UserEntity user = userHandler.findByEmail(loginDTO.getEmail());
-    userHandler.validatePassword(loginDTO.getPassword());
+    UserEntity user = facadeManager.validateLoginData(loginDTO);
 
     String access = jwtUtil.createJwt("access", user.getUserId(), UserRole.USER);
     String refresh = jwtUtil.createJwt("refresh", user.getUserId(), UserRole.USER);
@@ -65,7 +55,7 @@ public class UserServiceImpl implements UserService {
   // 회원 정보 조회
   @Override
   public ResultResponse getUserInfo(HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
+    UserEntity user = facadeManager.getUserByAccessToken(request);
 
     UserInfo userInfo = new UserInfo(user.getEmail(), user.getNickname());
 
@@ -75,16 +65,9 @@ public class UserServiceImpl implements UserService {
   // 회원 정보 수정
   @Override
   public ResultResponse updateUserInfo(UpdateDTO updateDTO, HttpServletRequest request) {
+    UserEntity user = facadeManager.updateUserInfo(request, updateDTO);
 
-    UserEntity user = fetchUser(request);
-
-    userHandler.validatePassword(updateDTO.getBeforePassword());
-    userHandler.validateNickname(updateDTO.getNickname());
-
-    UserEntity updateUser = UpdateDTO.of(user, updateDTO,
-        userHandler.encodePassword(updateDTO.getAfterPassword()));
-
-    userHandler.saveUser(updateUser);
+    facadeManager.saveUser(user);
 
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_USER_INFO);
@@ -94,9 +77,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public ResultResponse deleteUser(HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-
-    userHandler.deleteAllUserData(user);
+    facadeManager.deleteAllUserData(request);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_USER_INFO);
   }
