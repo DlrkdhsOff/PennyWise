@@ -13,5 +13,5 @@ public interface BudgetService {
 
   ResultResponse updateBudget(UpdateBudgetDTO updateBudgetDTO, HttpServletRequest request);
 
-  ResultResponse deleteBudget(Long budgetId, HttpServletRequest request);
+  ResultResponse deleteBudget(Long budgetId);
 }

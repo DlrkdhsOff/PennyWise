@@ -2,7 +2,6 @@ package com.zero.pennywise.controller;
 
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
-import com.zero.pennywise.model.request.transaction.UpdateTransactionDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.service.TransactionService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,25 +50,14 @@ public class TransactionController {
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
-  // 거래 수정
-  @PutMapping
-  public ResponseEntity<ResultResponse> updateTransaction(
-      @RequestBody @Valid UpdateTransactionDTO updateTransactionDTO,
-      HttpServletRequest request)
-  {
-
-    ResultResponse resultResponse = transactionService.updateTransaction(updateTransactionDTO, request);
-    return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
-  }
 
   // 거래 삭제
   @DeleteMapping
   public ResponseEntity<ResultResponse> deleteTransaction(
-      @RequestParam(name = "trasactionId") Long trasactionId,
-      HttpServletRequest request)
+      @RequestParam(name = "trasactionId") Long trasactionId)
   {
 
-    ResultResponse resultResponse = transactionService.deleteTransaction(trasactionId, request);
+    ResultResponse resultResponse = transactionService.deleteTransaction(trasactionId);
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 }

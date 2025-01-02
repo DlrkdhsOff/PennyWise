@@ -2,11 +2,15 @@ package com.zero.pennywise.model.request.user;
 
 import com.zero.pennywise.entity.UserEntity;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateDTO {
 
   @NotEmpty(message = "변경전 비밀번호를 입력해주세요.")

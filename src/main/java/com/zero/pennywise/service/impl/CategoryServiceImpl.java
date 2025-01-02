@@ -1,15 +1,11 @@
 package com.zero.pennywise.service.impl;
 
-import com.zero.pennywise.auth.jwt.JwtUtil;
-import com.zero.pennywise.component.CategoryHandler;
-import com.zero.pennywise.component.UserHandler;
+import com.zero.pennywise.component.facade.FacadeManager;
 import com.zero.pennywise.entity.CategoryEntity;
-import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.category.UpdateCategoryDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.model.response.page.PageResponse;
 import com.zero.pennywise.model.type.SuccessResultCode;
-import com.zero.pennywise.model.type.TokenType;
 import com.zero.pennywise.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-  private final JwtUtil jwtUtil;
-  private final UserHandler userHandler;
-  private final CategoryHandler categoryHandler;
-
-  // 요청 헤더에서 사용자 정보를 추출하여 반환
-  private UserEntity fetchUser(HttpServletRequest request) {
-    Long userId = jwtUtil.getUserId(request.getHeader(TokenType.ACCESS.getValue()));
-    return userHandler.findByUserId(userId);
-  }
-
-  // 사용자와 카테고리 이름으로 카테고리 엔티티 조회
-  private CategoryEntity fetchCategory(UserEntity user, String categoryName) {
-    return categoryHandler.findCategory(user, categoryName);
-  }
+  private final FacadeManager facadeManager;
 
   // 카테고리 목록
   @Override
   public ResultResponse getCategoryList(int page, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    PageResponse<String> response = PageResponse.of(categoryHandler.getAllCategoryList(user), page);
+    PageResponse<String> response = facadeManager.getUserCategoryList(request, page);
 
     return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
   }
@@ -48,14 +30,9 @@ public class CategoryServiceImpl implements CategoryService {
   // 카테고리 생성
   @Override
   public ResultResponse createCategory(String categoryName, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    categoryHandler.validateCategory(user, categoryName);
-    CategoryEntity category = CategoryEntity.builder()
-        .user(user)
-        .categoryName(categoryName)
-        .build();
+    CategoryEntity category = facadeManager.createCategory(request, categoryName);
 
-    categoryHandler.saveCategory(category);
+    facadeManager.saveCategory(category);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_CATEGORY);
   }
@@ -63,14 +40,10 @@ public class CategoryServiceImpl implements CategoryService {
   // 카테고리 수정
   @Override
   @Transactional
-  public ResultResponse updateCategory(UpdateCategoryDTO updateCategory, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    CategoryEntity category = fetchCategory(user, updateCategory.getBeforecategoryName());
+  public ResultResponse updateCategory(UpdateCategoryDTO updateCategoryDTO, HttpServletRequest request) {
+    CategoryEntity category = facadeManager.updateCategory(request, updateCategoryDTO);
 
-    categoryHandler.validateCategory(user, updateCategory.getAfterCategoryName());
-    CategoryEntity newCategory = UpdateCategoryDTO.of(category, updateCategory);
-
-    categoryHandler.saveCategory(newCategory);
+    facadeManager.saveCategory(category);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_CATEGORY);
   }
@@ -80,9 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   @Transactional
   public ResultResponse deleteCategory(String categoryName, HttpServletRequest request) {
-    UserEntity user = fetchUser(request);
-    CategoryEntity category = fetchCategory(user, categoryName);
-    categoryHandler.deleteCategory(category);
+    facadeManager.deleteCategory(request, categoryName);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_CATEGORY);
   }

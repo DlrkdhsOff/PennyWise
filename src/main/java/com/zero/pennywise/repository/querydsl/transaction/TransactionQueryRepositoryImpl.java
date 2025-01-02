@@ -20,7 +20,7 @@ public class TransactionQueryRepositoryImpl implements TransactionQueryRepositor
   private final JPAQueryFactory jpaQueryFactory;
 
   @Override
-  public PageResponse<Transactions> getTransactionInfo(UserEntity user, TransactionInfoDTO transactionInfoDTO, int page) {
+  public List<Transactions> getTransactionInfo(UserEntity user, TransactionInfoDTO transactionInfoDTO) {
     QTransactionEntity transaction = QTransactionEntity.transactionEntity;
     BooleanBuilder builder = new BooleanBuilder();
 
@@ -36,13 +36,11 @@ public class TransactionQueryRepositoryImpl implements TransactionQueryRepositor
       builder.and(transaction.dateTime.between(LocalDateTime.now(), LocalDateTime.now().minusMonths(transactionInfoDTO.getMonth())));
     }
 
-    List<Transactions> transactions = Transactions.of(
+    return Transactions.of(
         jpaQueryFactory
         .selectFrom(transaction)
         .where(builder)
         .fetch());
 
-
-    return PageResponse.of(transactions, page);
   }
 }

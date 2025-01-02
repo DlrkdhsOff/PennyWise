@@ -1,9 +1,11 @@
 package com.zero.pennywise.auth.jwt;
 
 import com.zero.pennywise.auth.service.CustomUserDetailService;
+import com.zero.pennywise.model.type.TokenType;
 import com.zero.pennywise.model.type.UserRole;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -32,7 +34,9 @@ public class JwtUtil {
   }
 
   // userId 추출
-  public Long getUserId(String token) {
+  public Long getUserId(HttpServletRequest request) {
+    String token = request.getHeader(TokenType.ACCESS.getValue());
+
     if(token.startsWith("Bearer ")) {
       token = token.substring(7);
     }
