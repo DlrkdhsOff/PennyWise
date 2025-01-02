@@ -48,6 +48,15 @@ public class FacadeManager {
 
   // ================= User =================
 
+  /**
+   * UserId 값과 일치하는 UserEntity 반환
+   *
+   * @param userId 조회할 UserEntity의 Id값
+   */
+  public UserEntity findByUserId(Long userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new GlobalException(FailedResultCode.USER_NOT_FOUND));
+  }
 
   /**
    * 토큰 값으로 UserEntity 반환
@@ -120,9 +129,7 @@ public class FacadeManager {
     }
 
     if(userRepository.existsByNickname(updateDTO.getNickname())) {
-      if (!user.getNickname().equals(updateDTO.getNickname())) {
-        throw new GlobalException(FailedResultCode.NICKNAME_ALREADY_USED);
-      }
+      throw new GlobalException(FailedResultCode.NICKNAME_ALREADY_USED);
     }
 
     return UpdateDTO.of(user, updateDTO, passwordEncoder.encode(updateDTO.getAfterPassword()));
@@ -286,7 +293,9 @@ public class FacadeManager {
   public PageResponse<Transactions> getTransactionList(HttpServletRequest request, TransactionInfoDTO transactionInfoDTO, int page) {
     UserEntity user = getUserByAccessToken(request);
 
-    return transactionQueryRepository.getTransactionInfo(user, transactionInfoDTO, page);
+    List<Transactions> transactions = transactionQueryRepository.getTransactionInfo(user, transactionInfoDTO);
+
+    return PageResponse.of(transactions, page);
   }
 
 

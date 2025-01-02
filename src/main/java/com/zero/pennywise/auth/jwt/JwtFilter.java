@@ -53,13 +53,13 @@ public class JwtFilter extends OncePerRequestFilter {
       return;
     }
 
-    setAuthentication(accessToken);
+    setAuthentication(request);
     filterChain.doFilter(request, response);
   }
 
   // userId를 추출 및 인증 정보를 설정
-  private void setAuthentication(String token) {
-    Long userId = jwtUtil.getUserId(token);
+  private void setAuthentication(HttpServletRequest request) {
+    Long userId = jwtUtil.getUserId(request);
 
     Authentication authentication = jwtUtil.getAuthentication(userId.toString());
     SecurityContextHolder.getContext().setAuthentication(authentication);
