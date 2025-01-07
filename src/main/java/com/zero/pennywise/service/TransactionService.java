@@ -11,5 +11,5 @@ public interface TransactionService {
 
   ResultResponse setTransaction(TransactionDTO transactionDTO, HttpServletRequest request);
 
-  ResultResponse deleteTransaction(Long trasactionId);
+  ResultResponse deleteTransaction(HttpServletRequest request, Long trasactionId);
 }

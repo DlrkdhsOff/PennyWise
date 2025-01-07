@@ -41,8 +41,8 @@ public class TransactionServiceImpl implements TransactionService {
 
   // 거래 삭제 기능
   @Override
-  public ResultResponse deleteTransaction(Long transactionId) {
-    facadeManager.deleteTransaction(transactionId);
+  public ResultResponse deleteTransaction(HttpServletRequest request, Long transactionId) {
+    facadeManager.deleteTransaction(request, transactionId);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_TRANSACTION);
   }

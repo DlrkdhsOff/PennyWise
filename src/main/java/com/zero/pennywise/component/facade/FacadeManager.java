@@ -334,9 +334,11 @@ public class FacadeManager {
    *
    * @param transactionId 삭제할 Transaction Id값
    */
-  public void deleteTransaction(Long transactionId) {
+  public void deleteTransaction(HttpServletRequest request, Long transactionId) {
+    UserEntity user = getUserByAccessToken(request);
 
-    TransactionEntity transaction = transactionRepository.findById(transactionId)
+    TransactionEntity transaction = transactionRepository
+        .findByUserAndTransactionId(user, transactionId)
         .orElseThrow(() -> new GlobalException(FailedResultCode.TRANSACTION_NOT_FOUND));
 
     transactionRepository.delete(transaction);

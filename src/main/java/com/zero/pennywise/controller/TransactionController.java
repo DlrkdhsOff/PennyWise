@@ -54,10 +54,11 @@ public class TransactionController {
   // 거래 삭제
   @DeleteMapping
   public ResponseEntity<ResultResponse> deleteTransaction(
-      @RequestParam(name = "trasactionId") Long trasactionId)
+      @RequestParam(name = "trasactionId") Long trasactionId,
+      HttpServletRequest request)
   {
 
-    ResultResponse resultResponse = transactionService.deleteTransaction(trasactionId);
+    ResultResponse resultResponse = transactionService.deleteTransaction(request, trasactionId);
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 }
