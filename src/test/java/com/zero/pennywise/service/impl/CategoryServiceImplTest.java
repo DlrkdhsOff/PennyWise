@@ -264,7 +264,7 @@ class CategoryServiceImplTest {
 
   @Test
   @DisplayName("카테고리 삭제 : 실패 - 존재하지 않은 카테고리")
-  void deleteCategory_Failed_Failed_CategoryNotFound() {
+  void deleteCategory_Failed_CategoryNotFound() {
     // given
     doThrow(new GlobalException(FailedResultCode.CATEGORY_NOT_FOUND))
         .when(facadeManager).deleteCategory(request, CATEGORY_NAME);

@@ -1196,10 +1196,12 @@ class FacadeManagerTest {
   @DisplayName("BudgetEntity 삭제 : 성공")
   void deleteBudget() {
     // given
-    when(budgetRepository.findById(BUDGET_ID)).thenReturn(Optional.of(budget));
+    when(jwtUtil.getUserId(request)).thenReturn(USER_ID);
+    when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+    when(budgetRepository.findByBudgetIdAndUser(BUDGET_ID, user)).thenReturn(Optional.of(budget));
 
     // when
-    facadeManager.deleteBudget(BUDGET_ID);
+    facadeManager.deleteBudget(request, BUDGET_ID);
 
     // then
     verify(budgetRepository, times(1)).delete(budget);
@@ -1209,12 +1211,14 @@ class FacadeManagerTest {
   @DisplayName("BudgetEntity 삭제 : 실패 - 존재하지 않은 예산 정보")
   void deleteBudget_Failed_BudgetNotFound() {
     // given
-    when(budgetRepository.findById(BUDGET_ID))
+    when(jwtUtil.getUserId(request)).thenReturn(USER_ID);
+    when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+    when(budgetRepository.findByBudgetIdAndUser(BUDGET_ID, user))
         .thenThrow(new GlobalException(FailedResultCode.BUDGET_NOT_FOUND));
 
     // when
     GlobalException exception = assertThrows(GlobalException.class,
-        () -> facadeManager.deleteBudget(BUDGET_ID));
+        () -> facadeManager.deleteBudget(request, BUDGET_ID));
 
     // then
     assertEquals(
