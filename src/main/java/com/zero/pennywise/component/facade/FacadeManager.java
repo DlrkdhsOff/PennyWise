@@ -379,6 +379,10 @@ public class FacadeManager {
 
     CategoryEntity category = getCategoryByUserAndCategoryName(user, budgetDTO.getCategoryName());
 
+    if (budgetRepository.existsByUserAndCategory(user, category)) {
+      throw new GlobalException(FailedResultCode.BUDGET_ALREADY_USED);
+    }
+
     return BudgetDTO.of(user, category, budgetDTO);
   }
 
@@ -416,8 +420,10 @@ public class FacadeManager {
    *
    * @param budgetId 삭제할 BudgetEntity Id 값
    */
-  public void deleteBudget(Long budgetId) {
-    BudgetEntity budget = budgetRepository.findById(budgetId)
+  public void deleteBudget(HttpServletRequest request, Long budgetId) {
+    UserEntity user = getUserByAccessToken(request);
+
+    BudgetEntity budget = budgetRepository.findByBudgetIdAndUser(budgetId, user)
             .orElseThrow(() -> new GlobalException(FailedResultCode.BUDGET_NOT_FOUND));
 
     budgetRepository.delete(budget);
