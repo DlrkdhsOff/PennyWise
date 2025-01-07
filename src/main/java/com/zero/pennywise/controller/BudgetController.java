@@ -59,9 +59,10 @@ public class BudgetController {
   // 예산 삭제
   @DeleteMapping
   public ResponseEntity<ResultResponse> deleteBudget(
-      @RequestParam("budgetId") Long budgetId) {
+      @RequestParam("budgetId") Long budgetId,
+      HttpServletRequest request) {
 
-    ResultResponse resultResponse = budgetService.deleteBudget(budgetId);
+    ResultResponse resultResponse = budgetService.deleteBudget(request, budgetId);
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 }

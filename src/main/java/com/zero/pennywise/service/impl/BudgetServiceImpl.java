@@ -26,7 +26,7 @@ public class BudgetServiceImpl implements BudgetService {
   public ResultResponse getBudget(String categoryName, int page, HttpServletRequest request) {
     PageResponse<Budgets> response = facadeManager.getBudgetList(request, categoryName, page);
 
-    return new ResultResponse(SuccessResultCode.SUCCESS_GET_CATEGORY_LIST, response);
+    return new ResultResponse(SuccessResultCode.SUCCESS_GET_BUDGET_LIST, response);
   }
 
   // 새로운 예산 등록
@@ -42,7 +42,7 @@ public class BudgetServiceImpl implements BudgetService {
 
   // 기존 예산 수정
   @Transactional
-  public ResultResponse updateBudget(UpdateBudgetDTO updateBudgetDTO, HttpServletRequest request) {
+    public ResultResponse updateBudget(UpdateBudgetDTO updateBudgetDTO, HttpServletRequest request) {
     BudgetEntity budget = facadeManager.updateBudget(request, updateBudgetDTO);
 
     facadeManager.saveBudget(budget);
@@ -53,9 +53,9 @@ public class BudgetServiceImpl implements BudgetService {
   // 예산 삭제
   @Override
   @Transactional
-  public ResultResponse deleteBudget(Long budgetId) {
+  public ResultResponse deleteBudget(HttpServletRequest request, Long budgetId) {
 
-    facadeManager.deleteBudget(budgetId);
+    facadeManager.deleteBudget(request, budgetId);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_BUDGET);
   }
