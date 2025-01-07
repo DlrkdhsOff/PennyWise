@@ -989,25 +989,49 @@ class FacadeManagerTest {
   @DisplayName("TransactionEntity 삭제 : 성공")
   void deleteTransaction() {
     // given
-    when(transactionRepository.findById(TRANSACTION_ID)).thenReturn(Optional.of(transaction));
+    when(jwtUtil.getUserId(request)).thenReturn(USER_ID);
+    when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+    when(transactionRepository.findByUserAndTransactionId(user, TRANSACTION_ID))
+        .thenReturn(Optional.of(transaction));
 
     // when
-    facadeManager.deleteTransaction(TRANSACTION_ID);
+    facadeManager.deleteTransaction(request, TRANSACTION_ID);
 
     // then
     verify(transactionRepository, times(1)).delete(transaction);
   }
 
   @Test
+  @DisplayName("TransactionEntity 삭제 : 실패 - 존재하지 않은 사용자")
+  void deleteTransaction_Failed_UserNotFound() {
+    // given
+    when(jwtUtil.getUserId(request)).thenReturn(USER_ID);
+    when(userRepository.findById(USER_ID))
+        .thenThrow(new GlobalException(FailedResultCode.USER_NOT_FOUND));
+
+    // when
+    GlobalException exception = assertThrows(GlobalException.class,
+        () -> facadeManager.deleteTransaction(request, TRANSACTION_ID));
+
+    // then
+    assertEquals(
+        FailedResultCode.USER_NOT_FOUND.getStatus(),
+        exception.getResultResponse().getStatus()
+    );
+  }
+
+  @Test
   @DisplayName("TransactionEntity 삭제 : 실패 - 존재하지 않은 거래 내역")
   void deleteTransaction_Failed_TransactionNotFound() {
     // given
-    when(transactionRepository.findById(TRANSACTION_ID))
+    when(jwtUtil.getUserId(request)).thenReturn(USER_ID);
+    when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+    when(transactionRepository.findByUserAndTransactionId(user, TRANSACTION_ID))
         .thenThrow(new GlobalException(FailedResultCode.TRANSACTION_NOT_FOUND));
 
     // when
     GlobalException exception = assertThrows(GlobalException.class,
-        () -> facadeManager.deleteTransaction(TRANSACTION_ID));
+        () -> facadeManager.deleteTransaction(request, TRANSACTION_ID));
 
     // then
     assertEquals(
