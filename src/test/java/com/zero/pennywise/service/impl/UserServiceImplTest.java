@@ -6,12 +6,11 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.zero.pennywise.auth.jwt.JwtUtil;
-import com.zero.pennywise.component.facade.FacadeManager;
+import com.zero.pennywise.component.facade.UserFacade;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.user.LoginDTO;
 import com.zero.pennywise.model.request.user.SignUpDTO;
-import com.zero.pennywise.model.request.user.UpdateDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.model.type.SuccessResultCode;
@@ -30,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class UserServiceImplTest {
 
   @Mock
-  private FacadeManager facadeManager;
+  private UserFacade userFacade;
 
   @Mock
   private JwtUtil jwtUtil;
@@ -84,7 +83,7 @@ class UserServiceImplTest {
   @DisplayName("회원가입 : 성공")
   void signup() {
     // given
-    when(facadeManager.createUser(signUpDTO)).thenReturn(user);
+    when(userFacade.createUser(signUpDTO)).thenReturn(user);
 
     // when
     ResultResponse response = userServiceImpl.signup(signUpDTO);
@@ -97,7 +96,7 @@ class UserServiceImplTest {
   @DisplayName("회원가입 : 실패 - 중복된 이메일")
   void signup_Failed_ExistsEmail() {
     // given
-    when(facadeManager.createUser(signUpDTO))
+    when(userFacade.createUser(signUpDTO))
         .thenThrow(new GlobalException(FailedResultCode.EMAIL_ALREADY_USED));
 
     // when
@@ -115,7 +114,7 @@ class UserServiceImplTest {
   @DisplayName("회원가입 : 실패 - 중복된 닉네임")
   void signup_Failed_ExistsNickname() {
     // given
-    when(facadeManager.createUser(signUpDTO))
+    when(userFacade.createUser(signUpDTO))
         .thenThrow(new GlobalException(FailedResultCode.NICKNAME_ALREADY_USED));
 
     // when
@@ -133,7 +132,7 @@ class UserServiceImplTest {
   @DisplayName("로그인 : 성공")
   void login() {
     // given
-    when(facadeManager.validateLoginData(loginDTO)).thenReturn(user);
+    when(userFacade.validateLoginData(loginDTO)).thenReturn(user);
     when(jwtUtil.createJwt("access", user.getUserId(), USER_ROLE)).thenReturn(ACCESS);
     when(jwtUtil.createJwt("refresh", user.getUserId(), USER_ROLE)).thenReturn(REFRESH);
 
@@ -148,7 +147,7 @@ class UserServiceImplTest {
   @DisplayName("로그인 : 실패 - 존재하지 않는 사용자")
   void login_Failed_UserNotFound() {
     // given
-    when(facadeManager.validateLoginData(loginDTO)).
+    when(userFacade.validateLoginData(loginDTO)).
         thenThrow(new GlobalException(FailedResultCode.USER_NOT_FOUND));
 
     // when
@@ -166,7 +165,7 @@ class UserServiceImplTest {
   @DisplayName("로그인 : 실패 - 비밀번호 불일치")
   void login_Failed_PasswordMisMatch() {
     // given
-    when(facadeManager.validateLoginData(loginDTO)).
+    when(userFacade.validateLoginData(loginDTO)).
         thenThrow(new GlobalException(FailedResultCode.PASSWORD_MISMATCH));
 
     // when
@@ -184,7 +183,7 @@ class UserServiceImplTest {
   @DisplayName("회원 정보 조회 : 성공")
   void getUserInfo() {
     // given
-    when(facadeManager.getUserByAccessToken(request)).thenReturn(user);
+    when(userFacade.getUserByAccessToken(request)).thenReturn(user);
 
     // when
     ResultResponse resultResponse = userServiceImpl.getUserInfo(request);
@@ -197,7 +196,7 @@ class UserServiceImplTest {
   @DisplayName("회원 정보 조회 : 실패")
   void getUserInfo_Failed_UserNotFound() {
     // given
-    when(facadeManager.getUserByAccessToken(request))
+    when(userFacade.getUserByAccessToken(request))
         .thenThrow(new GlobalException(FailedResultCode.USER_NOT_FOUND));
 
     // when
@@ -215,7 +214,7 @@ class UserServiceImplTest {
   @DisplayName("회원 정보 수정 : 성공")
   void updateUserInfo() {
     // given
-    when(facadeManager.updateUserInfo(request, updateDTO)).thenReturn(user);
+    when(userFacade.updateUserInfo(request, updateDTO)).thenReturn(user);
 
     // when
     ResultResponse response = userServiceImpl.updateUserInfo(updateDTO, request);
@@ -228,7 +227,7 @@ class UserServiceImplTest {
   @DisplayName("회원 정보 수정 : 실패 - 존재하지 않은 사용자")
   void updateUserInfo_Failed_UserNotFound() {
     // given
-    when(facadeManager.updateUserInfo(request, updateDTO))
+    when(userFacade.updateUserInfo(request, updateDTO))
         .thenThrow(new GlobalException(FailedResultCode.USER_NOT_FOUND));
 
     // when
@@ -246,7 +245,7 @@ class UserServiceImplTest {
   @DisplayName("회원 정보 수정 : 실패 - 비밀번호 불일치")
   void updateUserInfo_Failed_PasswordMisMatch() {
     // given
-    when(facadeManager.updateUserInfo(request, updateDTO))
+    when(userFacade.updateUserInfo(request, updateDTO))
         .thenThrow(new GlobalException(FailedResultCode.PASSWORD_MISMATCH));
 
     // when
@@ -264,7 +263,7 @@ class UserServiceImplTest {
   @DisplayName("회원 정보 수정 : 실패 - 중복된 닉네임")
   void updateUserInfo_Failed_ExistsNickname() {
     // given
-    when(facadeManager.updateUserInfo(request, updateDTO))
+    when(userFacade.updateUserInfo(request, updateDTO))
         .thenThrow(new GlobalException(FailedResultCode.NICKNAME_ALREADY_USED));
 
     // when
@@ -293,7 +292,7 @@ class UserServiceImplTest {
   void deleteUser_Failed_UserNotFound() {
     // given
     doThrow(new GlobalException(FailedResultCode.USER_NOT_FOUND))
-        .when(facadeManager).deleteAllUserData(request);
+        .when(userFacade).deleteAllUserData(request);
 
     // when
     GlobalException exception = assertThrows(GlobalException.class,

@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 public enum SuccessResultCode {
 
   // User
+  VALIDATE_EMAIL(HttpStatus.OK, "이메일 중복 검증 성공"),
+  VALIDATE_NICKNAME(HttpStatus.OK, "닉네임 중복 검증 성공"),
+  VALIDATE_PASSWORD(HttpStatus.OK, "비밀번호 검증 성공"),
   SUCCESS_SIGNUP(HttpStatus.CREATED, "회원가입 성공!"),
   SUCCESS_LOGIN(HttpStatus.OK, "로그인 성공!"),
   SUCCESS_GET_USER_INFO(HttpStatus.OK, "회원 정보 조회 성공!"),

@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 
-@Entity(name = "Users")
+@Entity(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
