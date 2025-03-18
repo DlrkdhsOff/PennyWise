@@ -1,7 +1,7 @@
 package com.zero.pennywise.model.response.transaction;
 
 import com.zero.pennywise.entity.TransactionEntity;
-import java.time.format.DateTimeFormatter;
+import com.zero.pennywise.utils.FormatUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -19,15 +19,15 @@ public class Transactions {
 
   private String categoryName;
 
-  private Long amount;
+  private String amount;
 
   private String description;
 
   private String dateTime;
 
-  private Long totalIncomeAmount;
+  private String totalIncomeAmount;
 
-  private Long totalExpensesAmount;
+  private String totalExpensesAmount;
 
   public static List<Transactions> of(List<TransactionEntity> transaction) {
     return transaction.stream()
@@ -35,11 +35,11 @@ public class Transactions {
             entity.getTransactionId(),
             entity.getType().getText(),
             entity.getCategory().getCategoryName(),
-            entity.getAmount(),
+            FormatUtil.formatWon(entity.getAmount()),
             entity.getDescription(),
-            entity.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-            entity.getTotalIncomeAmount(),
-            entity.getTotalExpensesAmount()
+            FormatUtil.formatTime(entity.getCreateAt()),
+            FormatUtil.formatWon(entity.getTotalIncomeAmount()),
+            FormatUtil.formatWon(entity.getTotalExpensesAmount())
         ))
         .collect(Collectors.toList());
   }

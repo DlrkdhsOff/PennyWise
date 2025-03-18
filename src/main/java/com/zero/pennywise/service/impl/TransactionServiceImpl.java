@@ -51,7 +51,8 @@ public class TransactionServiceImpl implements TransactionService {
     UserEntity user = userFacade.getUserByAccessToken(request);
     CategoryEntity category = financeFacade.findCategory(user, transactionDTO.getCategoryName());
 
-    financeFacade.createAndSaveTransaction(user, category, transactionDTO);
+    TransactionEntity transaction = financeFacade.createAndSaveTransaction(user, category, transactionDTO);
+    financeFacade.checkBudget(transaction);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_CREATE_TRANSACTION);
   }
