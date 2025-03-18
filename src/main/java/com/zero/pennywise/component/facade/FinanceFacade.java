@@ -1,9 +1,13 @@
 package com.zero.pennywise.component.facade;
 
+import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
+import com.zero.pennywise.model.request.budget.BudgetDTO;
+import com.zero.pennywise.model.response.budget.Budget;
 import com.zero.pennywise.model.type.FailedResultCode;
+import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,19 +15,19 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/**
- * 재무 관련 작업을 처리하는 퍼사드 컴포넌트.
- * 카테고리 관리를 위한 비즈니스 로직을 캡슐화합니다.
- */
+
 @Component
 @RequiredArgsConstructor
 public class FinanceFacade {
 
-  // 카테고리 데이터 접근을 위한 리포지토리
   private final CategoryRepository categoryRepository;
+  private final BudgetRepository budgetRepository;
+
+
+  // ================================ Category ================================
 
   /**
-   * 특정 사용자의 모든 카테고리 목록을 조회합니다.
+   * 특정 사용자의 모든 카테고리 목록 조회.
    *
    * @param user 카테고리를 조회할 사용자 엔티티
    * @return 사용자의 카테고리 이름 목록 (존재하지 않을 경우 빈 리스트)
@@ -37,7 +41,7 @@ public class FinanceFacade {
   }
 
   /**
-   * 카테고리 생성 전 중복 여부를 검증합니다.
+   * 카테고리 생성 전 중복 여부 검증.
    *
    * @param user 카테고리를 생성하려는 사용자 엔티티
    * @param categoryName 검증할 카테고리 이름
@@ -51,7 +55,7 @@ public class FinanceFacade {
   }
 
   /**
-   * 새로운 카테고리를 생성하고 저장합니다.
+   * 카테고리를 생성 및 저장.
    *
    * @param user 카테고리를 생성하는 사용자 엔티티
    * @param categoryName 생성할 카테고리 이름
@@ -66,7 +70,7 @@ public class FinanceFacade {
   }
 
   /**
-   * 특정 사용자의 카테고리를 삭제합니다.
+   * 특정 사용자의 카테고리 삭제.
    *
    * @param user 카테고리를 삭제하는 사용자 엔티티
    * @param categoryName 삭제할 카테고리 이름
@@ -74,5 +78,91 @@ public class FinanceFacade {
   public void deleteCategory(UserEntity user, String categoryName) {
     // 사용자와 카테고리명으로 카테고리 삭제
     categoryRepository.deleteByUserAndCategoryName(user, categoryName);
+  }
+
+  /**
+   * 특정 사용자가 입력한 카테고리와 일치하는 CategoryEntity 조회.
+   *
+   * @param user 카테고리를 조회할 사용자 엔티티
+   * @param categoryName 조회할 카테고리 이름
+   * @throws GlobalException 존재하지 않은 카테고리일 경우 예외 발생
+   */
+  public CategoryEntity findCategory(UserEntity user, String categoryName) {
+    return categoryRepository.findByUserAndCategoryName(user, categoryName)
+        .orElseThrow(() -> new GlobalException(FailedResultCode.CATEGORY_NOT_FOUND));
+  }
+
+
+  // ================================ Budget ================================
+
+  /**
+   * 현재 사용자의 모든 예산 목록 조회.
+   *
+   * @param user 예산을 조회할 사용자 엔티티
+   * @return 사용자의 예산 목록 (존재하지 않을 경우 빈 리스트)
+   */
+  public List<Budget> getBudgetList(UserEntity user) {
+    return budgetRepository.findAllByUser(user)
+        .map(budgetList -> budgetList.stream()
+            .map(Budget::of)
+            .collect(Collectors.toList()))
+        .orElse(new ArrayList<>());
+  }
+
+  /**
+   * 동일한 카테고리의 예산 존재 여부 검증.
+   *
+   * @param user 예산을 생성하려는 사용자 엔티티
+   * @param category 검증할 카테고리 엔티티
+   * @throws GlobalException 이미 해당 카테고리에 예산이 존재할 경우 예외 발생
+   */
+  public void validateBudget(UserEntity user, CategoryEntity category) {
+    if(budgetRepository.existsByUserAndCategory(user, category)) {
+      throw new GlobalException(FailedResultCode.BUDGET_ALREADY_USED);
+    }
+  }
+
+  /**
+   * 새로운 예산을 생성 생성 및 저장.
+   *
+   * @param user 예산을 생성하는 사용자 엔티티
+   * @param category 예산에 연결된 카테고리 엔티티
+   * @param budgetDTO 생성할 예산 정보를 담은 DTO
+   */
+  public void createAndSaveBudget(UserEntity user, CategoryEntity category, BudgetDTO budgetDTO) {
+    budgetRepository.save(BudgetDTO.of(user, category, budgetDTO));
+  }
+
+  /**
+   * 사용자와 카테고리에 해당하는 예산 조회.
+   *
+   * @param user 예산을 조회할 사용자 엔티티
+   * @param category 조회할 카테고리 엔티티
+   * @return 조회된 예산 엔티티
+   * @throws GlobalException 해당 예산이 존재하지 않을 경우 예외 발생
+   */
+  public BudgetEntity findBudget(UserEntity user, CategoryEntity category) {
+    return budgetRepository.findByUserAndCategory(user, category)
+        .orElseThrow(() -> new GlobalException(FailedResultCode.BUDGET_NOT_FOUND));
+  }
+
+  /**
+   * 기존 예산의 금액을 수정.
+   *
+   * @param budget 업데이트할 예산 엔티티
+   * @param amount 새로 설정할 예산 금액
+   */
+  public void updateBudget(BudgetEntity budget, Long amount) {
+    budgetRepository.updateBudget(budget.getBudgetId(), amount);
+  }
+
+  /**
+   * 특정 사용자의 예산 삭제.
+   *
+   * @param user 예산을 삭제하는 사용자 엔티티
+   * @param budget 삭제할 예산 엔티티
+   */
+  public void deleteBudget(UserEntity user, BudgetEntity budget) {
+    budgetRepository.deleteByUserAndBudgetId(user, budget.getBudgetId());
   }
 }

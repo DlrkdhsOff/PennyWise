@@ -1,5 +1,6 @@
 package com.zero.pennywise.model.response.budget;
 
+import com.zero.pennywise.entity.BudgetEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Budgets {
+public class Budget {
 
   private Long budgetId;
 
@@ -17,6 +18,10 @@ public class Budgets {
 
   private Long amount;
 
-  private Long balance;
-
+  public static Budget of(BudgetEntity budget) {
+    return new Budget(
+        budget.getBudgetId(),
+        budget.getCategory().getCategoryName(),
+        budget.getAmount());
+  }
 }
