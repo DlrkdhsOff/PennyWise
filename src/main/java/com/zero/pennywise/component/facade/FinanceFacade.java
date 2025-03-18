@@ -9,19 +9,21 @@ import com.zero.pennywise.model.request.budget.BudgetDTO;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
 import com.zero.pennywise.model.response.budget.Budget;
-import com.zero.pennywise.model.response.page.PageResponse;
 import com.zero.pennywise.model.response.transaction.TotalAmount;
 import com.zero.pennywise.model.response.transaction.Transactions;
+import com.zero.pennywise.model.response.waring.MessageDTO;
 import com.zero.pennywise.model.type.FailedResultCode;
-import com.zero.pennywise.model.type.TransactionType;
+import com.zero.pennywise.model.type.NotificationType;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.TransactionRepository;
-import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
+import com.zero.pennywise.utils.FormatUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 
@@ -33,6 +35,7 @@ public class FinanceFacade {
   private final BudgetRepository budgetRepository;
   private final TransactionQueryRepository transactionQueryRepository;
   private final TransactionRepository transactionRepository;
+  private final RedisTemplate<String, Object> redisTemplate;
 
   // ================================================================ Category ================================================================
 
@@ -175,6 +178,24 @@ public class FinanceFacade {
     budgetRepository.delete(budget);
   }
 
+  public void checkBudget(TransactionEntity transaction) {
+    BudgetEntity budget = budgetRepository.findByUserAndCategory(
+        transaction.getUser(), transaction.getCategory())
+        .orElse(null);
+
+    if(budget != null && budget.getAmount() < transaction.getTotalExpensesAmount()) {
+      String overAmount = FormatUtil.formatWon(transaction.getTotalExpensesAmount() - budget.getAmount());
+      String message = FormatUtil.formatOverBudgetMessage(transaction.getCategory().getCategoryName(), overAmount);
+
+      MessageDTO messageDTO = new MessageDTO(
+          transaction.getUser().getUserId(),
+          NotificationType.OVER_BUDGET,
+          message
+      );
+      redisTemplate.convertAndSend("notifications", messageDTO);
+    }
+  }
+
 
   // ================================================================ Transaction ================================================================
 
@@ -196,12 +217,12 @@ public class FinanceFacade {
    * @param category 거래와 연결된 카테고리 엔티티
    * @param transactionDTO 생성할 거래 정보를 담은 DTO
    */
-  public void createAndSaveTransaction(UserEntity user, CategoryEntity category, TransactionDTO transactionDTO) {
+  public TransactionEntity createAndSaveTransaction(UserEntity user, CategoryEntity category, TransactionDTO transactionDTO) {
     // 사용자와 카테고리의 현재 총 금액 조회
     TotalAmount totalAmount = transactionQueryRepository.getTotalAmount(user, category);
 
     // 거래 엔티티 생성 및 저장
-    transactionRepository.save(TransactionDTO.of(user, category, transactionDTO, totalAmount));
+    return transactionRepository.save(TransactionDTO.of(user, category, transactionDTO, totalAmount));
   }
 
   /**

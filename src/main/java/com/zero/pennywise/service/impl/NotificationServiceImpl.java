@@ -52,6 +52,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     if (emitter != null) {
       try {
+        log.info("==================================");
         emitter.send(SseEmitter.event().name("notifications").data(message));
       } catch (IOException e) {
         emitters.remove(userId);
@@ -68,11 +69,16 @@ public class NotificationServiceImpl implements NotificationService {
       MessageDTO messageDTO = mapper.readValue(message.getBody(), MessageDTO.class);
 
       log.info("message: {}", messageDTO.getMessage());
-      sendNotification(messageDTO.getUser().getUserId(), messageDTO.getMessage());
-      notificationRepository.save(MessageDTO.of(messageDTO));
+      sendNotification(messageDTO.getUserId(), messageDTO.getMessage());
+      saveNotification(messageDTO);
     } catch (IOException e) {
       log.info("Exception {}", e.getMessage());
     }
+  }
+
+  private void saveNotification(MessageDTO messageDTO) {
+    UserEntity user = userFacade.findByUserId(messageDTO.getUserId());
+    notificationRepository.save(MessageDTO.of(user, messageDTO));
   }
 
   @Override

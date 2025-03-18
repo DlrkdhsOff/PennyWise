@@ -1,7 +1,6 @@
 package com.zero.pennywise.controller;
 
 import com.zero.pennywise.model.request.budget.BudgetDTO;
-import com.zero.pennywise.model.request.budget.UpdateBudgetDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;

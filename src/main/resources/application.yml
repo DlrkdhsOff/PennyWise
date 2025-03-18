@@ -1,13 +1,16 @@
 spring:
+  config:
+    import: classpath:secret.yml
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/pennywise
-    username: root
-    password: dlrkdhsoff
+    url: ${DEV.DATABASE.URL}
+    username: ${DEV.DATABASE.USERNAME}
+    password: ${DEV.DATABASE.PASSWORD}
 
   jwt:
     secret:
-      key: KU1MrpjZAhmPgnD6pfZ6pVFfOFL8yVuQ7/rQDki/iVkzesH8782X9s656q1txnhzkg1I40ovzcpgXCUHD40/qQ==
+      key: ${DEV.JWT.SECRET.KEY}
 
   jpa:
     show-sql: true
@@ -17,6 +20,6 @@ spring:
 
   data:
     redis:
-      port: 6379
-      host: localhost
-      timeout: 1000
+      port: ${DEV.REDIS.PORT}
+      host: ${DEV.REDIS.HOST}
+      timeout: ${DEV.REDIS.TIMEOUT}

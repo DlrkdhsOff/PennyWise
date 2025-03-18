@@ -1,6 +1,7 @@
 package com.zero.pennywise.model.response.budget;
 
 import com.zero.pennywise.entity.BudgetEntity;
+import com.zero.pennywise.utils.FormatUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,12 +17,12 @@ public class Budget {
 
   private String categoryName;
 
-  private Long amount;
+  private String amount;
 
   public static Budget of(BudgetEntity budget) {
     return new Budget(
         budget.getBudgetId(),
         budget.getCategory().getCategoryName(),
-        budget.getAmount());
+        FormatUtil.formatWon(budget.getAmount()));
   }
 }
