@@ -1,7 +1,6 @@
-package com.zero.pennywise.enums;
+package com.zero.pennywise.model.type;
 
 import com.zero.pennywise.exception.GlobalException;
-import com.zero.pennywise.model.type.FailedResultCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

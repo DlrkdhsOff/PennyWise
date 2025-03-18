@@ -1,6 +1,6 @@
 package com.zero.pennywise.entity;
 
-import com.zero.pennywise.enums.TransactionType;
+import com.zero.pennywise.model.type.TransactionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

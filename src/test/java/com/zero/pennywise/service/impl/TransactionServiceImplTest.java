@@ -9,7 +9,7 @@ import com.zero.pennywise.component.facade.FacadeManager;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.enums.TransactionType;
+import com.zero.pennywise.model.type.TransactionType;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
