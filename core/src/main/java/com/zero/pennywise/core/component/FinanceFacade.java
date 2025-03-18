@@ -1,4 +1,4 @@
-package com.zero.pennywise.api.component;
+package com.zero.pennywise.core.component;
 
 import com.zero.pennywise.domain.entity.BudgetEntity;
 import com.zero.pennywise.domain.entity.CategoryEntity;

@@ -1,7 +1,7 @@
 package com.zero.pennywise.api.controller;
 
 import com.zero.pennywise.domain.model.response.ResultResponse;
-import com.zero.pennywise.api.service.NotificationService;
+import com.zero.pennywise.core.service.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

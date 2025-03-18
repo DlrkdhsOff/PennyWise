@@ -2,7 +2,7 @@ package com.zero.pennywise.api.controller;
 
 import com.zero.pennywise.domain.model.request.budget.BudgetDTO;
 import com.zero.pennywise.domain.model.response.ResultResponse;
-import com.zero.pennywise.api.service.BudgetService;
+import com.zero.pennywise.core.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

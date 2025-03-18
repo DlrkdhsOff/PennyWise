@@ -1,6 +1,6 @@
 package com.zero.pennywise.api.config;
 
-import com.zero.pennywise.api.service.impl.NotificationServiceImpl;
+import com.zero.pennywise.core.service.impl.NotificationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

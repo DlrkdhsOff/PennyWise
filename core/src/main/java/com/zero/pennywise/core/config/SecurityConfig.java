@@ -1,8 +1,8 @@
-package com.zero.pennywise.api.config;
+package com.zero.pennywise.core.config;
 
 
-import com.zero.pennywise.api.auth.jwt.JwtFilter;
-import com.zero.pennywise.api.auth.jwt.JwtUtil;
+import com.zero.pennywise.core.auth.jwt.JwtFilter;
+import com.zero.pennywise.core.auth.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

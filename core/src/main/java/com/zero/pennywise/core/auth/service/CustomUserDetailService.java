@@ -1,4 +1,4 @@
-package com.zero.pennywise.api.auth.service;
+package com.zero.pennywise.core.auth.service;
 
 import com.zero.pennywise.domain.entity.UserEntity;
 import com.zero.pennywise.core.exception.GlobalException;

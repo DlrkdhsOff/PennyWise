@@ -1,7 +1,7 @@
 package com.zero.pennywise.api.controller;
 
 import com.zero.pennywise.domain.model.response.ResultResponse;
-import com.zero.pennywise.api.service.CategoryService;
+import com.zero.pennywise.core.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.zero.pennywise.api.config;
+package com.zero.pennywise.core.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

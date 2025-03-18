@@ -1,4 +1,4 @@
-package com.zero.pennywise.api.service;
+package com.zero.pennywise.core.service;
 
 import com.zero.pennywise.domain.model.request.budget.BudgetDTO;
 import com.zero.pennywise.domain.model.response.ResultResponse;

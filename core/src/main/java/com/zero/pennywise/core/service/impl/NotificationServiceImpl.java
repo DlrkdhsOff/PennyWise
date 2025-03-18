@@ -1,7 +1,8 @@
-package com.zero.pennywise.api.service.impl;
+package com.zero.pennywise.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zero.pennywise.api.component.UserFacade;
+import com.zero.pennywise.core.service.NotificationService;
+import com.zero.pennywise.core.component.UserFacade;
 import com.zero.pennywise.domain.entity.UserEntity;
 import com.zero.pennywise.domain.model.response.ResultResponse;
 import com.zero.pennywise.domain.model.response.page.PageResponse;
@@ -9,7 +10,6 @@ import com.zero.pennywise.domain.model.response.waring.MessageDTO;
 import com.zero.pennywise.domain.model.response.waring.NotificationDTO;
 import com.zero.pennywise.domain.model.type.SuccessResultCode;
 import com.zero.pennywise.domain.repository.NotificationRepository;
-import com.zero.pennywise.api.service.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;

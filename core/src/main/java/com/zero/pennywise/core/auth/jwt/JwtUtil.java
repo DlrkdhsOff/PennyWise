@@ -1,6 +1,6 @@
-package com.zero.pennywise.api.auth.jwt;
+package com.zero.pennywise.core.auth.jwt;
 
-import com.zero.pennywise.api.auth.service.CustomUserDetailService;
+import com.zero.pennywise.core.auth.service.CustomUserDetailService;
 import com.zero.pennywise.domain.model.type.TokenType;
 import com.zero.pennywise.domain.model.type.UserRole;
 import io.jsonwebtoken.Jwts;
