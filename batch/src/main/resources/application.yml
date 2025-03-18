@@ -1,0 +1,25 @@
+spring:
+  config:
+    import: classpath:secret.yml
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DEV.DATABASE.URL}
+    username: ${DEV.DATABASE.USERNAME}
+    password: ${DEV.DATABASE.PASSWORD}
+
+  jwt:
+    secret:
+      key: ${DEV.JWT.SECRET.KEY}
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  data:
+    redis:
+      port: ${DEV.REDIS.PORT}
+      host: ${DEV.REDIS.HOST}
+      timeout: ${DEV.REDIS.TIMEOUT}

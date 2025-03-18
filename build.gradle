@@ -4,68 +4,72 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
-group = 'com.zero'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    // Spring Web
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+bootJar.enabled = false
+jar.enabled = true
 
-    // Spring Security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation 'org.springframework.security:spring-security-test'
+subprojects {
+    group = 'com.zero.pennwise'
+    version = '0.0.1-SNAPSHOT'
 
-    // Jwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
 
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    apply plugin : 'java'
+    apply plugin : 'java-library'
+    apply plugin : 'org.springframework.boot'
+    apply plugin : 'io.spring.dependency-management'
 
-    // JPA
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-    // MySQL
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    repositories {
+        mavenCentral()
+    }
 
-    // Validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    dependencies {
+        // Spring Web
+        implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // QueryDSL
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+        // Lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
 
-    // Redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+        // JPA
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // Spring Batch
-    implementation 'org.springframework.boot:spring-boot-starter-batch'
-    testImplementation 'org.springframework.batch:spring-batch-test'
+        // QueryDSL
+        implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+        annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+        annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+        annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-    // Swagger - SpringDoc
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+        // MySQL
+        runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // Validation
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+        // Redis
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+        // Test
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
 
