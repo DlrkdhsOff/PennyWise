@@ -18,13 +18,19 @@ public class PageResponse<T> {
   private List<T> dataList;
 
   public static <T> PageResponse<T> of(List<T> list, int pageNumber) {
-    // pagination 처리
-
-    Pageable pageable = PageRequest.of(pageNumber - 1, 4);
+    int pageSize = 5;  // 페이지 크기 설정
+    Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
     int start = (int) pageable.getOffset();
-    int end = Math.min((start + pageable.getPageSize()), list.size());
 
+    // start 인덱스가 데이터 리스트 크기를 초과하면 빈 페이지 반환
+    if (start >= list.size()) {
+      return new PageResponse<>(pageNumber, 0, 0L, List.of());
+    }
+
+    int end = Math.min(start + pageSize, list.size());
     List<T> pagedList = list.subList(start, end);
+
+    // 페이징 객체 생성
     Page<T> page = new PageImpl<>(pagedList, pageable, list.size());
 
     // Page를 PageResponse로 변환

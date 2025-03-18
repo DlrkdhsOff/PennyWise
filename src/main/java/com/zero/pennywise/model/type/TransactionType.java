@@ -8,26 +8,22 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TransactionType {
 
-  FIXED_EXPENSES("고정 지출"),
-  FIXED_INCOME("고정 수입"),
+  FIXED_EXPENSES("고정지출"),
+  FIXED_INCOME("고정수입"),
   EXPENSES("지출"),
   INCOME("수입"),
   END("만기");
 
-  private final String transactionType;
+  private final String text;
 
   public static TransactionType getTransactionType(String type) {
     return switch (type) {
       case "지출" -> EXPENSES;
       case "수입" -> INCOME;
-      case "고정 지출" -> FIXED_EXPENSES;
-      case "고정 수입" -> FIXED_INCOME;
+      case "고정지출" -> FIXED_EXPENSES;
+      case "고정수입" -> FIXED_INCOME;
       default -> throw new GlobalException(FailedResultCode.INVALID_TRANSACTION_TYPE);
     };
-  }
-
-  public static String of(TransactionType type) {
-    return type.transactionType;
   }
 
   public boolean isExpenses() {
