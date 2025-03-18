@@ -35,6 +35,9 @@ public enum SuccessResultCode {
   SUCCESS_GET_TRANSACTION_INFO(HttpStatus.OK, "거래 목록 조회 성공!"),
   SUCCESS_UPDATE_TRANSACTION(HttpStatus.OK, "거래 수정 성공!"),
   SUCCESS_DELETE_TRANSACTION(HttpStatus.OK, "거래 삭제 성공!"),
+
+  // WaringMessage
+  SUCCESS_GET_WARING_MESSAGE(HttpStatus.OK, "알림 내역 조회 성공")
   ;
 
   private final HttpStatus status;
