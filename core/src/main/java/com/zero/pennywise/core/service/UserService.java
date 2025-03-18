@@ -1,4 +1,4 @@
-package com.zero.pennywise.api.service;
+package com.zero.pennywise.core.service;
 
 import com.zero.pennywise.domain.model.request.user.LoginDTO;
 import com.zero.pennywise.domain.model.request.user.SignUpDTO;

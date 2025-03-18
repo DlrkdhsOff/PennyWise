@@ -1,4 +1,4 @@
-package com.zero.pennywise.api.auth.jwt;
+package com.zero.pennywise.core.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zero.pennywise.domain.model.type.TokenType;

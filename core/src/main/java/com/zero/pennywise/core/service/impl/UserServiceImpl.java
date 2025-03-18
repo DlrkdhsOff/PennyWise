@@ -1,13 +1,13 @@
-package com.zero.pennywise.api.service.impl;
+package com.zero.pennywise.core.service.impl;
 
-import com.zero.pennywise.api.component.UserFacade;
+import com.zero.pennywise.core.component.UserFacade;
 import com.zero.pennywise.domain.entity.UserEntity;
 import com.zero.pennywise.domain.model.request.user.LoginDTO;
 import com.zero.pennywise.domain.model.request.user.SignUpDTO;
 import com.zero.pennywise.domain.model.response.ResultResponse;
 import com.zero.pennywise.domain.model.response.user.UserInfo;
 import com.zero.pennywise.domain.model.type.SuccessResultCode;
-import com.zero.pennywise.api.service.UserService;
+import com.zero.pennywise.core.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

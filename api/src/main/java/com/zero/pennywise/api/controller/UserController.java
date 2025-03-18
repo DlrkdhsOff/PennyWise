@@ -3,7 +3,7 @@ package com.zero.pennywise.api.controller;
 import com.zero.pennywise.domain.model.request.user.LoginDTO;
 import com.zero.pennywise.domain.model.request.user.SignUpDTO;
 import com.zero.pennywise.domain.model.response.ResultResponse;
-import com.zero.pennywise.api.service.UserService;
+import com.zero.pennywise.core.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

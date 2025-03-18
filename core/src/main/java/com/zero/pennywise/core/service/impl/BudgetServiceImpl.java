@@ -1,7 +1,8 @@
-package com.zero.pennywise.api.service.impl;
+package com.zero.pennywise.core.service.impl;
 
-import com.zero.pennywise.api.component.FinanceFacade;
-import com.zero.pennywise.api.component.UserFacade;
+import com.zero.pennywise.core.service.BudgetService;
+import com.zero.pennywise.core.component.FinanceFacade;
+import com.zero.pennywise.core.component.UserFacade;
 import com.zero.pennywise.domain.entity.BudgetEntity;
 import com.zero.pennywise.domain.entity.CategoryEntity;
 import com.zero.pennywise.domain.entity.UserEntity;
@@ -9,7 +10,6 @@ import com.zero.pennywise.domain.model.request.budget.BudgetDTO;
 import com.zero.pennywise.domain.model.response.ResultResponse;
 import com.zero.pennywise.domain.model.response.budget.Budget;
 import com.zero.pennywise.domain.model.type.SuccessResultCode;
-import com.zero.pennywise.api.service.BudgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

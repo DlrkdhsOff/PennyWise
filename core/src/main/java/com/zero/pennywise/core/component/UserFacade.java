@@ -1,7 +1,7 @@
-package com.zero.pennywise.api.component;
+package com.zero.pennywise.core.component;
 
 
-import com.zero.pennywise.api.auth.jwt.JwtUtil;
+import com.zero.pennywise.core.auth.jwt.JwtUtil;
 import com.zero.pennywise.domain.entity.UserEntity;
 import com.zero.pennywise.core.exception.GlobalException;
 import com.zero.pennywise.domain.model.request.user.LoginDTO;
