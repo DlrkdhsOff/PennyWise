@@ -1,8 +1,7 @@
 package com.zero.pennywise.auth.service;
 
-import com.zero.pennywise.component.facade.FacadeManager;
+import com.zero.pennywise.component.facade.UserFacade;
 import com.zero.pennywise.entity.UserEntity;
-import com.zero.pennywise.model.request.user.UserDetailsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,12 +12,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailService implements UserDetailsService {
 
-  private final FacadeManager facadeManager;
+  private final UserFacade userFacade;
 
   @Override
   public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-    UserEntity user = facadeManager.findByUserId(Long.parseLong(userId));
+    UserEntity user = userFacade.findByUserId(Long.parseLong(userId));
 
-    return new UserDetailsDTO(user);
+    return org.springframework.security.core.userdetails.User.builder()
+        .username(user.getEmail())
+        .password("")
+        .roles(user.getRole().toString())
+        .build();
   }
 }
