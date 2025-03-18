@@ -6,7 +6,6 @@ import com.zero.pennywise.model.type.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.redis.connection.Message;
 
 @Getter
 @AllArgsConstructor

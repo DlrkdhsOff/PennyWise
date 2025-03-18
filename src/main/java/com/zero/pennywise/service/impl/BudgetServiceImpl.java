@@ -6,7 +6,6 @@ import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
-import com.zero.pennywise.model.request.budget.UpdateBudgetDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import com.zero.pennywise.model.response.budget.Budget;
 import com.zero.pennywise.model.type.SuccessResultCode;
