@@ -28,6 +28,13 @@ public class ResultResponse {
     this.data = data;
   }
 
+  public ResultResponse(HttpStatus status, String message) {
+    this.code = status.value();
+    this.status = status;
+    this.message = message;
+    this.data = null;
+  }
+
   public static ResultResponse of(SuccessResultCode successResultCode) {
     return new ResultResponse(successResultCode, null);
   }
@@ -35,5 +42,6 @@ public class ResultResponse {
   public static ResultResponse of(FailedResultCode failedResultCode) {
     return new ResultResponse(failedResultCode, null);
   }
+
 
 }
