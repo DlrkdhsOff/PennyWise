@@ -17,6 +17,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
   void deleteByUserAndCategoryName(UserEntity user, String categoryName);
 
-  // 카테고리 중복 여부 검증
+  Optional<CategoryEntity> findByUserAndCategoryName(UserEntity user, String categoryName);
 
 }
