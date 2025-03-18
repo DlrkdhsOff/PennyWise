@@ -9,7 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
 
-  Optional<TransactionEntity> findByUserAndTransactionId(UserEntity user, Long transactionId);
-
-  void deleteAllByUser(UserEntity user);
+  void deleteByUserAndTransactionId(UserEntity user, Long trasactionId);
 }

@@ -2,13 +2,22 @@ package com.zero.pennywise.component.facade;
 
 import com.zero.pennywise.entity.BudgetEntity;
 import com.zero.pennywise.entity.CategoryEntity;
+import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.exception.GlobalException;
 import com.zero.pennywise.model.request.budget.BudgetDTO;
+import com.zero.pennywise.model.request.transaction.TransactionDTO;
+import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
 import com.zero.pennywise.model.response.budget.Budget;
+import com.zero.pennywise.model.response.page.PageResponse;
+import com.zero.pennywise.model.response.transaction.TotalAmount;
+import com.zero.pennywise.model.response.transaction.Transactions;
 import com.zero.pennywise.model.type.FailedResultCode;
+import com.zero.pennywise.model.type.TransactionType;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
+import com.zero.pennywise.repository.TransactionRepository;
+import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,9 +31,10 @@ public class FinanceFacade {
 
   private final CategoryRepository categoryRepository;
   private final BudgetRepository budgetRepository;
+  private final TransactionQueryRepository transactionQueryRepository;
+  private final TransactionRepository transactionRepository;
 
-
-  // ================================ Category ================================
+  // ================================================================ Category ================================================================
 
   /**
    * 특정 사용자의 모든 카테고리 목록 조회.
@@ -93,7 +103,7 @@ public class FinanceFacade {
   }
 
 
-  // ================================ Budget ================================
+  // ================================================================ Budget ================================================================
 
   /**
    * 현재 사용자의 모든 예산 목록 조회.
@@ -165,4 +175,77 @@ public class FinanceFacade {
   public void deleteBudget(UserEntity user, BudgetEntity budget) {
     budgetRepository.deleteByUserAndBudgetId(user, budget.getBudgetId());
   }
+
+
+  // ================================================================ Transaction ================================================================
+
+  /**
+   * 사용자의 거래 내역을 조회.
+   *
+   * @param user 거래 내역을 조회할 사용자 엔티티
+   * @param transactionInfo 조회 조건을 담은 DTO
+   * @return 페이징 처리된 거래 내역 응답
+   */
+  public PageResponse<Transactions> getTransactionList(UserEntity user, TransactionInfoDTO transactionInfo) {
+    return transactionQueryRepository.getTransactionList(user, transactionInfo);
+  }
+
+  /**
+   * 새로운 거래 내역 생성 및 저장.
+   *
+   * @param user 거래를 생성하는 사용자 엔티티
+   * @param category 거래와 연결된 카테고리 엔티티
+   * @param transactionDTO 생성할 거래 정보를 담은 DTO
+   */
+  public void createAndSaveTransaction(UserEntity user, CategoryEntity category, TransactionDTO transactionDTO) {
+    // 사용자와 카테고리의 현재 총 금액 조회
+    TotalAmount totalAmount = transactionQueryRepository.getTotalAmount(user, category);
+
+    // 거래 엔티티 생성 및 저장
+    transactionRepository.save(TransactionDTO.of(user, category, transactionDTO, totalAmount));
+  }
+
+  /**
+   * 사용자의 특정 거래 내역 삭제.
+   *
+   * @param user 거래를 삭제하는 사용자 엔티티
+   * @param transactionId 삭제할 거래의 고유 식별자
+   */
+  public void deleteTransaction(UserEntity user, Long transactionId) {
+    // 사용자와 거래 ID로 거래 내역 삭제
+    transactionRepository.deleteByUserAndTransactionId(user, transactionId);
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class TransactionEntity extends DateEntity{
+public class TransactionEntity extends DateEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
