@@ -1,5 +1,6 @@
 package com.zero.pennywise.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,19 +18,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class BudgetEntity extends DateEntity{
+public class BudgetEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long budgetId;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 
+  @Column(nullable = false)
   private Long amount;
 }

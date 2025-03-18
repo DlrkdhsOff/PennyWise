@@ -8,12 +8,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
-@Entity(name = "Users")
+@Entity(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -24,7 +26,7 @@ public class UserEntity extends DateEntity{
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long userId;
 
-  @Column(length = 50, unique = true)
+  @Column(length = 50, unique = true, nullable = false)
   private String email;
 
   @Column(nullable = false)
@@ -34,5 +36,10 @@ public class UserEntity extends DateEntity{
   private String nickname;
 
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private UserRole role;
+
+  @LastModifiedDate
+  @Column(nullable = false)
+  private LocalDateTime updateAt;
 }
