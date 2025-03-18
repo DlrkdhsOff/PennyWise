@@ -1,5 +1,6 @@
 package com.zero.pennywise.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,15 +18,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class CategoryEntity extends DateEntity {
+public class CategoryEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long categoryId;
 
+  @Column(nullable = false)
   private String categoryName;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 

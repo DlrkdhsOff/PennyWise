@@ -22,27 +22,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class TransactionEntity {
+public class TransactionEntity extends DateEntity{
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long transactionId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
   private UserEntity user;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 
-  @Column(nullable = false)
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private TransactionType type;
 
+  @Column(nullable = false)
   private long amount;
 
+  @Column(nullable = false)
   private String description;
 
-  LocalDateTime dateTime;
+  @Column(nullable = false)
+  private Long totalIncomeAmount;
+
+  @Column(nullable = false)
+  private Long totalExpensesAmount;
 }
