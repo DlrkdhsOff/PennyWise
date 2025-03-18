@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
     // Bearer 시작 여부 및 null 값 검증
     if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
       log.info("Invalid or missing access-token");
-      filterChain.doFilter(request, response);
+      tokenInvalid(response);
       return;
     }
 
@@ -51,7 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
     // Access-Token 만료시간 검증
     if (jwtUtil.isExpired(accessToken)) {
       log.info("access-token is expired");
-      setResponse(response);
+      tokenExpired(response);
       return;
     }
 
@@ -67,8 +67,19 @@ public class JwtFilter extends OncePerRequestFilter {
     SecurityContextHolder.getContext().setAuthentication(authentication);
   }
 
+  private void tokenInvalid(HttpServletResponse response) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+
+
+    Map<String, String> body = Map.of("message", "토큰값이 null 입니다.");
+    response.getWriter().write(objectMapper.writeValueAsString(body));
+  }
+
   // Access-Token 만료시 401 반환
-  private void setResponse(HttpServletResponse response) throws IOException {
+  private void tokenExpired(HttpServletResponse response) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     response.setContentType("application/json");
@@ -84,9 +95,12 @@ public class JwtFilter extends OncePerRequestFilter {
     return requestURI.equals("/")
         || requestURI.equals("/api/v1/users/login")
         || requestURI.equals("/api/v1/users/signup")
-        || requestURI.equals("/v3/api-docs")
-        || requestURI.equals("/swagger-ui")
+        || requestURI.equals("/api/v1/users/validate/email")
+        || requestURI.equals("api/v1/users/validate/nickname")
+        || requestURI.matches("/v3/api-docs/.*")
+        || requestURI.matches("/v3/api-docs")
+        || requestURI.matches("/swagger-ui/.*")
         || requestURI.equals("/swagger-ui.html")
-        || requestURI.equals("/swagger-resources");
+        || requestURI.matches("/swagger-resources/.*");
   }
 }

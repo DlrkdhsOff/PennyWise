@@ -2,6 +2,7 @@ package com.zero.pennywise.repository;
 
 import com.zero.pennywise.entity.CategoryEntity;
 import com.zero.pennywise.entity.UserEntity;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
   boolean existsByUserAndCategoryName(UserEntity user, String categoryName);
 
+  @Transactional
   void deleteByUserAndCategoryName(UserEntity user, String categoryName);
 
   Optional<CategoryEntity> findByUserAndCategoryName(UserEntity user, String categoryName);

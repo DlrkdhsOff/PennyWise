@@ -14,6 +14,7 @@ import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
 import com.zero.pennywise.model.response.transaction.Transactions;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -26,7 +27,7 @@ public class TransactionQueryRepository  {
   QTransactionEntity qTransaction = QTransactionEntity.transactionEntity;
 
 
-  public PageResponse<Transactions> getTransactionList(UserEntity user, TransactionInfoDTO transactionInfoDTO) {
+  public List<Transactions> getTransactionList(UserEntity user, TransactionInfoDTO transactionInfoDTO) {
     BooleanBuilder builder = buildConditions(user, transactionInfoDTO);
 
     List<Transactions> transactionList = Transactions.of(
@@ -35,7 +36,7 @@ public class TransactionQueryRepository  {
         .where(builder)
         .fetch());
 
-    return PageResponse.of(transactionList, transactionInfoDTO.getPage());
+    return transactionList == null ? new ArrayList<>() : transactionList;
 
   }
 
@@ -47,11 +48,16 @@ public class TransactionQueryRepository  {
     if (transactionInfoDTO.getCategoryName() != null) {
       builder.and(qTransaction.category.categoryName.eq(transactionInfoDTO.getCategoryName()));
     }
-    if (transactionInfoDTO.getTransactionType() != null) {
+    if (transactionInfoDTO.getTransactionType() != null
+        && !transactionInfoDTO.getTransactionType().isEmpty()
+        && !transactionInfoDTO.getTransactionType().equals("전체")) {
       builder.and(qTransaction.type.eq(TransactionType.getTransactionType(transactionInfoDTO.getTransactionType())));
     }
     if (transactionInfoDTO.getMonth() != null) {
-      builder.and(qTransaction.createAt.between(LocalDateTime.now(), LocalDateTime.now().minusMonths(transactionInfoDTO.getMonth())));
+      builder.and(qTransaction.createAt.between(
+          LocalDateTime.now().minusMonths(
+              transactionInfoDTO.getMonth() == 0 ? 1 : transactionInfoDTO.getMonth()),
+          LocalDateTime.now()));
     }
 
     return builder;

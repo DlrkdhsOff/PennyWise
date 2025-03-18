@@ -3,6 +3,7 @@ package com.zero.pennywise.service.impl;
 import com.zero.pennywise.component.facade.FinanceFacade;
 import com.zero.pennywise.component.facade.UserFacade;
 import com.zero.pennywise.entity.CategoryEntity;
+import com.zero.pennywise.entity.TransactionEntity;
 import com.zero.pennywise.entity.UserEntity;
 import com.zero.pennywise.model.request.transaction.TransactionDTO;
 import com.zero.pennywise.model.request.transaction.TransactionInfoDTO;
@@ -32,7 +33,8 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public ResultResponse getTransactionInfo(HttpServletRequest request, TransactionInfoDTO transactionInfo) {
     UserEntity user = userFacade.getUserByAccessToken(request);
-    PageResponse<Transactions> transactionsList = financeFacade.getTransactionList(user, transactionInfo);
+    PageResponse<Transactions> transactionsList = PageResponse
+        .of(financeFacade.getTransactionList(user, transactionInfo), transactionInfo.getPage());
 
     return new ResultResponse(SuccessResultCode.SUCCESS_GET_TRANSACTION_INFO, transactionsList);
   }
@@ -65,7 +67,8 @@ public class TransactionServiceImpl implements TransactionService {
   public ResultResponse deleteTransaction(HttpServletRequest request, Long transactionId) {
     UserEntity user = userFacade.getUserByAccessToken(request);
 
-    financeFacade.deleteTransaction(user, transactionId);
+    TransactionEntity transaction = financeFacade.findTransaction(user, transactionId);
+    financeFacade.deleteTransaction(transaction);
 
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_TRANSACTION);
   }

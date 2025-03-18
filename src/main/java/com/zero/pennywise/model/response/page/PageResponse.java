@@ -19,6 +19,8 @@ public class PageResponse<T> {
 
   public static <T> PageResponse<T> of(List<T> list, int pageNumber) {
     int pageSize = 5;  // 페이지 크기 설정
+
+    pageNumber = pageNumber > 0 ? pageNumber : 1;
     Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
     int start = (int) pageable.getOffset();
 

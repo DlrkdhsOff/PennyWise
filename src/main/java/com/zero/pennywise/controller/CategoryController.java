@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +42,7 @@ public class CategoryController {
    * @param categoryName 생성할 카테고리의 이름
    * @return 카테고리 생성 결과와 적절한 HTTP 상태를 포함한 ResponseEntity
    */
-  @PostMapping
+  @GetMapping("/create")
   public ResponseEntity<ResultResponse> createCategory(
       HttpServletRequest request,
       @RequestParam("categoryName") String categoryName) {

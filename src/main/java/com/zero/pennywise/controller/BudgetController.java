@@ -65,9 +65,9 @@ public class BudgetController {
    */
   @PutMapping
   public ResponseEntity<ResultResponse> updateBudget(HttpServletRequest request,
-      @RequestBody @Valid UpdateBudgetDTO updateBudgetDTO) {
+      @RequestBody @Valid BudgetDTO budgetDTO) {
     // 예산 수정 서비스 호출
-    ResultResponse resultResponse = budgetService.updateBudget(request, updateBudgetDTO);
+    ResultResponse resultResponse = budgetService.updateBudget(request, budgetDTO);
     return new ResponseEntity<>(resultResponse, resultResponse.getStatus());
   }
 
