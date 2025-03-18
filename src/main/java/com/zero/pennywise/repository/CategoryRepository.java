@@ -13,11 +13,10 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
   // 사용자의 모든 카테고리 조회
   Optional<List<CategoryEntity>> findAllByUser(UserEntity user);
 
-  // 카테고리 중복 여부 검증
   boolean existsByUserAndCategoryName(UserEntity user, String categoryName);
 
-  Optional<CategoryEntity> findByUserAndCategoryName(UserEntity user, String categoryName);
+  void deleteByUserAndCategoryName(UserEntity user, String categoryName);
 
-  void deleteAllByUser(UserEntity user);
+  // 카테고리 중복 여부 검증
 
 }
