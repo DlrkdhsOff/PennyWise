@@ -63,19 +63,19 @@ public class BudgetServiceImpl implements BudgetService {
    * 기존 예산 수정.
    *
    * @param request 사용자 인증 정보를 포함하는 HTTP 서블릿 요청
-   * @param updateBudget 수정할 예산 정보를 담은 DTO
+   * @param budgetDTO 수정할 예산 정보를 담은 DTO
    * @return 예산 수정 결과를 포함한 ResultResponse
    */
   @Override
-  public ResultResponse updateBudget(HttpServletRequest request, UpdateBudgetDTO updateBudget) {
+  public ResultResponse updateBudget(HttpServletRequest request, BudgetDTO budgetDTO) {
     UserEntity user = userFacade.getUserByAccessToken(request);
 
     // 사용자의 특정 카테고리 및 해당 카테고리의 예산 조회
-    CategoryEntity category = financeFacade.findCategory(user, updateBudget.getCategoryName());
+    CategoryEntity category = financeFacade.findCategory(user, budgetDTO.getCategoryName());
     BudgetEntity budget = financeFacade.findBudget(user, category);
 
     // 예산 금액 업데이트
-    financeFacade.updateBudget(budget, updateBudget.getAmount());
+    financeFacade.updateBudget(budget, budgetDTO.getAmount());
     return ResultResponse.of(SuccessResultCode.SUCCESS_UPDATE_BUDGET);
   }
 
@@ -95,7 +95,7 @@ public class BudgetServiceImpl implements BudgetService {
     BudgetEntity budget = financeFacade.findBudget(user, category);
 
     // 예산 삭제
-    financeFacade.deleteBudget(user, budget);
+    financeFacade.deleteBudget(budget);
     return ResultResponse.of(SuccessResultCode.SUCCESS_DELETE_BUDGET);
   }
 

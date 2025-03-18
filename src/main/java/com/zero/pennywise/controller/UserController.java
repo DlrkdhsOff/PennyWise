@@ -94,7 +94,7 @@ public class UserController {
    * @param request HTTP 요청 객체 (인증 정보 추출을 위함)
    * @return 사용자 정보
    */
-  @GetMapping
+  @GetMapping("/info")
   public ResponseEntity<ResultResponse> getUserInfo(HttpServletRequest request) {
     ResultResponse response = userService.getUserInfo(request);
     return new ResponseEntity<>(response, response.getStatus());
@@ -107,7 +107,7 @@ public class UserController {
    * @param nickname 새 닉네임
    * @return 수정 결과
    */
-  @PutMapping("/nickname")
+  @PutMapping("/update/nickname")
   public ResponseEntity<ResultResponse> updateNickname(
       HttpServletRequest request,
       @RequestParam("nickname") String nickname) {
@@ -122,7 +122,7 @@ public class UserController {
    * @param password 새 비밀번호
    * @return 수정 결과
    */
-  @PutMapping("/password")
+  @PutMapping("/update/password")
   public ResponseEntity<ResultResponse> updatePassword(
       HttpServletRequest request,
       @RequestParam("password") String password) {

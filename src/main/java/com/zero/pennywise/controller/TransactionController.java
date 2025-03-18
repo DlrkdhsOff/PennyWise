@@ -31,7 +31,7 @@ public class TransactionController {
    * @param transactionInfo 거래 조회 조건을 담은 DTO (유효성 검증 포함)
    * @return 거래 내역과 HTTP 상태를 포함한 ResponseEntity
    */
-  @GetMapping
+  @PostMapping
   public ResponseEntity<ResultResponse> getTransactionList(HttpServletRequest request,
       @RequestBody @Valid TransactionInfoDTO transactionInfo) {
     // 거래 내역 조회 서비스 호출
@@ -46,7 +46,7 @@ public class TransactionController {
    * @param transactionDTO 생성할 거래 정보를 담은 DTO (유효성 검증 포함)
    * @return 거래 생성 결과와 HTTP 상태를 포함한 ResponseEntity
    */
-  @PostMapping
+  @PostMapping("/create")
   public ResponseEntity<ResultResponse> transaction(HttpServletRequest request,
       @RequestBody @Valid TransactionDTO transactionDTO) {
     // 거래 생성 서비스 호출

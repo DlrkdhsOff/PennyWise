@@ -1,7 +1,6 @@
 package com.zero.pennywise.service;
 
 import com.zero.pennywise.model.request.budget.BudgetDTO;
-import com.zero.pennywise.model.request.budget.UpdateBudgetDTO;
 import com.zero.pennywise.model.response.ResultResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -11,7 +10,7 @@ public interface BudgetService {
 
   ResultResponse createBudget(HttpServletRequest request, BudgetDTO budgetDTO);
 
-  ResultResponse updateBudget(HttpServletRequest request, UpdateBudgetDTO updateBudgetDTO);
+  ResultResponse updateBudget(HttpServletRequest request, BudgetDTO budgetDTO);
 
   ResultResponse deleteBudget(HttpServletRequest request, String categoryName);
 

@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
 
   void deleteByUserAndTransactionId(UserEntity user, Long trasactionId);
+
+  Optional<TransactionEntity> findByUserAndTransactionId(UserEntity user, Long transactionId);
 }

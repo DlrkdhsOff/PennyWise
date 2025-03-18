@@ -169,11 +169,10 @@ public class FinanceFacade {
   /**
    * 특정 사용자의 예산 삭제.
    *
-   * @param user 예산을 삭제하는 사용자 엔티티
    * @param budget 삭제할 예산 엔티티
    */
-  public void deleteBudget(UserEntity user, BudgetEntity budget) {
-    budgetRepository.deleteByUserAndBudgetId(user, budget.getBudgetId());
+  public void deleteBudget(BudgetEntity budget) {
+    budgetRepository.delete(budget);
   }
 
 
@@ -186,7 +185,7 @@ public class FinanceFacade {
    * @param transactionInfo 조회 조건을 담은 DTO
    * @return 페이징 처리된 거래 내역 응답
    */
-  public PageResponse<Transactions> getTransactionList(UserEntity user, TransactionInfoDTO transactionInfo) {
+  public List<Transactions> getTransactionList(UserEntity user, TransactionInfoDTO transactionInfo) {
     return transactionQueryRepository.getTransactionList(user, transactionInfo);
   }
 
@@ -206,14 +205,26 @@ public class FinanceFacade {
   }
 
   /**
+   * 사용자와 카테고리에 해당하는 예산 조회.
+   *
+   * @param user 예산을 조회할 사용자 엔티티
+   * @param transactionId 조회할 거래정보 ID
+   * @return 조회된 거래 정보 엔티티
+   * @throws GlobalException 해당 거래 내역이 존재하지 않을 경우 예외 발생
+   */
+  public TransactionEntity findTransaction(UserEntity user, Long transactionId) {
+    return transactionRepository.findByUserAndTransactionId(user, transactionId)
+        .orElseThrow(() -> new GlobalException(FailedResultCode.TRANSACTION_NOT_FOUND));
+  }
+
+  /**
    * 사용자의 특정 거래 내역 삭제.
    *
-   * @param user 거래를 삭제하는 사용자 엔티티
-   * @param transactionId 삭제할 거래의 고유 식별자
+   * @param transaction 삭제할 거래 정보 엔티티
    */
-  public void deleteTransaction(UserEntity user, Long transactionId) {
-    // 사용자와 거래 ID로 거래 내역 삭제
-    transactionRepository.deleteByUserAndTransactionId(user, transactionId);
+  public void deleteTransaction(TransactionEntity transaction) {
+
+    transactionRepository.delete(transaction);
   }
 }
 
