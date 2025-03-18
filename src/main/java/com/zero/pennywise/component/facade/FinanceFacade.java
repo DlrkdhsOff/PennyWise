@@ -15,7 +15,7 @@ import com.zero.pennywise.model.type.FailedResultCode;
 import com.zero.pennywise.repository.BudgetRepository;
 import com.zero.pennywise.repository.CategoryRepository;
 import com.zero.pennywise.repository.TransactionRepository;
-import com.zero.pennywise.repository.querydsl.transaction.TransactionQueryRepository;
+import com.zero.pennywise.repository.querydsl.TransactionQueryRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

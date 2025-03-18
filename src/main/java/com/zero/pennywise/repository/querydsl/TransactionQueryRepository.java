@@ -1,4 +1,4 @@
-package com.zero.pennywise.repository.querydsl.transaction;
+package com.zero.pennywise.repository.querydsl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
