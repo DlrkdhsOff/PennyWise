@@ -1,4 +1,13 @@
+server:
+  port: 9090
+
+# batch 모듈의 application.yml
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration
+
   config:
     import: classpath:secret.yml
 

@@ -25,6 +25,4 @@ public interface BudgetRepository extends JpaRepository<BudgetEntity, Long> {
   @Transactional
   @Query("UPDATE budgets b SET b.amount = :amount WHERE b.budgetId = :budgetId")
   void updateBudget(Long budgetId, Long amount);
-
-  void deleteByUserAndBudgetId(UserEntity user, Long budgetId);
 }

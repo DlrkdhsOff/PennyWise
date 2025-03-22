@@ -12,6 +12,7 @@ import com.zero.pennywise.domain.model.response.budget.Budget;
 import com.zero.pennywise.domain.model.response.transaction.TotalAmount;
 import com.zero.pennywise.domain.model.response.transaction.Transactions;
 import com.zero.pennywise.domain.model.response.waring.MessageDTO;
+import com.zero.pennywise.domain.model.type.AnalyzeType;
 import com.zero.pennywise.domain.model.type.FailedResultCode;
 import com.zero.pennywise.domain.model.type.NotificationType;
 import com.zero.pennywise.domain.repository.BudgetRepository;
@@ -19,8 +20,11 @@ import com.zero.pennywise.domain.repository.CategoryRepository;
 import com.zero.pennywise.domain.repository.TransactionRepository;
 import com.zero.pennywise.domain.repository.querydsl.TransactionQueryRepository;
 import com.zero.pennywise.domain.utils.FormatUtil;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -246,6 +250,39 @@ public class FinanceFacade {
   public void deleteTransaction(TransactionEntity transaction) {
 
     transactionRepository.delete(transaction);
+  }
+
+  public List<TransactionEntity> findTransactionByType(UserEntity user, AnalyzeType type) {
+    List<TransactionEntity> allTransaction = transactionQueryRepository.findLastTransaction(user, type);
+
+    if(allTransaction.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    Map<String, TransactionEntity> map = new HashMap<>();
+    if (type.equals(AnalyzeType.THIS)) {
+
+      for (TransactionEntity t : allTransaction) {
+
+        if (!map.containsKey(t.getCategory().getCategoryName())) {
+          map.put(t.getCategory().getCategoryName(), t);
+        }
+      }
+
+    } else {
+
+      for (TransactionEntity t : allTransaction) {
+        Month month = t.getCreateAt().getMonth();
+
+        String key = month + "-" + t.getCategory().getCategoryName();
+
+        if (!map.containsKey(key)) {
+          map.put(key, t);
+        }
+      }
+
+    }
+    return new ArrayList<>(map.values());
   }
 }
 
