@@ -6,10 +6,10 @@
 
 #### 기술 스택
 
-- **Backend**: Java, Spring Boot, Spring Security, JWT, Spring Batch
-- **Database**: MySQL, JPA, QueryDSL, Redis
-- **실시간 알림**: SSE(Server-Sent Events)
-- **API 문서화**: Swagger
+- **Backend**: Java 17, Spring Boot 3.3, SSE, Spring Security, Spring Data JPA, JWT, Spring Batch
+- **Database**: MySQL, Redis, QueryDSL
+- **DevOps**: Jenkins
+- **Tools**: Git, GitHub, Swagger
 
 #### 주요 기능
 
